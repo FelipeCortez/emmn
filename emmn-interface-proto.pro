@@ -25,12 +25,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    tracker.cpp
+    tracker.cpp \
+    settings.cpp \
+    addtrackerdialog.cpp \
+    control.cpp \
+    efem.cpp \
+    serial.cpp \
+    trackerlistmodel.cpp
 
 HEADERS  += mainwindow.h \
-    tracker.h
+    tracker.h \
+    settings.h \
+    addtrackerdialog.h \
+    control.h \
+    efem.h \
+    serial.h \
+    trackerlistmodel.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    tracker_dialog.ui
 
 LIBS +=        C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\libsgp4.a
 INCLUDEPATH += C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\include

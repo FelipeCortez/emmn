@@ -1,41 +1,36 @@
-/*
- * Copyright 2013 Daniel Warner <contact@danrw.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #include "tracker.h"
 #include <QDebug>
 
-Tracker::Tracker()
-    : user_geo(-5.7793, -35.201, 0.014),
-      sgp4(Tle("SCD 1                   ",
-               "1 22490U 93009B   17123.70008125  .00000249  00000-0  18216-4 0  9992",
-               "2 22490  24.9694 217.7757 0042800 225.1509 269.3688 14.44484423278880"))
+Tracker::Tracker(std::vector<std::string> tle_list)
+    : user_geo(-5.7793, -35.201, 0.014)
+    , tle1(QString::fromStdString(tle_list[0]))
+    , tle2(QString::fromStdString(tle_list[1]))
+    , tle3(QString::fromStdString(tle_list[2]))
 {
 }
 
-Tracker::Tracker(std::vector<std::string> tle_list)
+Tracker::Tracker(QList<QString> tle_list)
     : user_geo(-5.7793, -35.201, 0.014)
-    , sgp4(Tle(tle_list[0], tle_list[1], tle_list[2]))
+    , tle1(tle_list[0])
+    , tle2(tle_list[1])
+    , tle3(tle_list[2])
+{
+}
+
+Tracker::Tracker(std::string tle1, std::string tle2, std::string tle3)
+    : user_geo(-5.7793, -35.201, 0.014)
+    , tle1(QString::fromStdString(tle1))
+    , tle2(QString::fromStdString(tle2))
+    , tle3(QString::fromStdString(tle3))
 {
 }
 
 double Tracker::FindMaxElevation(
         const DateTime& aos,
-        const DateTime& los)
+        const DateTime& los) const
 {
     Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
 
     bool running;
 
@@ -47,8 +42,7 @@ double Tracker::FindMaxElevation(
 
     running = true;
 
-    do
-    {
+    do {
         running = true;
         max_elevation = -99999999999999.0;
         while (running && current_time < time2)
@@ -110,9 +104,10 @@ double Tracker::FindMaxElevation(
 DateTime Tracker::FindCrossingPoint(
         const DateTime& initial_time1,
         const DateTime& initial_time2,
-        bool finding_aos)
+        bool finding_aos) const
 {
     Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
 
     bool running;
     int cnt;
@@ -198,16 +193,15 @@ DateTime Tracker::FindCrossingPoint(
     return middle_time;
 }
 
-// DateTime start_date = DateTime::Now(true);
-// DateTime end_date(start_date.AddDays(7.0));
-std::list<struct PassDetails> Tracker::GeneratePassList(
+std::list<PassDetails> Tracker::GeneratePassList(
         const DateTime& start_time,
         const DateTime& end_time,
         const int time_step)
 {
-    std::list<struct PassDetails> pass_list;
+    std::list<PassDetails> pass_list;
 
     Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
 
     DateTime aos_time;
     DateTime los_time;
@@ -269,7 +263,7 @@ std::list<struct PassDetails> Tracker::GeneratePassList(
                     current_time,
                     false);
 
-            struct PassDetails pd;
+            PassDetails pd;
             pd.aos = aos_time;
             pd.los = los_time;
             pd.max_elevation = FindMaxElevation(
@@ -314,7 +308,7 @@ std::list<struct PassDetails> Tracker::GeneratePassList(
          * satellite still above horizon at end of search period, so use end
          * time as los
          */
-        struct PassDetails pd;
+        PassDetails pd;
         pd.aos = aos_time;
         pd.los = end_time;
         pd.max_elevation = FindMaxElevation(aos_time, end_time);
@@ -323,4 +317,134 @@ std::list<struct PassDetails> Tracker::GeneratePassList(
     }
 
     return pass_list;
+}
+
+QList<PassDetails> Tracker::GeneratePassListQt(
+        const DateTime& start_time,
+        const DateTime& end_time,
+        const int time_step) const
+{
+    QList<PassDetails> pass_list;
+
+    Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+
+    DateTime aos_time;
+    DateTime los_time;
+
+    bool found_aos = false;
+
+    DateTime previous_time(start_time);
+    DateTime current_time(start_time);
+
+    while (current_time < end_time)
+    {
+        bool end_of_pass = false;
+
+        /*
+         * calculate satellite position
+         */
+        Eci eci = sgp4.FindPosition(current_time);
+        CoordTopocentric topo = obs.GetLookAngle(eci);
+
+        if (!found_aos && topo.elevation > 0.0)
+        {
+            /*
+             * aos hasnt occured yet, but the satellite is now above horizon
+             * this must have occured within the last time_step
+             */
+            if (start_time == current_time)
+            {
+                /*
+                 * satellite was already above the horizon at the start,
+                 * so use the start time
+                 */
+                aos_time = start_time;
+            }
+            else
+            {
+                /*
+                 * find the point at which the satellite crossed the horizon
+                 */
+                aos_time = FindCrossingPoint(
+                        previous_time,
+                        current_time,
+                        true);
+            }
+            found_aos = true;
+        }
+        else if (found_aos && topo.elevation < 0.0)
+        {
+            found_aos = false;
+            /*
+             * end of pass, so move along more than time_step
+             */
+            end_of_pass = true;
+            /*
+             * already have the aos, but now the satellite is below the horizon,
+             * so find the los
+             */
+            los_time = FindCrossingPoint(
+                    previous_time,
+                    current_time,
+                    false);
+
+            PassDetails pd;
+            pd.aos = aos_time;
+            pd.los = los_time;
+            pd.max_elevation = FindMaxElevation(
+                    aos_time,
+                    los_time);
+
+            pass_list.push_back(pd);
+        }
+
+        /*
+         * save current time
+         */
+        previous_time = current_time;
+
+        if (end_of_pass)
+        {
+            /*
+             * at the end of the pass move the time along by 30mins
+             */
+            current_time = current_time + TimeSpan(0, 30, 0);
+        }
+        else
+        {
+            /*
+             * move the time along by the time step value
+             */
+            current_time = current_time + TimeSpan(0, 0, time_step);
+        }
+
+        if (current_time > end_time)
+        {
+            /*
+             * dont go past end time
+             */
+            current_time = end_time;
+        }
+    };
+
+    if (found_aos)
+    {
+        /*
+         * satellite still above horizon at end of search period, so use end
+         * time as los
+         */
+        PassDetails pd;
+        pd.aos = aos_time;
+        pd.los = end_time;
+        pd.max_elevation = FindMaxElevation(aos_time, end_time);
+
+        pass_list.push_back(pd);
+    }
+
+    return pass_list;
+}
+
+QString Tracker::getTitle() const {
+    return tle1.trimmed();
 }

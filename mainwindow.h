@@ -3,7 +3,11 @@
 
 #include <QMainWindow>
 #include <QItemSelection>
+#include <QStringListModel>
+#include "trackerlistmodel.h"
+#include "addtrackerdialog.h"
 #include "tracker.h"
+#include "settings.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,10 +23,16 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Tracker tracker;
+    AddTrackerDialog addTrackerDialog;
+    Settings settings;
+    TrackerListModel *model;
+    QList<Tracker> trackers;
 
 public slots:
    void rowChangedSlot(QItemSelection selected, QItemSelection);
+   void persistenceChangedSlot(const QString text);
+   void addTrackerDialogSlot();
+   void acceptedTleSlot(int);
 };
 
 #endif // MAINWINDOW_H
