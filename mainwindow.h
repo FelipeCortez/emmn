@@ -26,12 +26,13 @@ private:
     AddTrackerDialog addTrackerDialog;
     Settings settings;
     TrackerListModel *model;
-    QList<Tracker> trackers;
+    void loadTrackersFromSettings();
 
 public slots:
    void rowChangedSlot(QItemSelection selected, QItemSelection);
    void persistenceChangedSlot(const QString text);
    void addTrackerDialogSlot();
+   void removeSelectedTrackerSlot();
    void acceptedTleSlot(int);
 };
 

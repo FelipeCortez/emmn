@@ -10,7 +10,7 @@ public:
     Settings();
     QString getPersistentString();
     void setPersistentString(QString str);
-    QList<Tracker> getTrackers();
+    QList<Tracker> loadTrackers();
     void saveTrackers(QList<Tracker> trackers);
 private:
     QSettings settings;

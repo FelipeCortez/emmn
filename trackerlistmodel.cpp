@@ -62,7 +62,23 @@ bool TrackerListModel::setData(const QModelIndex &index, const QVariant &value, 
 }
 
 bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent) {
+    if(   row < 0
+       || row >= rowCount()
+       || row < 0
+       || (row + count) > rowCount()) {
+        return false;
+    }
 
+    beginRemoveRows(parent, row, row + count - 1);
+    int countLeft = count;
+    while(countLeft--) {
+        qDebug() << row + countLeft;
+        qDebug() << "Removing: " << trackers.at(row + countLeft).getTitle();
+        trackers.removeAt(row + countLeft);
+    }
+    endRemoveRows();
+    qDebug() << trackers.length();
+    return true;
 }
 
 QList<Tracker> TrackerListModel::getTrackers() {

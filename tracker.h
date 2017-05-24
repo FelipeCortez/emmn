@@ -27,6 +27,7 @@ class Tracker
 {
 public:
     // it's better for these to use std::string instead of QString because they belong to the SGP4 lib
+    Tracker();
     Tracker(std::vector<std::string> tle_list);
     Tracker(QList<QString> tle_list);
     Tracker(std::string tle1, std::string tle2, std::string tle3);
@@ -46,24 +47,15 @@ public:
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
         const int time_step = 180) const;
     QString getTitle() const;
-    /*
-    friend QDataStream & operator << (QDataStream &arch, const Tracker & object) {
-        arch << object.testString;
-        arch << object.testInt;
-        return arch;
-    }
-
-    friend QDataStream & operator >> (QDataStream &arch, Tracker & object) {
-         arch >> object.testString;
-         arch >> object.testInt;
-         return arch;
-    }
-    */
-private:
+    friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
+    friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
+//private:
     CoordGeodetic user_geo;
     QString tle1;
     QString tle2;
     QString tle3;
 };
+
+Q_DECLARE_METATYPE(Tracker)
 
 #endif // TRACKER_H

@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->satellitesView->setModel(model);
     ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    loadTrackersFromSettings();
+
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -30,59 +32,75 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(clicked(bool)),
             this,
             SLOT(addTrackerDialogSlot()));
+    connect(ui->removeTrackerButton,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(removeSelectedTrackerSlot()));
     connect(&addTrackerDialog,
             SIGNAL(finished(int)),
             this,
             SLOT(acceptedTleSlot(int)));
 }
 
-void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
-    qDebug() << selected.indexes().first().data(0).toString();
-    qDebug() << selected.indexes().first().data(TrackerListModel::IdRole).toString();
-    QList<PassDetails> pd = selected.indexes().first().data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
-    //std::list<PassDetails> pd = trackers[0].GeneratePassList();
-
-    // http://stackoverflow.com/a/11907059
-    const int numRows = pd.size();
-    const int numColumns = 1;
-
-    QStandardItemModel* tableModel = new QStandardItemModel(numRows, numColumns);
-    tableModel->setHorizontalHeaderLabels(QStringList() << "AOS"
-                                                   << "LOS"
-                                                   << "Max elevation"
-                                                   << "Duration");
-
-    if (pd.begin() == pd.end()) {
-        qDebug() << "no passes found";
-    } else {
-        int row = 0;
-        QList<PassDetails>::const_iterator itr = pd.begin();
-        do {
-            QString text;
-            QStandardItem* item;
-
-            text = QString::fromStdString(itr->aos.ToString());
-            item = new QStandardItem(text);
-            tableModel->setItem(row, 0, item);
-
-            text = QString::fromStdString(itr->los.ToString());
-            item = new QStandardItem(text);
-            tableModel->setItem(row, 1, item);
-
-            text = QString::number(Util::RadiansToDegrees(itr->max_elevation));
-            item = new QStandardItem(text);
-            tableModel->setItem(row, 2, item);
-
-            text = QString::fromStdString((itr->los - itr->aos).ToString());
-            item = new QStandardItem(text);
-            tableModel->setItem(row, 3, item);
-
-            ++row;
-        } while (++itr != pd.end());
+void MainWindow::loadTrackersFromSettings() {
+    auto trackers = settings.loadTrackers();
+    for(auto t : trackers) {
+        model->addTracker(t);
     }
+}
 
-    ui->passesView->setModel(tableModel);
-    ui->passesView->resizeColumnsToContents();
+void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
+    if(!selected.isEmpty()) {
+        ui->removeTrackerButton->setEnabled(true);
+        //qDebug() << selected.indexes().first().data(0).toString();
+        //qDebug() << selected.indexes().first().data(TrackerListModel::IdRole).toString();
+        QList<PassDetails> pd = selected.indexes().first().data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
+        //std::list<PassDetails> pd = trackers[0].GeneratePassList();
+
+        // http://stackoverflow.com/a/11907059
+        const int numRows = pd.size();
+        const int numColumns = 1;
+
+        QStandardItemModel* tableModel = new QStandardItemModel(numRows, numColumns);
+        tableModel->setHorizontalHeaderLabels(QStringList() << "AOS"
+                                              << "LOS"
+                                              << "Max elevation"
+                                              << "Duration");
+
+        if (pd.begin() == pd.end()) {
+            qDebug() << "no passes found";
+        } else {
+            int row = 0;
+            QList<PassDetails>::const_iterator itr = pd.begin();
+            do {
+                QString text;
+                QStandardItem* item;
+
+                text = QString::fromStdString(itr->aos.ToString());
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 0, item);
+
+                text = QString::fromStdString(itr->los.ToString());
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 1, item);
+
+                text = QString::number(Util::RadiansToDegrees(itr->max_elevation));
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 2, item);
+
+                text = QString::fromStdString((itr->los - itr->aos).ToString());
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 3, item);
+
+                ++row;
+            } while (++itr != pd.end());
+        }
+
+        ui->passesView->setModel(tableModel);
+        ui->passesView->resizeColumnsToContents();
+    } else {
+        ui->removeTrackerButton->setEnabled(false);
+    }
 }
 
 void MainWindow::persistenceChangedSlot(const QString text) {
@@ -93,13 +111,22 @@ void MainWindow::addTrackerDialogSlot() {
     addTrackerDialog.exec();
 }
 
+void MainWindow::removeSelectedTrackerSlot() {
+    foreach(const QModelIndex &index, ui->satellitesView->selectionModel()->selectedIndexes()) {
+        qDebug() << index.data(Qt::DisplayRole).toString();
+        model->removeRow(index.row());
+        settings.saveTrackers(model->getTrackers());
+    }
+}
+
 void MainWindow::acceptedTleSlot(int) {
-    qDebug() << addTrackerDialog.tleInput->toPlainText();
+    //qDebug() << addTrackerDialog.tleInput->toPlainText();
     QStringList tle = addTrackerDialog.tleInput->toPlainText().split("\n");
     if(tle.size() == 3) { // Check if two line element set has three elements :)
         try {
             Tracker t(tle);
             model->addTracker(t);
+            settings.saveTrackers(model->getTrackers());
         } catch(TleException e) {
             qDebug() << "TLE inválida";
         }

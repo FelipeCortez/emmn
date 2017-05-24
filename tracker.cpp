@@ -1,6 +1,14 @@
 #include "tracker.h"
 #include <QDebug>
 
+Tracker::Tracker()
+    : user_geo(-5.7793, -35.201, 0.014)
+    , tle1("")
+    , tle2("")
+    , tle3("")
+{
+}
+
 Tracker::Tracker(std::vector<std::string> tle_list)
     : user_geo(-5.7793, -35.201, 0.014)
     , tle1(QString::fromStdString(tle_list[0]))
@@ -447,4 +455,19 @@ QList<PassDetails> Tracker::GeneratePassListQt(
 
 QString Tracker::getTitle() const {
     return tle1.trimmed();
+}
+
+QDataStream &operator <<(QDataStream &stream, const Tracker &val) {
+    //CoordGeodetic user_geo;
+    stream << val.tle1;
+    stream << val.tle2;
+    stream << val.tle3;
+    return stream;
+}
+
+QDataStream &operator >>(QDataStream &stream, Tracker &val) {
+    stream >> val.tle1;
+    stream >> val.tle2;
+    stream >> val.tle3;
+    return stream;
 }
