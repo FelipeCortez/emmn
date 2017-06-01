@@ -26,6 +26,15 @@ Q_DECLARE_METATYPE(QList<PassDetails>)
 class Tracker
 {
 public:
+    enum Satellite {
+        Azimuth,
+        Elevation,
+        Range,
+        Latitude,
+        Longitude,
+        Altitude
+    };
+
     // it's better for these to use std::string instead of QString because they belong to the SGP4 lib
     Tracker();
     Tracker(std::vector<std::string> tle_list);
@@ -46,10 +55,13 @@ public:
         const DateTime& start_time = DateTime::Now(true),
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
         const int time_step = 180) const;
+    QString nextPass() const;
     QString getTitle() const;
+    void UpdateTLE() const;
+    QString getSatInfo(int info) const;
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
-//private:
+private:
     CoordGeodetic user_geo;
     QString tle1;
     QString tle2;

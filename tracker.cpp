@@ -33,6 +33,24 @@ Tracker::Tracker(std::string tle1, std::string tle2, std::string tle3)
 {
 }
 
+void Tracker::UpdateTLE() const {
+//
+}
+
+QString Tracker::getSatInfo(int info) const {
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    Eci eci = sgp4.FindPosition(DateTime::Now());
+    Observer obs(user_geo);
+    switch(info) {
+        case Satellite::Elevation:
+            return QString::number(obs.GetLookAngle(eci).elevation);
+        case Satellite::Azimuth:
+            return QString::number(obs.GetLookAngle(eci).azimuth);
+        case Satellite::Range:
+            return QString::number(obs.GetLookAngle(eci).range);
+    }
+}
+
 double Tracker::FindMaxElevation(
         const DateTime& aos,
         const DateTime& los) const
@@ -451,6 +469,10 @@ QList<PassDetails> Tracker::GeneratePassListQt(
     }
 
     return pass_list;
+}
+
+QString Tracker::nextPass() const {
+    return QString::fromStdString((GeneratePassListQt()[0].aos - DateTime::Now()).ToString());
 }
 
 QString Tracker::getTitle() const {

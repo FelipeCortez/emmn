@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QStandardItemModel>
 #include <QDebug>
 #include <QNetworkAccessManager>
 #include <string>
@@ -8,15 +7,18 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
   , ui(new Ui::MainWindow)
-  , addTrackerDialog(this)
-  , settings()
+  , addTrackerDialog(this),
+    satInfoTimer(this),
+    tableModel(nullptr)
 {
     model = new TrackerListModel();
 
     ui->setupUi(this);
-    ui->persistenceInput->setText(settings.getPersistentString());
     ui->satellitesView->setModel(model);
     ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    network.getTLE("TERRA");
 
     loadTrackersFromSettings();
 
@@ -24,10 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
             SLOT(rowChangedSlot(QItemSelection, QItemSelection)));
-    connect(ui->persistenceInput,
-            SIGNAL(textChanged(const QString)),
-            this,
-            SLOT(persistenceChangedSlot(const QString)));
     connect(ui->addTrackerButton,
             SIGNAL(clicked(bool)),
             this,
@@ -40,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(finished(int)),
             this,
             SLOT(acceptedTleSlot(int)));
+    connect(&satInfoTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(satInfoUpdateSlot()));
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -49,19 +51,35 @@ void MainWindow::loadTrackersFromSettings() {
     }
 }
 
+void MainWindow::enableSatelliteButtons(bool enable) {
+    ui->removeTrackerButton->setEnabled(enable);
+    ui->editTrackerButton->setEnabled(enable);
+}
+
+QString betterDate(DateTime date) {
+    return QString("%1/%2/%3 %4:%5:%6 UTC").arg(date.Year())
+                                           .arg(date.Month(), 2, 10, QChar('0'))
+                                           .arg(date.Day(), 2, 10, QChar('0'))
+                                           .arg(date.Hour(), 2, 10, QChar('0'))
+                                           .arg(date.Minute(), 2, 10, QChar('0'))
+                                           .arg(date.Second(), 2, 10, QChar('0'));
+}
+
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
     if(!selected.isEmpty()) {
-        ui->removeTrackerButton->setEnabled(true);
-        //qDebug() << selected.indexes().first().data(0).toString();
-        //qDebug() << selected.indexes().first().data(TrackerListModel::IdRole).toString();
-        QList<PassDetails> pd = selected.indexes().first().data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
-        //std::list<PassDetails> pd = trackers[0].GeneratePassList();
+        auto selectedIndex = selected.indexes().first();
+        auto tracker = model->getTrackers()[selectedIndex.row()];
+        enableSatelliteButtons();
+        satInfoTimer.start(1000);
+        satInfoUpdateSlot();
 
+        QList<PassDetails> pd = selectedIndex.data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;
 
-        QStandardItemModel* tableModel = new QStandardItemModel(numRows, numColumns);
+        if(tableModel) { delete tableModel; }
+        tableModel = new QStandardItemModel(numRows, numColumns);
         tableModel->setHorizontalHeaderLabels(QStringList() << "AOS"
                                               << "LOS"
                                               << "Max elevation"
@@ -76,15 +94,15 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 QString text;
                 QStandardItem* item;
 
-                text = QString::fromStdString(itr->aos.ToString());
+                text = betterDate(itr->aos);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 0, item);
 
-                text = QString::fromStdString(itr->los.ToString());
+                text = betterDate(itr->los);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 1, item);
 
-                text = QString::number(Util::RadiansToDegrees(itr->max_elevation));
+                text = QString::number(Util::RadiansToDegrees(itr->max_elevation)) + QString("°");
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 2, item);
 
@@ -99,7 +117,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->passesView->setModel(tableModel);
         ui->passesView->resizeColumnsToContents();
     } else {
-        ui->removeTrackerButton->setEnabled(false);
+        enableSatelliteButtons(false);
     }
 }
 
@@ -108,6 +126,7 @@ void MainWindow::persistenceChangedSlot(const QString text) {
 }
 
 void MainWindow::addTrackerDialogSlot() {
+    addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
     addTrackerDialog.exec();
 }
 
@@ -134,6 +153,20 @@ void MainWindow::acceptedTleSlot(int) {
         //model->setData();
     } else {
         qDebug() << "Wrong";
+    }
+}
+
+void MainWindow::satInfoUpdateSlot() {
+    auto selected = ui->satellitesView->selectionModel()->selection();
+    if(!selected.isEmpty()) {
+        auto selectedIndex = selected.indexes().first();
+        auto tracker = model->getTrackers()[selectedIndex.row()];
+
+        ui->satElevation->setText(tracker.getSatInfo(Tracker::Elevation));
+        ui->satAzimuth->setText(tracker.getSatInfo(Tracker::Azimuth));
+        ui->satNextPass->setText(tracker.nextPass());
+    } else {
+        satInfoTimer.stop();
     }
 }
 
