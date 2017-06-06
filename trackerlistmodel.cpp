@@ -65,15 +65,19 @@ bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent)
     beginRemoveRows(parent, row, row + count - 1);
     int countLeft = count;
     while(countLeft--) {
-        qDebug() << row + countLeft;
-        qDebug() << "Removing: " << trackers.at(row + countLeft).getTitle();
+        //qDebug() << row + countLeft;
+        //qDebug() << "Removing: " << trackers.at(row + countLeft).getTitle();
         trackers.removeAt(row + countLeft);
     }
     endRemoveRows();
-    qDebug() << trackers.length();
+    //qDebug() << trackers.length();
     return true;
 }
 
 QList<Tracker> TrackerListModel::getTrackers() {
     return trackers;
+}
+
+void TrackerListModel::setTracker(int row, Tracker tracker) {
+    trackers[row] = tracker;
 }

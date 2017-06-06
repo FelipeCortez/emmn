@@ -16,11 +16,11 @@ void Settings::setPersistentString(QString str) {
 void Settings::saveTrackers(QList<Tracker> trackers) {
     //settings.setValue("tracker", QVariant::fromValue(trackers.first()));
 
-    qDebug() << "Salvando";
+    //qDebug() << "Salvando";
     settings.beginWriteArray("trackers", trackers.length());
     int i;
     for(i = 0; i < trackers.length(); ++i) {
-        qDebug() << trackers.at(i).getTitle();
+        //qDebug() << trackers.at(i).getTitle();
         settings.setArrayIndex(i);
         settings.setValue("tracker", QVariant::fromValue(trackers[i]));
     }

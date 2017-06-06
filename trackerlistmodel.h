@@ -22,6 +22,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &, int) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     QList<Tracker> getTrackers();
+    void setTracker(int row, Tracker tracker);
 private:
     QList<Tracker> trackers;
 };

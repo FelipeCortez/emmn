@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
+
     network.getTLE("TERRA");
 
     loadTrackersFromSettings();
@@ -30,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(clicked(bool)),
             this,
             SLOT(addTrackerDialogSlot()));
+    connect(ui->editTrackerButton,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(editSelectedTrackerSlot()));
     connect(ui->removeTrackerButton,
             SIGNAL(clicked(bool)),
             this,
@@ -72,6 +78,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         enableSatelliteButtons();
         satInfoTimer.start(1000);
         satInfoUpdateSlot();
+        ui->satelliteGroupBox->setTitle(tracker.getTitle());
 
         QList<PassDetails> pd = selectedIndex.data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
         // http://stackoverflow.com/a/11907059
@@ -80,10 +87,10 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
 
         if(tableModel) { delete tableModel; }
         tableModel = new QStandardItemModel(numRows, numColumns);
-        tableModel->setHorizontalHeaderLabels(QStringList() << "AOS"
-                                              << "LOS"
-                                              << "Max elevation"
-                                              << "Duration");
+        tableModel->setHorizontalHeaderLabels(QStringList() << "Aquisição de sinal"
+                                              << "Perda de sinal"
+                                              << "Elevação máxima"
+                                              << "Duração");
 
         if (pd.begin() == pd.end()) {
             qDebug() << "no passes found";
@@ -114,9 +121,13 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
             } while (++itr != pd.end());
         }
 
+        ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+2);
+        ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+        ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
         ui->passesView->setModel(tableModel);
         ui->passesView->resizeColumnsToContents();
     } else {
+        tableModel->clear();
         enableSatelliteButtons(false);
     }
 }
@@ -126,7 +137,16 @@ void MainWindow::persistenceChangedSlot(const QString text) {
 }
 
 void MainWindow::addTrackerDialogSlot() {
-    addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
+    ui->satellitesView->selectionModel()->clear();
+    addTrackerDialog.tleInput->clear();
+    addTrackerDialog.exec();
+}
+
+void MainWindow::editSelectedTrackerSlot() {
+    auto index = ui->satellitesView->selectionModel()->selectedIndexes().first().row();
+    auto tracker = model->getTrackers()[index];
+    //settings.saveTrackers(model->getTrackers());
+    addTrackerDialog.tleInput->setPlainText(tracker.getFullTLE());
     addTrackerDialog.exec();
 }
 
@@ -138,21 +158,34 @@ void MainWindow::removeSelectedTrackerSlot() {
     }
 }
 
-void MainWindow::acceptedTleSlot(int) {
-    //qDebug() << addTrackerDialog.tleInput->toPlainText();
-    QStringList tle = addTrackerDialog.tleInput->toPlainText().split("\n");
-    if(tle.size() == 3) { // Check if two line element set has three elements :)
-        try {
-            Tracker t(tle);
-            model->addTracker(t);
-            settings.saveTrackers(model->getTrackers());
-        } catch(TleException e) {
-            qDebug() << "TLE inválida";
-        }
+void MainWindow::acceptedTleSlot(int confirm) {
+    if(confirm) {
+        //qDebug() << addTrackerDialog.tleInput->toPlainText();
+        QStringList tle = addTrackerDialog.tleInput->toPlainText().split("\n");
+        if(tle.size() == 3) { // Check if two line element set has three elements :)
+            try {
+                Tracker t(tle);
+                auto selected = ui->satellitesView->selectionModel()->selection();
+                if(selected.isEmpty()) {
+                    auto index = model->addTracker(t);
+                    ui->satellitesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
+                    settings.saveTrackers(model->getTrackers());
+                } else {
+                    auto selectedIndex = selected.indexes().first();
+                    auto tracker = model->getTrackers()[selectedIndex.row()];
+                    ui->satellitesView->selectionModel()->setCurrentIndex(selectedIndex, QItemSelectionModel::ClearAndSelect);
+                    model->setTracker(selectedIndex.row(), t);
+                    settings.saveTrackers(model->getTrackers());
+                    rowChangedSlot(selected, QItemSelection());
+                }
+            } catch(TleException e) {
+                qDebug() << "TLE inválida";
+            }
 
-        //model->setData();
-    } else {
-        qDebug() << "Wrong";
+            //model->setData();
+        } else {
+            qDebug() << "Wrong";
+        }
     }
 }
 
@@ -162,11 +195,15 @@ void MainWindow::satInfoUpdateSlot() {
         auto selectedIndex = selected.indexes().first();
         auto tracker = model->getTrackers()[selectedIndex.row()];
 
-        ui->satElevation->setText(tracker.getSatInfo(Tracker::Elevation));
-        ui->satAzimuth->setText(tracker.getSatInfo(Tracker::Azimuth));
+        ui->satElevation->setText(tracker.getSatInfo(Tracker::Elevation) + QString("°"));
+        ui->satAzimuth->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
         ui->satNextPass->setText(tracker.nextPass());
     } else {
         satInfoTimer.stop();
+        ui->satelliteGroupBox->setTitle("Satélite");
+        ui->satElevation->setText("");
+        ui->satAzimuth->setText("");
+        ui->satNextPass->setText("");
     }
 }
 

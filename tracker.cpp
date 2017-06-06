@@ -38,17 +38,19 @@ void Tracker::UpdateTLE() const {
 }
 
 QString Tracker::getSatInfo(int info) const {
+    const double PI = 3.141592653589793238463;
     SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now());
     Observer obs(user_geo);
     switch(info) {
         case Satellite::Elevation:
-            return QString::number(obs.GetLookAngle(eci).elevation);
+            return QString::number(obs.GetLookAngle(eci).elevation * 180 / PI);
         case Satellite::Azimuth:
-            return QString::number(obs.GetLookAngle(eci).azimuth);
+            return QString::number(obs.GetLookAngle(eci).azimuth * 180 / PI);
         case Satellite::Range:
             return QString::number(obs.GetLookAngle(eci).range);
     }
+    return QString("");
 }
 
 double Tracker::FindMaxElevation(
@@ -472,7 +474,17 @@ QList<PassDetails> Tracker::GeneratePassListQt(
 }
 
 QString Tracker::nextPass() const {
-    return QString::fromStdString((GeneratePassListQt()[0].aos - DateTime::Now()).ToString());
+    if(getSatInfo(Elevation).toDouble() < 0) {
+        return QString::fromStdString((GeneratePassListQt()[0].aos - DateTime::Now()).ToString());
+    } else {
+        return QString("Passando");
+    }
+}
+
+QString Tracker::getFullTLE() const {
+    QStringList tle;
+    tle << tle1 << tle2 << tle3;
+    return tle.join("\n");
 }
 
 QString Tracker::getTitle() const {

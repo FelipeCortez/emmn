@@ -57,6 +57,7 @@ public:
         const int time_step = 180) const;
     QString nextPass() const;
     QString getTitle() const;
+    QString getFullTLE() const;
     void UpdateTLE() const;
     QString getSatInfo(int info) const;
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
