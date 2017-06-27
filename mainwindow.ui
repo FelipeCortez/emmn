@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>EMMN</string>
   </property>
+  <property name="statusTip">
+   <string/>
+  </property>
   <property name="documentMode">
    <bool>false</bool>
   </property>
@@ -63,7 +66,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Passagens</string>
+         <string>Passagens (próximos sete dias)</string>
         </property>
        </widget>
       </item>
@@ -82,7 +85,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QListView" name="satellitesView"/>
+       <widget class="QListView" name="satellitesView">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="satelliteGroupBox">
@@ -199,7 +206,7 @@
     <property name="title">
      <string>Arquivo</string>
     </property>
-    <addaction name="actionConfigura_es"/>
+    <addaction name="actionConfig"/>
    </widget>
    <addaction name="menuArquivo"/>
   </widget>
@@ -209,7 +216,7 @@
     <string>Carregar efemérides</string>
    </property>
   </action>
-  <action name="actionConfigura_es">
+  <action name="actionConfig">
    <property name="text">
     <string>Configurações</string>
    </property>

@@ -54,13 +54,25 @@ int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
 FILE *arq;
 
 //NOME DA PORTA SERIAL UTILIZADA
-const wchar_t port_name[] = L"COM7"; //COLOCAR NOME DA PORTA SERIAL ENTRE AS ASPAS
+//const wchar_t port_name[] = L"COM3"; //COLOCAR NOME DA PORTA SERIAL ENTRE AS ASPAS
 
 //Cria objeto da porta serial
 CSerial serial;
 
-Control::Control() {
-    // hey, look: nothing
+Control::Control(const wchar_t* port) {
+    //INICIA COMUNICAÇÃO SERIAL
+    serial.Open(port);
+    //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
+    serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
+    // Configura porta serial para na hora de ler bytes esperar até o numero solicitado, passado como argumento da função
+    serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
+
+    if (serial.IsOpen() == true) {
+        qDebug() << "Porta serial conectada" << "(" << QString::fromStdWString(port) << ")";
+    } else {
+        qDebug() << "Erro ao abrir porta" << "(" << QString::fromStdWString(port) << ")";
+        return; // TODO: substituir por throw error
+    }
 }
 
 int Control::cont_passagem(char *arq_name, char *_sat_name)
@@ -484,145 +496,7 @@ void Control::gerar_rampa(float *_rampa_AZ, float *_rampa_ELE)
 }
 
 void Control::runProgram() {
-    printf("Quantos arquivos serao carregados? Maximo: 3\n");
-    int n_arq;
-    while (true) {
-        scanf("%d", &n_arq);
-        if (n_arq > 3 || n_arq < 1) {
-            printf("Numero de arquivos invalidos, por favor digite um numero valido\n");
-        } else {
-            break;
-        }
-    }
-
-    char arq_names[3][50]; //Matriz que armazenará o nome dos arquivos inseridos
-    system("cls"); //Limpar console
-    printf("Digite o nome do(s) arquivo(s), incluindo '.txt'. \nExemplo: efemerides-scd2.txt\n");
-    for (i = 0; i<n_arq; i++) {
-        scanf("%s", arq_names[i]);
-    }
-
-    printf("\nArquivos a serem carregados:\n");
-    for (i = 0; i < n_arq; i++) {
-        printf("%s\n", arq_names[i]);
-        n_pass[i] = cont_passagem(arq_names[i], sat_name[i]); // conta passagens e coloca o nome do satélite em sat_name
-        //Verifica se foi possivel abrir arquivo e realizar contagem
-        //Caso não seja possivel, encerra o programa
-        if (n_pass[i] == -1) {
-            printf("ERRO AO ABRIR ARQUIVO %d\n"
-                    "Por favor verifique o arquivo e o nome inserido e reinicie o programa\n\n", i+1);
-            return;
-        }
-
-        printf("Numero de passagens no arquivo %s: %d -> "
-                "Nome do satelite: %s\n\n", arq_names[i], n_pass[i], sat_name[i]);
-    }
-
-    //ALOCAÇÃO DE MEMÓRIA PARA PASSAGENS E GRAVAÇÃO DO NOME DOS SATELITES
-    if (n_arq == 1) {
-        //Alocação da memoria para as passagens
-        passagem = new Efem[n_pass[0]];
-
-        //Leitura e gravação das efemerides das passagens correspondentes
-        if (load_efem(arq_names[0], 0, n_pass[0], sat_name[0]) == -1) {
-            printf("Erro ao abrir arquivo 1, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-        //Realiza modificações necessárias nas passagens
-        tratar_efem(n_pass[0]);
-    } else if (n_arq == 2) {
-        passagem = new Efem[n_pass[0] + n_pass[1]];
-
-        //Leitura e gravação das efemerides do primeiro arquivo
-        if (load_efem(arq_names[0], 0, n_pass[0], sat_name[0]) == -1) {
-            printf("Erro ao abrir arquivo 1, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-
-        //Leitura e gravação das efemerides do segundo arquivo
-        if (load_efem(arq_names[1], n_pass[0], n_pass[0] + n_pass[1], sat_name[1]) == -1) {
-            printf("Erro ao abrir arquivo 2, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-
-        //Realiza modificações necessárias nas passagens
-        tratar_efem(n_pass[0] + n_pass[1]);
-
-        //Ordena cronologicamente as passagens
-        ordenar_passagens(n_pass[0] + n_pass[1]);
-
-    } else if (n_arq == 3) {
-        passagem = new Efem[n_pass[0] + n_pass[1] + n_pass[2]];
-
-        //Leitura e gravação das efemerides do primeiro arquivo
-        if (load_efem(arq_names[0], 0, n_pass[0], sat_name[0]) == -1) {
-            printf("Erro ao abrir arquivo 1, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-
-        //Leitura e gravação das efemerides do segundo arquivo
-        if (load_efem(arq_names[1], n_pass[0], n_pass[1] + n_pass[0], sat_name[1]) == -1) {
-            printf("Erro ao abrir arquivo 2, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-
-        //Leitura e gravação das efemerides do terceiro arquivo
-        //Não seria n_pass[2] em vez de [3]?
-        if (load_efem(arq_names[2], n_pass[0] + n_pass[1], n_pass[0] + n_pass[1] + n_pass[3], sat_name[2]) == -1) {
-            printf("Erro ao abrir arquivo 3, por favor verifique o arquivo e reinicie o programa\n");
-            return;
-        }
-
-        //Realiza modificações necessárias nas passagens
-        tratar_efem(n_pass[0] + n_pass[1] + n_pass[2]);
-
-        //Ordena cronologicamente as passagens
-        ordenar_passagens(n_pass[0] + n_pass[1] + n_pass[2]);
-    }
-
-    // -----------------------------------------------------------------------------------------------
-
-    int cont_pass = 0;
-    start = 0;
-    find_pass = false;
-    //Verifica se a passagem atual da sequencia já ocorreu. Caso sim, pula para a proxima até achar
-    //alguma que ainda não ocorreu. Caso nenhuma passagem não tenha ocorrido, o programa é encerrado.
-    while (find_pass == false) {
-        //Recebe as informações da passagem atual
-        passagem[cont_pass].get_info(&start, &stop, &durat, &max_ele, satelite);
-
-        //incrementa o contador de passagens caso a passagem já ocorreu
-        if (stop < time(NULL)) {
-            cont_pass++;
-        }
-        //incrementa o contador de passagens caso a máxima elevação da passagem for menor que 10°
-        else if (max_ele < 10.0) {
-            cont_pass++;
-        }
-        //incrementa contador de passagens caso o tempo restante seja menor que 3 min
-        else if (difftime(stop, time(NULL)) < 180) {
-            cont_pass++;
-        } else {
-            //Passagem válida encontrada
-            find_pass = true;
-
-            //Verifica se a passagem já começou
-            if (start < time(NULL)) {
-                pass_start = true;
-            } else {
-                pass_start = false;
-            }
-        }
-
-
-        //Verifica se o contador de passagens já ultrapassou o numero de passagens no(s) arquivo(s)
-        if (cont_pass >= (n_pass[0] + n_pass[1] + n_pass[2])) {
-            printf("Arquivo(s) sem passagens uteis\n\n");
-            delete[] passagem;
-            return;
-        }
-    }
-
+    /*
     //INICIA COMUNICAÇÃO SERIAL
     serial.Open(port_name);
     //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
@@ -630,58 +504,19 @@ void Control::runProgram() {
     // Configura porta serial para na hora de ler bytes esperar até o numero solicitado, passado como argumento da função
     serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
 
-    //Verifica se porta serial realmente foi aberta
-    if (serial.IsOpen() == true)
+    if (serial.IsOpen() == true) {
         printf("Porta serial conectada\n\n");
-    else
-    {
+    } else {
         printf("Erro ao abrir porta serial\n");
-        return;
+        return; // TODO: substituir por throw error
     }
 
-    seconds = difftime(start, time(NULL));
-    aux_time = round(seconds);
-    hor = aux_time / 3600.0;
-    min = (aux_time % 3600) / 60;
-    sec = (aux_time % 3600) % 60;
-    horario = localtime(&start);
-
-    //Exibição do tempo restante para a proxima passagem até faltar 30 segundos para a passagem (cronometro)
-    while ((start - 31) > time(NULL)) {
-        printf("Numero de passagens que ja ocorreram: %d  Total de passagens carregadas: %d\n\n", cont_pass, n_pass[0] + n_pass[1] + n_pass[2]);
-        printf("Informacoes da proxima passagem:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-        horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-        printf("Tempo restante para a proxima passagem: %d:%d:%d\n\n", hor, min, sec);
-
-        //Envia comando STATE para saber STATUS atual do sistema
-        send_state(input_state, &AZ, &ELE, &cont_erro);
-
-        Sleep(500);
-        system("cls");
-        seconds = difftime(start, time(NULL));
-        aux_time = round(seconds);
-        hor = aux_time / 3600.0;
-        min = (aux_time % 3600) / 60;
-        sec = (aux_time % 3600) % 60;
-        horario = localtime(&start);
-    }
+    //Envia comando STATE para saber STATUS atual do sistema
+    // Ou seja, "get" state
+    send_state(input_state, &AZ, &ELE, &cont_erro);
 
     //Recebe a primeira efeméride da passagem
-    passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-
-    //Se a passagem já estiver acontecendo, pula para a posição da antena daqui a 30 sec
-    if (pass_start == true) {
-        aux_time = time(NULL) + 30;
-        while (ef_time < aux_time) {
-            //Avança uma linha na tabela
-            passagem[cont_pass].next();
-            //Recebe a efemeride atual da tabela
-            passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-            }
-    }
-
-    //Espera até faltar 30 segundos para a passagem
-    while (time(NULL) < ef_time - 30);
+    //passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
 
     //liga sistema e recebe estado atual da antena
     send_power();
@@ -690,187 +525,31 @@ void Control::runProgram() {
     //gera rampa de posicionamento inicial
     gerar_rampa(rampa_AZ, rampa_ELE);
 
-    //Abre um arquivo para escrita da posição atual da antena durante o rastreio
-    //Também escreve a posição de referência ao lado da posição da antena
-    arq = fopen("posicao_antena.txt","w");
-    fprintf(arq,"POSICIONAMENTO INICIAL\n\n");
-
     //Envia sinal de controle com a rampa inicial
     for (cont_aux = 1; cont_aux < 30; cont_aux++) {
-        while (time(NULL) < (ef_time - 30 + cont_aux));
-        system("cls");
-        printf("Informacoes da passagem atual:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-            horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-        printf("RAMPA DE POSICIONAMENTO INICIAL\n\n");
+        //while (time(NULL) < (ef_time - 30 + cont_aux));
+        //system("cls");
+        //printf("Informacoes da passagem atual:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
+        //    horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
+        //printf("RAMPA DE POSICIONAMENTO INICIAL\n\n");
         send_set(rampa_AZ[cont_aux], rampa_ELE[cont_aux], setString, &cont_erro);
-        Sleep(20);
+        //Sleep(20);
         send_state(input_state, &AZ, &ELE, &cont_erro);
-        printf("Erro AZ: %f  Erro ELE: %f", refAZ - AZ, refELE - ELE);
-        fprintf(arq, "AZ: %f  ELE:%f   refAZ: %f refELE: %f\n", AZ, ELE, rampa_AZ[cont_aux], rampa_ELE[cont_aux]);
     }
 
-    //Avança uma linha na tabela
-    passagem[cont_pass].next();
+    // Enquanto tiver passagem
+    passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
+    send_set(refAZ, refELE, setString, &cont_erro);
+    send_state(input_state, &AZ, &ELE, &cont_erro); // para verificar erro
+    gerar_rampa(180, 90); // posicionamento final
 
-    //LOOP DE RASTREIO
-    while (cont_pass < (n_pass[0] + n_pass[1] + n_pass[2])) {
-        passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
+    // No fim
+    send_power();
+    Sleep(20);
+    send_state(input_state, &AZ, &ELE, &cont_erro);
 
-        //Prende o sistema até a hora da próxima efem
-        while (time(NULL) < ef_time);
-        //scanf("%d", &lixo);
-        system("cls");
-        printf("Informacoes da passagem atual:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-            horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-        //envia comando SET
-        send_set(refAZ, refELE, setString, &cont_erro);
-        fprintf(arq, "AZ_antena: %f  ELE_antena:%f  refAZ:%f  refELE:%f\n", AZ, ELE, refAZ, refELE);
-
-        //espera 20 ms e envia comando STATE
-        Sleep(20);
-        send_state(input_state, &AZ, &ELE, &cont_erro);
-        printf("Erro AZ: %f  Erro ELE: %f",refAZ - AZ, refELE - ELE);
-
-        //Verifica se o arquivo de efemerides acabou
-        if (passagem[cont_pass].next() != 0) {
-            //fim da passagem
-            refAZ = 180.00;
-            refELE = 90.00;
-
-            //Gera rampa de posicionamento final
-            gerar_rampa(rampa_AZ, rampa_ELE);
-
-            //CONTROLE DE POSICIONAMENTO FINAL (RAMPA)
-            for (cont_aux = 1; cont_aux < 30; cont_aux++) {
-                //incrementa o tempo da próxima efeméride com o contador para garantir controle a 1s
-                while (time(NULL) < (ef_time + cont_aux)); //Espera até a hora da proxima efem
-                system("cls"); // limpa prompt de comando
-
-                printf("RAMPA DE POSICIONAMENTO FINAL\n\n");
-
-                //envia comando SET com valores dos arrays de rampa
-                send_set(rampa_AZ[cont_aux], rampa_ELE[cont_aux], setString, &cont_erro);
-
-                //Espera 20 mS e envia comando STATE
-                Sleep(20);
-                send_state(input_state, &AZ, &ELE, &cont_erro);
-
-            }
-
-            //Desliga potência do sistema
-            send_power();
-            Sleep(20);
-            send_state(input_state, &AZ, &ELE, &cont_erro);
-
-            //incrementa contador de passagens
-            cont_pass++;
-
-            //Verifica se a passagem atual da sequencia já ocorreu. Caso sim, pula para a proxima até achar
-            //alguma que ainda não ocorreu. Caso nenhuma passagem não tenha ocorrido, o programa é encerrado.
-            start = 0;
-            find_pass = false;
-            while (find_pass == false)
-            {
-                //Recebe as informações da passagem atual
-                passagem[cont_pass].get_info(&start, &stop, &durat, &max_ele, satelite);
-
-                //incrementa o contador de passagens caso a passagem já ocorreu
-                if (stop < time(NULL)) {
-                    cont_pass++;
-                }
-                //incrementa o contador de passagens caso a máxima elevação da passagem for menor que 10°
-                else if (max_ele < 10.0) {
-                    cont_pass++;
-                }
-                //incrementa contador de passagens caso o tempo restante seja menor que 3 min
-                else if (difftime(stop, time(NULL)) < 180) {
-                    cont_pass++;
-                }
-
-                else {
-                    //Passagem válida encontrada
-                    find_pass = true;
-
-                    //Verifica se a passagem já começou
-                    if (start < time(NULL))
-                        pass_start = true;
-
-                    else {
-                        pass_start = false;
-                    }
-                }
-            }
-
-            system("cls");
-
-            if (cont_pass < (n_pass[0] + n_pass[1] + n_pass[2])) {//Feito para evitar chamar passagem além do limite carregado
-                //Obtem as informações da proxima passagem
-                passagem[cont_pass].get_info(&start, &stop, &durat, &max_ele, satelite);
-
-                //Exibição do tempo restante para a proxima passagem
-                while ((start - 31) > time(NULL)) {
-                    printf("Numero de passagens que ja ocorreram: %d  Total de passagens carregadas: %d\n\n", cont_pass, n_pass[0] + n_pass[1] + n_pass[2]);
-                    printf("Informacoes da proxima passagem:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-                        horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-                    printf("Tempo restante para a proxima passagem: %d:%d:%d\n\n", hor, min, sec);
-
-                    //Envia comando STATE para saber STATUS atual do sistema
-                    send_state(input_state, &AZ, &ELE, &cont_erro);
-
-                    Sleep(500);
-                    system("cls");
-                    seconds = difftime(start, time(NULL));
-                    aux_time = round(seconds);
-                    hor = aux_time / 3600.0;
-                    min = (aux_time % 3600) / 60;
-                    sec = (aux_time % 3600) % 60;
-                    horario = localtime(&start);
-                }
-
-                //Recebe a primeira efeméride da passagem atual
-                passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-
-                //Se a passagem já estiver acontecendo, pula para a posição da antena daqui a 30 sec (tempo necessario para posicionamento)
-                if (pass_start == true) {
-                aux_time = time(NULL) + 30;
-                    while (ef_time < aux_time) {
-                        //Avança uma linha na tabela
-                        passagem[cont_pass].next();
-                        //Recebe a efemeride atual da tabela
-                        passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-                    }
-                }
-
-                //Espera até faltar 30 segundos para a passagem
-                while (time(NULL) < ef_time - 30);
-
-                //liga sistema e recebe estado atual da antena
-                send_power();
-                send_state(input_state, &AZ, &ELE, &cont_erro);
-
-                //gera rampa de posicionamento inicial
-                gerar_rampa(rampa_AZ, rampa_ELE);
-
-                //Envia sinal de controle com a rampa inicial
-                for (cont_aux = 1; cont_aux < 30; cont_aux++) {
-
-                    while (time(NULL) < (ef_time - 30 + cont_aux));
-                    system("cls");
-                    printf("Informacoes da passagem atual:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-                        horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-                    printf("RAMPA DE POSICIONAMENTO INICIAL\n\n");
-                    send_set(rampa_AZ[cont_aux], rampa_ELE[cont_aux], setString, &cont_erro);
-                    Sleep(20);
-                    send_state(input_state, &AZ, &ELE, &cont_erro);
-                }
-
-                //Avança uma linha na tabela
-                passagem[cont_pass].next();
-
-            }//End if (cont_pass < (n_pass[0] + n_pass[1] + n_pass[2]))
-        }//End if (passagem[cont_pass].next() != 0)
-    }//while (cont_pass < (n_pass[0] + n_pass[1] + n_pass[2]))
 
     printf("Fim das passagens carregadas!!\n");
     delete [] passagem;
+    */
 }

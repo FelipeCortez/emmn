@@ -4,13 +4,7 @@
 Settings::Settings()
     : settings("INPE", "EMMN")
 {
-    persistentString = settings.value("persistentString", "Testando").toString();
     qRegisterMetaTypeStreamOperators<Tracker>("Tracker");
-}
-
-void Settings::setPersistentString(QString str) {
-    persistentString = str;
-    settings.setValue("persistentString", persistentString);
 }
 
 void Settings::saveTrackers(QList<Tracker> trackers) {
@@ -40,6 +34,10 @@ QList<Tracker> Settings::loadTrackers() {
     return trackers;
 }
 
-QString Settings::getPersistentString() {
-    return persistentString;
+bool Settings::getUseLocalTime() {
+    return settings.value("useLocalTime", false).toBool();
+}
+
+void Settings::setUseLocalTime(bool useLocalTime) {
+    settings.setValue("useLocalTime", useLocalTime);
 }

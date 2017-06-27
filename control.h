@@ -1,17 +1,17 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include <QtCore>
 #include <time.h>
 #include <stdio.h>
 #include <Windows.h>
+#include <QDebug>
 #include "efem.h"
 #include "serial.h"
 
 class Control
 {
 public:
-    Control();
+    Control(const wchar_t *port);
 
     void runProgram();
 

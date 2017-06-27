@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
-#include <QNetworkAccessManager>
 #include <string>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
   , ui(new Ui::MainWindow)
-  , addTrackerDialog(this),
-    satInfoTimer(this),
-    tableModel(nullptr)
+  , addTrackerDialog(this)
+  , settingsDialog(this)
+  , satInfoTimer(this)
+  , tableModel(nullptr)
+  , control(L"COM3")
 {
     model = new TrackerListModel();
 
@@ -17,13 +18,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->satellitesView->setModel(model);
     ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
+    ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
     addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
 
-    network.getTLE("TERRA");
-
     loadTrackersFromSettings();
 
+    connect(ui->actionConfig,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(settingsDialogSlot(bool)));
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -44,6 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(finished(int)),
             this,
             SLOT(acceptedTleSlot(int)));
+    connect(&settingsDialog,
+            SIGNAL(finished(int)),
+            this,
+            SLOT(acceptedSettingsSlot(int)));
     connect(&satInfoTimer,
             SIGNAL(timeout()),
             this,
@@ -62,13 +72,22 @@ void MainWindow::enableSatelliteButtons(bool enable) {
     ui->editTrackerButton->setEnabled(enable);
 }
 
-QString betterDate(DateTime date) {
-    return QString("%1/%2/%3 %4:%5:%6 UTC").arg(date.Year())
+QString MainWindow::betterDate(DateTime date) {
+    QString zone;
+    if(settings.getUseLocalTime()) {
+        date = date.AddHours(-3);
+        zone = "(GMT-3)";
+    } else {
+        zone = "UTC";
+    }
+
+    return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
                                            .arg(date.Month(), 2, 10, QChar('0'))
                                            .arg(date.Day(), 2, 10, QChar('0'))
                                            .arg(date.Hour(), 2, 10, QChar('0'))
                                            .arg(date.Minute(), 2, 10, QChar('0'))
-                                           .arg(date.Second(), 2, 10, QChar('0'));
+                                           .arg(date.Second(), 2, 10, QChar('0'))
+                                           .arg(zone);
 }
 
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
@@ -80,7 +99,10 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         satInfoUpdateSlot();
         ui->satelliteGroupBox->setTitle(tracker.getTitle());
 
-        QList<PassDetails> pd = selectedIndex.data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
+        //network.getTLE(tracker.getTitle());
+        tracker.UpdateTLE();
+        QList<PassDetails> pd = tracker.GeneratePassListQt();
+        //QList<PassDetails> pd = selectedIndex.data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;
@@ -121,9 +143,6 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
             } while (++itr != pd.end());
         }
 
-        ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+2);
-        ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-        ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
         ui->passesView->setModel(tableModel);
         ui->passesView->resizeColumnsToContents();
     } else {
@@ -132,20 +151,20 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
     }
 }
 
-void MainWindow::persistenceChangedSlot(const QString text) {
-    settings.setPersistentString(text);
-}
-
 void MainWindow::addTrackerDialogSlot() {
     ui->satellitesView->selectionModel()->clear();
     addTrackerDialog.tleInput->clear();
     addTrackerDialog.exec();
 }
 
+void MainWindow::settingsDialogSlot(bool) {
+    settingsDialog.updateWithSettings(&settings);
+    settingsDialog.exec();
+}
+
 void MainWindow::editSelectedTrackerSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first().row();
     auto tracker = model->getTrackers()[index];
-    //settings.saveTrackers(model->getTrackers());
     addTrackerDialog.tleInput->setPlainText(tracker.getFullTLE());
     addTrackerDialog.exec();
 }
@@ -181,11 +200,17 @@ void MainWindow::acceptedTleSlot(int confirm) {
             } catch(TleException e) {
                 qDebug() << "TLE inválida";
             }
-
-            //model->setData();
         } else {
             qDebug() << "Wrong";
         }
+    }
+}
+
+void MainWindow::acceptedSettingsSlot(int confirm) {
+    if(confirm) {
+        settings.setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
+        auto selected = ui->satellitesView->selectionModel()->selection();
+        rowChangedSlot(selected, QItemSelection());
     }
 }
 

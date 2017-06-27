@@ -8,13 +8,14 @@ class Settings
 {
 public:
     Settings();
-    QString getPersistentString();
-    void setPersistentString(QString str);
     QList<Tracker> loadTrackers();
     void saveTrackers(QList<Tracker> trackers);
+    bool getUseLocalTime();
+    void setUseLocalTime(bool useLocalTime);
+
 private:
     QSettings settings;
-    QString persistentString;
+    bool useLocalTime;
 };
 
 #endif // SETTINGS_H

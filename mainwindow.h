@@ -7,9 +7,11 @@
 #include <QStandardItemModel>
 #include "trackerlistmodel.h"
 #include "addtrackerdialog.h"
+#include "settingsdialog.h"
 #include "tracker.h"
 #include "settings.h"
 #include "network.h"
+#include "control.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,23 +29,26 @@ public:
 private:
     Ui::MainWindow *ui;
     AddTrackerDialog addTrackerDialog;
+    SettingsDialog settingsDialog;
     Settings settings;
-    Network network;
     TrackerListModel *model;
-    void loadTrackersFromSettings();
     QTimer satInfoTimer;
     QStandardItemModel* tableModel;
+    Network network;
+    Control control;
+
+    void loadTrackersFromSettings();
+    QString betterDate(DateTime datetime);
 
 public slots:
    void rowChangedSlot(QItemSelection selected, QItemSelection);
-   void persistenceChangedSlot(const QString text);
    void addTrackerDialogSlot();
+   void settingsDialogSlot(bool);
    void editSelectedTrackerSlot();
    void removeSelectedTrackerSlot();
    void acceptedTleSlot(int confirm);
+   void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
 };
-
-QString betterDate(DateTime datetime);
 
 #endif // MAINWINDOW_H

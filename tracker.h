@@ -11,6 +11,7 @@
 #include <QString>
 #include <QList>
 #include <QMetaType>
+#include "network.h"
 
 struct PassDetails
 {

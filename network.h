@@ -8,16 +8,17 @@ class Network : public QObject
 {
     Q_OBJECT
 public:
-    explicit Network(QObject *parent = 0);
-    void getTLE(const QString satellite);
+    Network(QObject *parent = 0);
+    void getTLE(const QString tle1);
 
 private:
     QNetworkAccessManager manager;
     QNetworkReply* reply;
     QString satName;
+    //QString
 
 public slots:
-    void downloadFinished();
+    QStringList downloadFinished();
 };
 
 #endif // NETWORK_H

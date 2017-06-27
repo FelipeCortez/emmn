@@ -1,4 +1,5 @@
 #include "tracker.h"
+#include "network.h"
 #include <QDebug>
 
 Tracker::Tracker()
@@ -34,7 +35,6 @@ Tracker::Tracker(std::string tle1, std::string tle2, std::string tle3)
 }
 
 void Tracker::UpdateTLE() const {
-//
 }
 
 QString Tracker::getSatInfo(int info) const {

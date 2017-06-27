@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     efem.cpp \
     serial.cpp \
     trackerlistmodel.cpp \
-    network.cpp
+    network.cpp \
+    settingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     tracker.h \
@@ -42,10 +43,12 @@ HEADERS  += mainwindow.h \
     efem.h \
     serial.h \
     trackerlistmodel.h \
-    network.h
+    network.h \
+    settingsdialog.h
 
 FORMS    += mainwindow.ui \
-    tracker_dialog.ui
+    tracker_dialog.ui \
+    settings_dialog.ui
 
 LIBS +=        C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\libsgp4.a
 INCLUDEPATH += C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\include
