@@ -2,15 +2,20 @@
 #include <QPainter>
 #include <QDebug>
 
-NextPassesView::NextPassesView(QWidget *parent) : QWidget(parent)
+NextPassesView::NextPassesView(QWidget *parent)
+    : QWidget(parent)
+    , trackers(nullptr)
 {
     setMinimumHeight(1);
 }
 
+void NextPassesView::setTrackers(QList<Tracker>* trackers) {
+    this->trackers = trackers;
+}
+
 // https://stackoverflow.com/questions/24831484/how-to-align-qpainter-drawtext-around-a-point-not-a-rectangle
 void drawText(QPainter & painter, qreal x, qreal y, Qt::Alignment flags,
-              const QString & text, QRectF * boundingRect = 0)
-{
+              const QString & text, QRectF * boundingRect = 0) {
    const qreal size = 32767.0;
    QPointF corner(x, y - size);
    if (flags & Qt::AlignHCenter) corner.rx() -= size/2.0;
@@ -23,71 +28,111 @@ void drawText(QPainter & painter, qreal x, qreal y, Qt::Alignment flags,
 }
 
 void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
-              const QString & text, QRectF * boundingRect = {})
-{
+              const QString & text, QRectF * boundingRect = {}) {
    drawText(painter, point.x(), point.y(), flags, text, boundingRect);
 }
 
 void NextPassesView::paintEvent(QPaintEvent *) {
-    QPainter painter;
-    QStringList trackerStrings;
-    trackerStrings << "SCD1" << "SCD2" << "CBERS-4" << "SMOS" << "BIROS";
-    int totalHeight = 0;
-    const int margins = 10;
-    const int trackerHeight = 18;
+    if(trackers != nullptr) {
+        QPainter painter;
+        int totalHeight = 0;
+        const int margins = 10;
+        const int trackerHeight = 16;
 
-    totalHeight += margins;
-    painter.begin(this);
-    //painter.setRenderHint(QPainter::Antialiasing);
-    int textMaxWidth = 0;
-    for(QStringList::iterator it = trackerStrings.begin(); it != trackerStrings.end(); ++it) {
-        if(textMaxWidth < painter.fontMetrics().width(*it)) {
-            textMaxWidth = painter.fontMetrics().width(*it);
+        painter.begin(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        int textMaxWidth = 0;
+        for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
+            Tracker t = *it;
+            if(textMaxWidth < painter.fontMetrics().width(t.getTitle())) {
+                textMaxWidth = painter.fontMetrics().width(t.getTitle());
+            }
         }
-    }
 
-    painter.setPen(Qt::gray);
+        const int hours = 12;
+        auto now = DateTime::Now(false);
+        auto later = DateTime::Now(false).AddHours(hours);
+        auto totalTicks = (later - now).Ticks();
 
-    QRectF xAxisRect(QPointF(margins + textMaxWidth + margins, totalHeight),
-                     QPointF(width() - 1 - margins, totalHeight + trackerHeight * trackerStrings.length()));
-    int i;
-    for(i = 0; i < 10; ++i) {
-        float lineX = xAxisRect.left() + (xAxisRect.width() * i / 9);
-        painter.drawLine(QPointF(lineX, xAxisRect.top()),
-                         QPointF(lineX, xAxisRect.bottom()));
+        QRectF xAxisRect(QPointF(margins + textMaxWidth + margins, totalHeight),
+                         QPointF(width() - 1 - margins, totalHeight + trackerHeight * trackers->length()));
+        auto dateIt = now.AddMinutes(60 - now.Minute());
 
+        painter.setPen(Qt::gray);
+        painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
+                         QPointF(xAxisRect.left(), xAxisRect.bottom()));
         drawText(painter,
-                 QPointF(lineX, xAxisRect.bottom() + margins),
+                 QPointF(xAxisRect.left(), xAxisRect.bottom() + margins),
                  Qt::AlignVCenter | Qt::AlignHCenter,
-                 "13:30");
-    }
+                 QString::number(now.Hour()) + ":" + QString::number(now.Minute()) + ":" + QString::number(now.Second()));
 
-    for(QStringList::iterator it = trackerStrings.begin(); it != trackerStrings.end(); ++it) {
-        QString satName = *it;
-        QRectF itemRect(xAxisRect.left(), totalHeight, xAxisRect.width() / 4, trackerHeight);
-        QRectF barRect(itemRect);
-        barRect.setTop(itemRect.top() + 3);
-        barRect.setBottom(itemRect.bottom() - 3);
-        painter.setPen(Qt::black);
-        drawText(painter,
-                 QPointF(margins, barRect.center().y()),
-                 Qt::AlignVCenter,
-                 satName);
-        painter.setPen(Qt::black);
-        painter.drawRect(barRect);
+        while(dateIt < later) {
+            auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
+            float lineX = xAxisRect.left() + (xAxisRect.width() * linePercentage);
+            painter.drawLine(QPointF(lineX, xAxisRect.top()),
+                             QPointF(lineX, xAxisRect.bottom()));
+
+            drawText(painter,
+                     QPointF(lineX, xAxisRect.bottom() + margins),
+                     Qt::AlignVCenter | Qt::AlignHCenter,
+                     QString::number(dateIt.Hour()) + ":" + QString::number(dateIt.Minute()));
+            dateIt = dateIt.AddHours(1);
+        }
+
+        bool alternate = 0;
+
+        for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
+            QRectF itemRect(0, totalHeight, width(), trackerHeight);
+
+            /*
+            if(alternate) {
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(QColor(250, 250, 250));
+                painter.drawRect(itemRect);
+                painter.setBrush(Qt::NoBrush);
+            }
+            */
+
+            alternate = !alternate;
+
+            auto tracker = *it;
+            painter.setPen(Qt::black);
+            drawText(painter,
+                     QPointF(margins, itemRect.center().y()),
+                     Qt::AlignVCenter,
+                     tracker.getTitle());
+
+            auto passes = tracker.GeneratePassListQt(now, later);
+            for(QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {
+                auto pass = *it2;
+                auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;
+                auto rightPercentage = (float) (pass.los - now).Ticks() / totalTicks;
+                QRectF barRect(itemRect);
+                barRect.setTop(itemRect.top() + 5);
+                barRect.setBottom(itemRect.bottom() - 5);
+                barRect.setLeft(xAxisRect.left() + xAxisRect.width() * leftPercentage);
+                barRect.setRight(xAxisRect.left() + xAxisRect.width() * rightPercentage);
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(Qt::black);
+                painter.drawRect(barRect);
+                painter.setBrush(Qt::NoBrush);
+            }
+
+            totalHeight += trackerHeight;
+        }
+
+        totalHeight += margins * 2;
+
+        /*
+        QRectF fullRect(QPointF(1, 1),
+                        QPointF(width() - 1, totalHeight - 1));
         painter.setPen(Qt::red);
-        //painter.drawRect(itemRect);
-        totalHeight += trackerHeight;
+        painter.drawRect(fullRect);
+        */
+        painter.end();
+
+        setMinimumHeight(totalHeight);
     }
-
-    totalHeight += margins * 3;
-    QRectF fullRect(QPointF(1, 1),
-                    QPointF(width() - 1, totalHeight - 1));
-    painter.setPen(Qt::red);
-    painter.drawRect(fullRect);
-    painter.end();
-
-    setMinimumHeight(totalHeight);
 }
 
 /*

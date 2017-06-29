@@ -22,9 +22,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
+    satInfoTimer.start(1000);
+
     addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
 
     loadTrackersFromSettings();
+    ui->nextPassesView->setTrackers(model->getTrackersRef());
 
     connect(ui->actionConfig,
             SIGNAL(triggered(bool)),
@@ -82,12 +85,12 @@ QString MainWindow::betterDate(DateTime date) {
     }
 
     return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
-                                           .arg(date.Month(), 2, 10, QChar('0'))
-                                           .arg(date.Day(), 2, 10, QChar('0'))
-                                           .arg(date.Hour(), 2, 10, QChar('0'))
-                                           .arg(date.Minute(), 2, 10, QChar('0'))
-                                           .arg(date.Second(), 2, 10, QChar('0'))
-                                           .arg(zone);
+                                          .arg(date.Month(), 2, 10, QChar('0'))
+                                          .arg(date.Day(), 2, 10, QChar('0'))
+                                          .arg(date.Hour(), 2, 10, QChar('0'))
+                                          .arg(date.Minute(), 2, 10, QChar('0'))
+                                          .arg(date.Second(), 2, 10, QChar('0'))
+                                          .arg(zone);
 }
 
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
@@ -95,9 +98,9 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         auto selectedIndex = selected.indexes().first();
         auto tracker = model->getTrackers()[selectedIndex.row()];
         enableSatelliteButtons();
-        satInfoTimer.start(1000);
         satInfoUpdateSlot();
         ui->satelliteGroupBox->setTitle(tracker.getTitle());
+        ui->nextPassesView->repaint();
 
         //network.getTLE(tracker.getTitle());
         tracker.UpdateTLE();
@@ -175,6 +178,8 @@ void MainWindow::removeSelectedTrackerSlot() {
         model->removeRow(index.row());
         settings.saveTrackers(model->getTrackers());
     }
+
+    ui->nextPassesView->repaint();
 }
 
 void MainWindow::acceptedTleSlot(int confirm) {
@@ -216,6 +221,8 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
 
 void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
+    ui->nextPassesView->repaint();
+
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
         auto tracker = model->getTrackers()[selectedIndex.row()];
@@ -224,7 +231,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satAzimuth->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
         ui->satNextPass->setText(tracker.nextPass());
     } else {
-        satInfoTimer.stop();
+        //satInfoTimer.stop();
         ui->satelliteGroupBox->setTitle("Satélite");
         ui->satElevation->setText("");
         ui->satAzimuth->setText("");

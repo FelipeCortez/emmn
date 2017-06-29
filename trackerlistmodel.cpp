@@ -78,6 +78,10 @@ QList<Tracker> TrackerListModel::getTrackers() {
     return trackers;
 }
 
+QList<Tracker>* TrackerListModel::getTrackersRef() {
+    return &trackers;
+}
+
 void TrackerListModel::setTracker(int row, Tracker tracker) {
     trackers[row] = tracker;
 }

@@ -2,6 +2,7 @@
 #define NEXTPASSESVIEW_H
 
 #include <QWidget>
+#include "tracker.h"
 
 class NextPassesView : public QWidget
 {
@@ -9,6 +10,9 @@ class NextPassesView : public QWidget
 public:
     explicit NextPassesView(QWidget *parent = 0);
     void paintEvent(QPaintEvent *);
+    void setTrackers(QList<Tracker>* trackers);
+private:
+    QList<Tracker>* trackers;
 
 signals:
 
