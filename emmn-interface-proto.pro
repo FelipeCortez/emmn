@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     serial.cpp \
     trackerlistmodel.cpp \
     network.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    nextpassesview.cpp
 
 HEADERS  += mainwindow.h \
     tracker.h \
@@ -44,7 +45,8 @@ HEADERS  += mainwindow.h \
     serial.h \
     trackerlistmodel.h \
     network.h \
-    settingsdialog.h
+    settingsdialog.h \
+    nextpassesview.h
 
 FORMS    += mainwindow.ui \
     tracker_dialog.ui \

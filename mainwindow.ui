@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>761</width>
-    <height>535</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -191,6 +191,9 @@
       </item>
      </layout>
     </item>
+    <item row="3" column="0" colspan="2">
+     <widget class="NextPassesView" name="widget" native="true"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -223,6 +226,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>NextPassesView</class>
+   <extends>QWidget</extends>
+   <header>nextpassesview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
