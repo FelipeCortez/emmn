@@ -31,6 +31,7 @@ void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
               const QString & text, QRectF * boundingRect = {}) {
    drawText(painter, point.x(), point.y(), flags, text, boundingRect);
 }
+// ------------------
 
 void NextPassesView::paintEvent(QPaintEvent *) {
     if(trackers != nullptr) {
@@ -58,14 +59,8 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                          QPointF(width() - 1 - margins, totalHeight + trackerHeight * trackers->length()));
         auto dateIt = now.AddMinutes(60 - now.Minute());
 
+        // draws reference lines
         painter.setPen(Qt::gray);
-        painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
-                         QPointF(xAxisRect.left(), xAxisRect.bottom()));
-        drawText(painter,
-                 QPointF(xAxisRect.left(), xAxisRect.bottom() + margins),
-                 Qt::AlignVCenter | Qt::AlignHCenter,
-                 QString::number(now.Hour()) + ":" + QString::number(now.Minute()) + ":" + QString::number(now.Second()));
-
         while(dateIt < later) {
             auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
             float lineX = xAxisRect.left() + (xAxisRect.width() * linePercentage);
@@ -79,21 +74,28 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             dateIt = dateIt.AddHours(1);
         }
 
-        bool alternate = 0;
+        // draws reference line for current time
+        QString nowStr(QString::number(now.Hour()) + ":" + QString::number(now.Minute()));
+        QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
+        boundingRect.setWidth(boundingRect.width() + 10);
+        boundingRect.moveCenter(QPointF(xAxisRect.left(), xAxisRect.bottom() + margins + 1));
+        painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
+                         QPointF(xAxisRect.left(), xAxisRect.bottom()));
+        painter.setPen(Qt::NoPen);
+        QColor transpBgColor = palette().color(QPalette::Window);
+        transpBgColor.setAlphaF(0.7);
+        painter.setBrush(transpBgColor);
+        QRectF textBgRect(boundingRect);
+        painter.drawRect(textBgRect);
+        painter.setPen(Qt::gray);
+        drawText(painter,
+                 QPointF(xAxisRect.left(), xAxisRect.bottom() + margins),
+                 Qt::AlignVCenter | Qt::AlignHCenter,
+                 nowStr);
 
+        // draws items
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             QRectF itemRect(0, totalHeight, width(), trackerHeight);
-
-            /*
-            if(alternate) {
-                painter.setPen(Qt::NoPen);
-                painter.setBrush(QColor(250, 250, 250));
-                painter.drawRect(itemRect);
-                painter.setBrush(Qt::NoBrush);
-            }
-            */
-
-            alternate = !alternate;
 
             auto tracker = *it;
             painter.setPen(Qt::black);
@@ -134,49 +136,3 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         setMinimumHeight(totalHeight);
     }
 }
-
-/*
-void NextPassesView::paintEvent(QPaintEvent *) {
-    const int rectHeight = 10;
-    const int padding = 5;
-    const int trackerMargin = 15;
-    const int xAxisStart = 50;
-    QPainter painter;
-    QStringList trackerStrings;
-    trackerStrings << "SCD1" << "SCD2" << "CBERS-4" << "FELSAT";
-    painter.begin(this);
-    //painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::black);
-    painter.drawRect(0, 0, width() - 1, height() - 1);
-    painter.setPen(Qt::red);
-    painter.drawRect(padding, padding, width() - padding * 2, height() - padding * 2);
-    painter.setPen(Qt::black);
-
-    int currentMargin = 10;
-    for(QStringList::iterator it = trackerStrings.begin(); it != trackerStrings.end(); ++it) {
-        QString current = *it;
-        painter.drawText(padding, padding + currentMargin, current);
-        painter.drawRect(padding + xAxisStart, padding + currentMargin - 8, 300, rectHeight);
-        currentMargin += trackerMargin;
-    }
-
-    const int axisSpacing = (width() - (padding + xAxisStart)) / 9;
-    int i;
-    for(i = 0; i < 10; ++i) {
-        QPoint tickPoint(padding + xAxisStart + axisSpacing * i,
-                         currentMargin + 10);
-        painter.setPen(Qt::gray);
-        painter.drawLine(tickPoint + QPoint(0, -currentMargin),
-                         tickPoint + QPoint(0, -5));
-        painter.setPen(Qt::black);
-        drawText(painter,
-                 tickPoint,
-                 Qt::AlignVCenter | Qt::AlignHCenter,
-                 QString::number(i) + "0:00");
-    }
-
-
-    setMinimumHeight(currentMargin + 20);
-    painter.end();
-}
-*/
