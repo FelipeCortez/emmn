@@ -1,4 +1,5 @@
 #include "nextpassesview.h"
+#include "helpers.h"
 #include <QPainter>
 #include <QDebug>
 
@@ -70,7 +71,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             drawText(painter,
                      QPointF(lineX, xAxisRect.bottom() + margins),
                      Qt::AlignVCenter | Qt::AlignHCenter,
-                     QString::number(dateIt.Hour()) + ":" + QString::number(dateIt.Minute()));
+                     Helpers::betterTime(dateIt));
             dateIt = dateIt.AddHours(1);
         }
 
@@ -78,7 +79,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         QString nowStr(QString::number(now.Hour()) + ":" + QString::number(now.Minute()));
         QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
         boundingRect.setWidth(boundingRect.width() + 10);
-        boundingRect.moveCenter(QPointF(xAxisRect.left(), xAxisRect.bottom() + margins + 1));
+        boundingRect.moveCenter(QPointF(xAxisRect.left() + margins * 2, xAxisRect.top() + margins / 2 + 1));
         painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
                          QPointF(xAxisRect.left(), xAxisRect.bottom()));
         painter.setPen(Qt::NoPen);
@@ -89,9 +90,9 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         painter.drawRect(textBgRect);
         painter.setPen(Qt::gray);
         drawText(painter,
-                 QPointF(xAxisRect.left(), xAxisRect.bottom() + margins),
-                 Qt::AlignVCenter | Qt::AlignHCenter,
-                 nowStr);
+                 QPointF(xAxisRect.left() + margins, xAxisRect.top()),
+                 Qt::AlignTop,
+                 Helpers::betterTime(dateIt));
 
         // draws items
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <string>
-#include "settings.h"
+#include "helpers.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -79,26 +79,6 @@ void MainWindow::enableSatelliteButtons(bool enable) {
     ui->editTrackerButton->setEnabled(enable);
 }
 
-QString MainWindow::betterDate(DateTime date) {
-    QString zone;
-    /*
-    if(settings.getUseLocalTime()) {
-        date = date.AddHours(-3);
-        zone = "(GMT-3)";
-    } else {
-        zone = "UTC";
-    }
-    */
-
-    return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
-                                          .arg(date.Month(), 2, 10, QChar('0'))
-                                          .arg(date.Day(), 2, 10, QChar('0'))
-                                          .arg(date.Hour(), 2, 10, QChar('0'))
-                                          .arg(date.Minute(), 2, 10, QChar('0'))
-                                          .arg(date.Second(), 2, 10, QChar('0'))
-                                          .arg(zone);
-}
-
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
@@ -132,11 +112,11 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 QString text;
                 QStandardItem* item;
 
-                text = betterDate(itr->aos);
+                text = Helpers::betterDate(itr->aos);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 0, item);
 
-                text = betterDate(itr->los);
+                text = Helpers::betterDate(itr->los);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 1, item);
 
@@ -192,7 +172,7 @@ void MainWindow::acceptedTleSlot(int confirm) {
     if(confirm) {
         //qDebug() << addTrackerDialog.tleInput->toPlainText();
         QStringList tle = addTrackerDialog.tleInput->toPlainText().split("\n");
-        if(tle.size() == 3) { // Check if two line element set has three elements :)
+        if(tle.size() == 3) { // Check if two line element set has three lines :)
             try {
                 Tracker t(tle);
                 auto selected = ui->satellitesView->selectionModel()->selection();

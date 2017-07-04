@@ -45,7 +45,7 @@ HEADERS  += mainwindow.h \
     network.h \
     settingsdialog.h \
     nextpassesview.h \
-    settings.h
+    helpers.h
 
 FORMS    += mainwindow.ui \
     tracker_dialog.ui \

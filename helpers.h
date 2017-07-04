@@ -1,9 +1,10 @@
-#ifndef Settings_H
-#define Settings_H
+#ifndef HELPERS_H
+#define HELPERS_H
 
 #include <QSettings>
 #include <QList>
 #include "tracker.h"
+#include "DateTime.h"
 
 namespace Settings {
     inline QSettings* getSettings() {
@@ -52,4 +53,40 @@ namespace Settings {
     }
 }
 
-#endif // Settings_H
+namespace Helpers {
+    inline QString betterDate(DateTime date) {
+        QString zone;
+
+        if(Settings::getUseLocalTime()) {
+            date = date.AddHours(-3);
+            zone = "(GMT-3)";
+        } else {
+            zone = "UTC";
+        }
+
+        return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
+                                              .arg(date.Month(), 2, 10, QChar('0'))
+                                              .arg(date.Day(), 2, 10, QChar('0'))
+                                              .arg(date.Hour(), 2, 10, QChar('0'))
+                                              .arg(date.Minute(), 2, 10, QChar('0'))
+                                              .arg(date.Second(), 2, 10, QChar('0'))
+                                              .arg(zone);
+    }
+
+    inline QString betterTime(DateTime time) {
+        QString zone;
+
+        if(Settings::getUseLocalTime()) {
+            time = time.AddHours(-3);
+            zone = "(GMT-3)";
+        } else {
+            zone = "UTC";
+        }
+
+        return QString("%4:%5").arg(time.Hour(), 2, 10, QChar('0'))
+                               .arg(time.Minute(), 2, 10, QChar('0'));
+                                  //.arg(zone);
+    }
+}
+
+#endif // HELPERS_H

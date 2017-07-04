@@ -9,7 +9,7 @@
 #include "addtrackerdialog.h"
 #include "settingsdialog.h"
 #include "tracker.h"
-#include "settings.h"
+#include "helpers.h"
 #include "network.h"
 #include "control.h"
 

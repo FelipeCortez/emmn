@@ -1,5 +1,5 @@
 #include "settingsdialog.h"
-#include "settings.h"
+#include "helpers.h"
 #include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget * parent) :
