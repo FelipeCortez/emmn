@@ -41,7 +41,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         const int trackerHeight = 16;
 
         painter.begin(this);
-        painter.setRenderHint(QPainter::Antialiasing);
+        //painter.setRenderHint(QPainter::Antialiasing);
         int textMaxWidth = 0;
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             Tracker t = *it;

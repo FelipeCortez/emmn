@@ -16,11 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     ui->satellitesView->setModel(model);
-    ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    setWindowState(Qt::WindowMaximized);
+    //ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
     ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->satellitesView->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->satellitesView->setDragEnabled(true);
 
     satInfoTimer.start(1000);
 
@@ -114,7 +117,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         tableModel = new QStandardItemModel(numRows, numColumns);
         tableModel->setHorizontalHeaderLabels(QStringList() << "Aquisição de sinal"
                                               << "Perda de sinal"
-                                              << "Elevação máxima"
+                                              << "El. máx."
                                               << "Duração");
 
         if (pd.begin() == pd.end()) {
@@ -222,6 +225,10 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
 void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
     ui->nextPassesView->repaint();
+
+    QMap<QString, float> answerMap = control.send_state();
+    ui->azLabel->setText(QString::number(answerMap.value("az")));
+    ui->eleLabel->setText(QString::number(answerMap.value("ele")));
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();

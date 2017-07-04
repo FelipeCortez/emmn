@@ -3,7 +3,7 @@
 
 #include <QSettings>
 #include "tracker.h"
-
+/*
 class Settings
 {
 public:
@@ -17,5 +17,5 @@ private:
     QSettings settings;
     bool useLocalTime;
 };
-
+*/
 #endif // SETTINGS_H

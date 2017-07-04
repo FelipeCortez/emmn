@@ -1,15 +1,28 @@
-#include "settings.h"
-#include <QDebug>
+#ifndef UTIL_H
+#define UTIL_H
 
-Settings::Settings()
-    : settings("INPE", "EMMN")
-{
+#include <QSettings>
+#include <QList>
+#include "tracker.h"
+
+namespace Util {
+    QSettings getSettings();
+}
+
+namespace Settings {
+    QList<Tracker> loadTrackers();
+    void saveTrackers(QList<Tracker> trackers);
+    bool getUseLocalTime();
+    void setUseLocalTime(bool useLocalTime);
+}
+
+QSettings Util::getSettings() {
+    return QSettings("EMMN", "INPE");
 }
 
 void Settings::saveTrackers(QList<Tracker> trackers) {
-    //settings.setValue("tracker", QVariant::fromValue(trackers.first()));
+    QSettings settings = Util::getSettings();
 
-    //qDebug() << "Salvando";
     settings.beginWriteArray("trackers", trackers.length());
     int i;
     for(i = 0; i < trackers.length(); ++i) {
@@ -21,6 +34,7 @@ void Settings::saveTrackers(QList<Tracker> trackers) {
 }
 
 QList<Tracker> Settings::loadTrackers() {
+    settings = Util::getSettings();
     QList<Tracker> trackers;
     int count = settings.beginReadArray("trackers");
     int i;
@@ -40,3 +54,5 @@ bool Settings::getUseLocalTime() {
 void Settings::setUseLocalTime(bool useLocalTime) {
     settings.setValue("useLocalTime", useLocalTime);
 }
+
+#endif // UTIL_H
