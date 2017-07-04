@@ -26,7 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     tracker.cpp \
-    settings.cpp \
     addtrackerdialog.cpp \
     control.cpp \
     efem.cpp \
@@ -38,7 +37,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     tracker.h \
-    settings.h \
     addtrackerdialog.h \
     control.h \
     efem.h \
@@ -47,7 +45,7 @@ HEADERS  += mainwindow.h \
     network.h \
     settingsdialog.h \
     nextpassesview.h \
-    util.h
+    settings.h
 
 FORMS    += mainwindow.ui \
     tracker_dialog.ui \

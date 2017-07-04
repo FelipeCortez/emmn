@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <string>
+#include "settings.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -67,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::loadTrackersFromSettings() {
-    auto trackers = settings.loadTrackers();
+    auto trackers = Settings::loadTrackers();
     for(auto t : trackers) {
         model->addTracker(t);
     }
@@ -80,12 +81,14 @@ void MainWindow::enableSatelliteButtons(bool enable) {
 
 QString MainWindow::betterDate(DateTime date) {
     QString zone;
+    /*
     if(settings.getUseLocalTime()) {
         date = date.AddHours(-3);
         zone = "(GMT-3)";
     } else {
         zone = "UTC";
     }
+    */
 
     return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
                                           .arg(date.Month(), 2, 10, QChar('0'))
@@ -164,7 +167,7 @@ void MainWindow::addTrackerDialogSlot() {
 }
 
 void MainWindow::settingsDialogSlot(bool) {
-    settingsDialog.updateWithSettings(&settings);
+    settingsDialog.updateWithSettings();
     settingsDialog.exec();
 }
 
@@ -179,7 +182,7 @@ void MainWindow::removeSelectedTrackerSlot() {
     foreach(const QModelIndex &index, ui->satellitesView->selectionModel()->selectedIndexes()) {
         qDebug() << index.data(Qt::DisplayRole).toString();
         model->removeRow(index.row());
-        settings.saveTrackers(model->getTrackers());
+        Settings::saveTrackers(model->getTrackers());
     }
 
     ui->nextPassesView->repaint();
@@ -196,13 +199,13 @@ void MainWindow::acceptedTleSlot(int confirm) {
                 if(selected.isEmpty()) {
                     auto index = model->addTracker(t);
                     ui->satellitesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
-                    settings.saveTrackers(model->getTrackers());
+                    Settings::saveTrackers(model->getTrackers());
                 } else {
                     auto selectedIndex = selected.indexes().first();
                     auto tracker = model->getTrackers()[selectedIndex.row()];
                     ui->satellitesView->selectionModel()->setCurrentIndex(selectedIndex, QItemSelectionModel::ClearAndSelect);
                     model->setTracker(selectedIndex.row(), t);
-                    settings.saveTrackers(model->getTrackers());
+                    Settings::saveTrackers(model->getTrackers());
                     rowChangedSlot(selected, QItemSelection());
                 }
             } catch(TleException e) {
@@ -216,7 +219,7 @@ void MainWindow::acceptedTleSlot(int confirm) {
 
 void MainWindow::acceptedSettingsSlot(int confirm) {
     if(confirm) {
-        settings.setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
+        Settings::setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
     }

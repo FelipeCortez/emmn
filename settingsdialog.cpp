@@ -1,4 +1,5 @@
 #include "settingsdialog.h"
+#include "settings.h"
 #include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget * parent) :
@@ -7,6 +8,6 @@ SettingsDialog::SettingsDialog(QWidget * parent) :
     setupUi(this);
 }
 
-void SettingsDialog::updateWithSettings(Settings* settings) {
-    useLocalTimeCheckbox->setChecked(settings->getUseLocalTime());
+void SettingsDialog::updateWithSettings() {
+    useLocalTimeCheckbox->setChecked(Settings::getUseLocalTime());
 }

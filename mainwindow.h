@@ -30,7 +30,6 @@ private:
     Ui::MainWindow *ui;
     AddTrackerDialog addTrackerDialog;
     SettingsDialog settingsDialog;
-    Settings settings;
     TrackerListModel *model;
     QTimer satInfoTimer;
     QStandardItemModel* tableModel;
