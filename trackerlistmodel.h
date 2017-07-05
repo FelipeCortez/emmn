@@ -4,6 +4,11 @@
 #include <QAbstractListModel>
 #include "tracker.h"
 
+struct PassDetailsWithTracker {
+    Tracker* tracker;
+    PassDetails passDetails;
+};
+
 class TrackerListModel : public QAbstractListModel
 {
 public:
@@ -23,6 +28,8 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     QList<Tracker> getTrackers();
     QList<Tracker>* getTrackersRef();
+    QList<PassDetailsWithTracker> getAllPasses(const DateTime& start_time = DateTime::Now(true),
+                                    const DateTime& end_time = DateTime::Now(true).AddHours(24));
     void setTracker(int row, Tracker tracker);
 private:
     QList<Tracker> trackers;

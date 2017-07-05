@@ -32,6 +32,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(model->getTrackersRef());
+    model->getAllPasses();
+
+    // Força atualização da tabela (meio gambiarra... talvez mudar)
+    auto selected = ui->satellitesView->selectionModel()->selection();
+    rowChangedSlot(selected, QItemSelection());
 
     connect(ui->actionConfig,
             SIGNAL(triggered(bool)),
@@ -85,13 +90,13 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         auto tracker = model->getTrackers()[selectedIndex.row()];
         enableSatelliteButtons();
         satInfoUpdateSlot();
+        ui->passesViewLabel->setText("Passagens para " + tracker.getTitle());
         ui->satelliteGroupBox->setTitle(tracker.getTitle());
         ui->nextPassesView->repaint();
 
         //network.getTLE(tracker.getTitle());
-        tracker.UpdateTLE();
+        //tracker.UpdateTLE();
         QList<PassDetails> pd = tracker.GeneratePassListQt();
-        //QList<PassDetails> pd = selectedIndex.data(TrackerListModel::PassesRole).value<QList<PassDetails>>();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;
@@ -99,9 +104,9 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         if(tableModel) { delete tableModel; }
         tableModel = new QStandardItemModel(numRows, numColumns);
         tableModel->setHorizontalHeaderLabels(QStringList() << "Aquisição de sinal"
-                                              << "Perda de sinal"
-                                              << "El. máx."
-                                              << "Duração");
+                                                            << "Perda de sinal"
+                                                            << "El. máx."
+                                                            << "Duração");
 
         if (pd.begin() == pd.end()) {
             qDebug() << "no passes found";
@@ -135,8 +140,55 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->passesView->setModel(tableModel);
         ui->passesView->resizeColumnsToContents();
     } else {
-        tableModel->clear();
+        // Nenhum satélite selecionado!
         enableSatelliteButtons(false);
+
+        QList<PassDetailsWithTracker> allPasses = model->getAllPasses();
+        const int numRows = allPasses.size();
+        const int numColumns = 1;
+        if(tableModel) { delete tableModel; }
+        tableModel = new QStandardItemModel(numRows, numColumns);
+        tableModel->setHorizontalHeaderLabels(QStringList() << "Satélite"
+                                                            << "Aquisição de sinal"
+                                                            << "Perda de sinal"
+                                                            << "El. máx."
+                                                            << "Duração");
+
+        if (allPasses.begin() == allPasses.end()) {
+            qDebug() << "no passes found";
+        } else {
+            int row = 0;
+            QList<PassDetailsWithTracker>::const_iterator itr = allPasses.begin();
+            do {
+                QString text;
+                QStandardItem* item;
+
+                text = itr->tracker->getTitle();
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 0, item);
+
+                text = Helpers::betterDate(itr->passDetails.aos);
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 1, item);
+
+                text = Helpers::betterDate(itr->passDetails.los);
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 2, item);
+
+                text = QString::number(Util::RadiansToDegrees(itr->passDetails.max_elevation)) + QString("°");
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 3, item);
+
+                text = QString::fromStdString((itr->passDetails.los - itr->passDetails.aos).ToString());
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 4, item);
+
+                ++row;
+            } while (++itr != allPasses.end());
+        }
+
+        ui->passesView->setModel(tableModel);
+        ui->passesView->resizeColumnsToContents();
     }
 }
 
@@ -209,9 +261,9 @@ void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
     ui->nextPassesView->repaint();
 
-    QMap<QString, float> answerMap = control.send_state();
-    ui->azLabel->setText(QString::number(answerMap.value("az")));
-    ui->eleLabel->setText(QString::number(answerMap.value("ele")));
+    //QMap<QString, float> answerMap = control.send_state();
+    //ui->azLabel->setText(QString::number(answerMap.value("az")));
+    //ui->eleLabel->setText(QString::number(answerMap.value("ele")));
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();

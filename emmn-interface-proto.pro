@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     trackerlistmodel.cpp \
     network.cpp \
     settingsdialog.cpp \
-    nextpassesview.cpp
+    nextpassesview.cpp \
+    helpers.cpp
 
 HEADERS  += mainwindow.h \
     tracker.h \

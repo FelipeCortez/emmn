@@ -59,8 +59,8 @@ public:
     QString nextPass() const;
     QString getTitle() const;
     QString getFullTLE() const;
-    void UpdateTLE() const;
     QString getSatInfo(int info) const;
+    void UpdateTLE() const;
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
 private:

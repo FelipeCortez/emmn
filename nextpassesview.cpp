@@ -58,7 +58,8 @@ void NextPassesView::paintEvent(QPaintEvent *) {
 
         QRectF xAxisRect(QPointF(margins + textMaxWidth + margins, totalHeight),
                          QPointF(width() - 1 - margins, totalHeight + trackerHeight * trackers->length()));
-        auto dateIt = now.AddMinutes(60 - now.Minute());
+        auto hourNow = now.AddMinutes(60 - now.Minute());
+        auto dateIt = hourNow;
 
         // draws reference lines
         painter.setPen(Qt::gray);
@@ -92,7 +93,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         drawText(painter,
                  QPointF(xAxisRect.left() + margins, xAxisRect.top()),
                  Qt::AlignTop,
-                 Helpers::betterTime(dateIt));
+                 Helpers::betterTime(now));
 
         // draws items
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
@@ -111,12 +112,13 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                 auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;
                 auto rightPercentage = (float) (pass.los - now).Ticks() / totalTicks;
                 QRectF barRect(itemRect);
-                barRect.setTop(itemRect.top() + 5);
-                barRect.setBottom(itemRect.bottom() - 5);
+                barRect.setTop(itemRect.top() + 3);
+                barRect.setBottom(itemRect.bottom() - 3);
                 barRect.setLeft(xAxisRect.left() + xAxisRect.width() * leftPercentage);
                 barRect.setRight(xAxisRect.left() + xAxisRect.width() * rightPercentage);
                 painter.setPen(Qt::NoPen);
-                painter.setBrush(Qt::black);
+                painter.setBrush(palette().dark());
+                //painter.setBrush(Qt::black);
                 painter.drawRect(barRect);
                 painter.setBrush(Qt::NoBrush);
             }
