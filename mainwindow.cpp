@@ -58,6 +58,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(clicked(bool)),
             this,
             SLOT(removeSelectedTrackerSlot()));
+    connect(ui->showAllPassesButton,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(clearSelectedTrackerSlot()));
     connect(&addTrackerDialog,
             SIGNAL(finished(int)),
             this,
@@ -70,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(timeout()),
             this,
             SLOT(satInfoUpdateSlot()));
+
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -82,6 +87,7 @@ void MainWindow::loadTrackersFromSettings() {
 void MainWindow::enableSatelliteButtons(bool enable) {
     ui->removeTrackerButton->setEnabled(enable);
     ui->editTrackerButton->setEnabled(enable);
+    ui->showAllPassesButton->setEnabled(enable);
 }
 
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
@@ -141,6 +147,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->passesView->resizeColumnsToContents();
     } else {
         // Nenhum satélite selecionado!
+        ui->passesViewLabel->setText("Todas as passagens");
         enableSatelliteButtons(false);
 
         QList<PassDetailsWithTracker> allPasses = model->getAllPasses();
@@ -279,6 +286,10 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satAzimuth->setText("");
         ui->satNextPass->setText("");
     }
+}
+
+void MainWindow::clearSelectedTrackerSlot() {
+    ui->satellitesView->selectionModel()->clear();
 }
 
 MainWindow::~MainWindow()

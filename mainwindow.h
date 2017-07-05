@@ -48,6 +48,7 @@ public slots:
    void acceptedTleSlot(int confirm);
    void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
+   void clearSelectedTrackerSlot();
 };
 
 #endif // MAINWINDOW_H
