@@ -61,6 +61,14 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(clicked(bool)),
             this,
             SLOT(clearSelectedTrackerSlot()));
+    connect(ui->moveTrackerUpButton,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(moveTrackerUpSlot()));
+    connect(ui->moveTrackerDownButton,
+            SIGNAL(clicked(bool)),
+            this,
+            SLOT(moveTrackerDownSlot()));
     connect(&addTrackerDialog,
             SIGNAL(finished(int)),
             this,
@@ -87,6 +95,15 @@ void MainWindow::enableSatelliteButtons(bool enable) {
     ui->removeTrackerButton->setEnabled(enable);
     ui->editTrackerButton->setEnabled(enable);
     ui->showAllPassesButton->setEnabled(enable);
+    auto selected = ui->satellitesView->selectionModel()->selection();
+    if(enable) {
+        auto selectedIndex = selected.indexes().first();
+        ui->moveTrackerUpButton->setEnabled(selectedIndex.row() > 0);
+        ui->moveTrackerDownButton->setEnabled(selectedIndex.row() < model->rowCount() - 1);
+    } else {
+        ui->moveTrackerUpButton->setEnabled(false);
+        ui->moveTrackerDownButton->setEnabled(false);
+    }
 }
 
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
@@ -267,7 +284,12 @@ void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
     ui->nextPassesView->repaint();
 
-    ui->nextPassCountdownLabel->setText(QString::fromStdString((model->allPasses.at(0).passDetails.aos - DateTime::Now()).ToString()));
+    auto remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now();
+    if(remaining.Ticks() <= 0) {
+        ui->nextPassCountdownLabel->setText("Passando");
+    } else {
+        ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
+    }
     ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
     //QMap<QString, float> answerMap = control.send_state();
     //ui->azLabel->setText(QString::number(answerMap.value("az")));
@@ -291,6 +313,26 @@ void MainWindow::satInfoUpdateSlot() {
 
 void MainWindow::clearSelectedTrackerSlot() {
     ui->satellitesView->selectionModel()->clear();
+}
+
+void MainWindow::moveTrackerUpSlot() {
+    auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
+    auto indexRow = index.row();
+    model->getTrackersRef()->swap(indexRow, indexRow - 1);
+    auto newIndex = model->index(indexRow - 1);
+    ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
+    ui->satellitesView->setModel(model);
+    Settings::saveTrackers(model->getTrackers());
+}
+
+void MainWindow::moveTrackerDownSlot() {
+    auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
+    auto indexRow = index.row();
+    model->getTrackersRef()->swap(indexRow, indexRow + 1);
+    auto newIndex = model->index(indexRow + 1);
+    ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
+    ui->satellitesView->setModel(model);
+    Settings::saveTrackers(model->getTrackers());
 }
 
 MainWindow::~MainWindow()

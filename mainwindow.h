@@ -49,6 +49,8 @@ public slots:
    void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
    void clearSelectedTrackerSlot();
+   void moveTrackerUpSlot();
+   void moveTrackerDownSlot();
 };
 
 #endif // MAINWINDOW_H
