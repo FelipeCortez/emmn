@@ -32,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(model->getTrackersRef());
-    model->getAllPasses();
 
     // Força atualização da tabela (meio gambiarra... talvez mudar)
     auto selected = ui->satellitesView->selectionModel()->selection();
@@ -268,6 +267,8 @@ void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
     ui->nextPassesView->repaint();
 
+    ui->nextPassCountdownLabel->setText(QString::fromStdString((model->allPasses.at(0).passDetails.aos - DateTime::Now()).ToString()));
+    ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
     //QMap<QString, float> answerMap = control.send_state();
     //ui->azLabel->setText(QString::number(answerMap.value("az")));
     //ui->eleLabel->setText(QString::number(answerMap.value("ele")));

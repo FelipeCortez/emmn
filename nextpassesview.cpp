@@ -42,7 +42,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         const int trackerHeight = 16;
 
         painter.begin(this);
-        //painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::Antialiasing);
         int textMaxWidth = 0;
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             Tracker t = *it;
@@ -117,10 +117,12 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                 barRect.setLeft(xAxisRect.left() + xAxisRect.width() * leftPercentage);
                 barRect.setRight(xAxisRect.left() + xAxisRect.width() * rightPercentage);
                 painter.setPen(Qt::NoPen);
-                painter.setBrush(palette().dark());
+                painter.setBrush(Qt::black);
+                painter.setOpacity(0.7);
                 //painter.setBrush(Qt::black);
-                painter.drawRect(barRect);
+                painter.drawRoundedRect(barRect, 3, 3);
                 painter.setBrush(Qt::NoBrush);
+                painter.setOpacity(1);
             }
 
             totalHeight += trackerHeight;

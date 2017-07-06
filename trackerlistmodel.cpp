@@ -113,12 +113,15 @@ QList<PassDetailsWithTracker> TrackerListModel::getAllPasses(const DateTime& sta
     //qDebug() << "all passes";
     std::sort(allPassList.begin(), allPassList.end(), comparePassDetails);
 
+    /*
     for(auto pdt : allPassList) {
         //qDebug() << pdt.tracker->getTitle();
         //qDebug() << QString::fromStdString(pdt.passDetails.aos.ToString());
         //qDebug() << QString::fromStdString(pdt.passDetails.los.ToString());
         //qDebug() << "/";
     }
+    */
 
+    allPasses = allPassList;
     return allPassList;
 }
