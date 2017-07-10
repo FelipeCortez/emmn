@@ -10,11 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
   , addTrackerDialog(this)
   , settingsDialog(this)
   , satInfoTimer(this)
+  , antennaTimer(this)
   , tableModel(nullptr)
   , control(L"COM3")
 {
     model = new TrackerListModel();
 
+    counter = 0;
     ui->setupUi(this);
     ui->satellitesView->setModel(model);
     setWindowState(Qt::WindowMaximized);
@@ -27,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->satellitesView->setDragEnabled(true);
 
     satInfoTimer.start(1000);
+    antennaTimer.start(100);
 
     addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
 
@@ -81,6 +84,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(timeout()),
             this,
             SLOT(satInfoUpdateSlot()));
+    connect(&antennaTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(antennaUpdateSlot()));
 
 }
 
@@ -309,6 +316,35 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satAzimuth->setText("");
         ui->satNextPass->setText("");
     }
+}
+
+double lerp(float t, float a, float b){
+      return ((1-t) * a) + (t * b);
+  }
+
+void MainWindow::antennaUpdateSlot() {
+    TimeSpan remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now(true);
+    auto nextPass = model->allPasses.at(0);
+    float secondsRemaining = remaining.Ticks() / (1000000.f);
+    //qDebug() << remaining.TotalSeconds();
+
+    float startLerping = 60;
+
+    if(nextPass.tracker->getObserverElevation() >= 0) {
+        qDebug() << "Passando";
+        qDebug() << nextPass.tracker->getObserverElevation();
+    } else if(secondsRemaining <= startLerping &&
+              secondsRemaining > 0) {
+        qDebug() << "Interpolando";
+        // Interpolar entre elevação atual e 0
+        double t = (startLerping - secondsRemaining) / startLerping;
+        qDebug() << "Antena:";
+        qDebug() << lerp(t, 180, 0);
+    } else {
+        qDebug() << "Contagem regressiva";
+        qDebug() << secondsRemaining - startLerping;
+    }
+    qDebug() << "--";
 }
 
 void MainWindow::clearSelectedTrackerSlot() {

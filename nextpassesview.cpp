@@ -83,17 +83,6 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         boundingRect.moveCenter(QPointF(xAxisRect.left() + margins * 2, xAxisRect.top() + margins / 2 + 1));
         painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
                          QPointF(xAxisRect.left(), xAxisRect.bottom()));
-        painter.setPen(Qt::NoPen);
-        QColor transpBgColor = palette().color(QPalette::Window);
-        transpBgColor.setAlphaF(0.7);
-        painter.setBrush(transpBgColor);
-        QRectF textBgRect(boundingRect);
-        painter.drawRect(textBgRect);
-        painter.setPen(Qt::gray);
-        drawText(painter,
-                 QPointF(xAxisRect.left() + margins, xAxisRect.top()),
-                 Qt::AlignTop,
-                 Helpers::betterTime(now));
 
         // draws items
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
@@ -127,6 +116,19 @@ void NextPassesView::paintEvent(QPaintEvent *) {
 
             totalHeight += trackerHeight;
         }
+
+        // draws current time and background for readability
+        painter.setPen(Qt::NoPen);
+        QColor transpBgColor = palette().color(QPalette::Window);
+        transpBgColor.setAlphaF(0.7);
+        painter.setBrush(transpBgColor);
+        QRectF textBgRect(boundingRect);
+        painter.drawRect(textBgRect);
+        painter.setPen(Qt::gray);
+        drawText(painter,
+                 QPointF(xAxisRect.left() + margins, xAxisRect.top()),
+                 Qt::AlignTop,
+                 Helpers::betterTime(now));
 
         totalHeight += margins * 2;
 

@@ -32,9 +32,11 @@ private:
     SettingsDialog settingsDialog;
     TrackerListModel *model;
     QTimer satInfoTimer;
+    QTimer antennaTimer;
     QStandardItemModel* tableModel;
     Network network;
     Control control;
+    int counter;
 
     void loadTrackersFromSettings();
     QString betterDate(DateTime datetime);
@@ -48,6 +50,7 @@ public slots:
    void acceptedTleSlot(int confirm);
    void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
+   void antennaUpdateSlot();
    void clearSelectedTrackerSlot();
    void moveTrackerUpSlot();
    void moveTrackerDownSlot();

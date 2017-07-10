@@ -29,7 +29,7 @@ public:
     QList<Tracker> getTrackers();
     QList<Tracker>* getTrackersRef();
     QList<PassDetailsWithTracker> getAllPasses(const DateTime& start_time = DateTime::Now(true),
-                                    const DateTime& end_time = DateTime::Now(true).AddHours(24));
+                                               const DateTime& end_time = DateTime::Now(true).AddHours(24));
     void setTracker(int row, Tracker tracker);
     QList<PassDetailsWithTracker> allPasses;
 private:

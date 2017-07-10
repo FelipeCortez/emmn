@@ -473,6 +473,14 @@ QList<PassDetails> Tracker::GeneratePassListQt(
     return pass_list;
 }
 
+double Tracker::getObserverElevation() {
+    Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    Eci eci = sgp4.FindPosition(DateTime::Now());
+    CoordTopocentric topo = obs.GetLookAngle(eci);
+    return topo.elevation;
+}
+
 QString Tracker::nextPass() const {
     if(getSatInfo(Elevation).toDouble() < 0) {
         return QString::fromStdString((GeneratePassListQt()[0].aos - DateTime::Now()).ToString());

@@ -60,6 +60,7 @@ public:
     QString getTitle() const;
     QString getFullTLE() const;
     QString getSatInfo(int info) const;
+    double getObserverElevation();
     void UpdateTLE() const;
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
