@@ -1,5 +1,6 @@
 #include "tracker.h"
 #include "network.h"
+#include "helpers.h"
 #include <QDebug>
 
 Tracker::Tracker()
@@ -127,6 +128,32 @@ double Tracker::FindMaxElevation(
     } while (time_step > 1.0);
 
     return max_elevation;
+}
+
+bool Tracker::IsPassReverse(PassDetails pd) const
+{
+    Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+
+    double time_step = 60; // in seconds
+    DateTime current_time(pd.aos);
+    double prevAz = -1;
+
+    while(current_time < pd.los) {
+        Eci eci = sgp4.FindPosition(current_time);
+        CoordTopocentric topo = obs.GetLookAngle(eci);
+
+        if(prevAz != -1) {
+            if(fabs(Helpers::radToDeg(topo.azimuth) - prevAz) > 180) {
+                return true;
+            }
+        }
+
+        prevAz = Helpers::radToDeg(topo.azimuth);
+        current_time = current_time.AddSeconds(time_step);
+    }
+
+    return false;
 }
 
 DateTime Tracker::FindCrossingPoint(
@@ -423,6 +450,7 @@ QList<PassDetails> Tracker::GeneratePassListQt(
             pd.max_elevation = FindMaxElevation(
                     aos_time,
                     los_time);
+            pd.reverse = IsPassReverse(pd);
 
             pass_list.push_back(pd);
         }
@@ -473,12 +501,20 @@ QList<PassDetails> Tracker::GeneratePassListQt(
     return pass_list;
 }
 
-double Tracker::getObserverElevation() {
+double Tracker::getAzimuthForObserver() {
     Observer obs(user_geo);
     SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now());
     CoordTopocentric topo = obs.GetLookAngle(eci);
-    return topo.elevation;
+    return Helpers::radToDeg(topo.azimuth);
+}
+
+double Tracker::getElevationForObserver() {
+    Observer obs(user_geo);
+    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    Eci eci = sgp4.FindPosition(DateTime::Now());
+    CoordTopocentric topo = obs.GetLookAngle(eci);
+    return Helpers::radToDeg(topo.elevation);
 }
 
 QString Tracker::nextPass() const {

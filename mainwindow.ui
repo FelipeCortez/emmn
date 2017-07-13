@@ -308,6 +308,7 @@
      <string>Arquivo</string>
     </property>
     <addaction name="actionConfig"/>
+    <addaction name="actionDebugar"/>
    </widget>
    <addaction name="menuArquivo"/>
   </widget>
@@ -320,6 +321,11 @@
   <action name="actionConfig">
    <property name="text">
     <string>Configurações</string>
+   </property>
+  </action>
+  <action name="actionDebugar">
+   <property name="text">
+    <string>Debugar</string>
    </property>
   </action>
  </widget>

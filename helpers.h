@@ -17,6 +17,7 @@ namespace Settings {
 namespace Helpers {
     QString betterDate(DateTime date);
     QString betterTime(DateTime time);
+    double radToDeg(double rad);
 }
 
 #endif // HELPERS_H

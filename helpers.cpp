@@ -81,4 +81,9 @@ namespace Helpers {
                                .arg(time.Minute(), 2, 10, QChar('0'));
                                   //.arg(zone);
     }
+
+    double radToDeg(double rad) {
+        const double PI = 3.141592653589793238463;
+        return rad * 180 / PI;
+    }
 }

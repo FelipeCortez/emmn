@@ -4,8 +4,8 @@
 #include <string>
 #include "helpers.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+  : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , addTrackerDialog(this)
   , settingsDialog(this)
@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     counter = 0;
     ui->setupUi(this);
     ui->satellitesView->setModel(model);
-    setWindowState(Qt::WindowMaximized);
+    //setWindowState(Qt::WindowMaximized);
     //ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->satellitesView->setDragEnabled(true);
 
     satInfoTimer.start(1000);
-    antennaTimer.start(100);
+    antennaTimer.start(500);
 
     addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
 
@@ -44,6 +44,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(triggered(bool)),
             this,
             SLOT(settingsDialogSlot(bool)));
+    connect(ui->actionDebugar,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(debugarSlot(bool)));
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -88,7 +92,6 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(timeout()),
             this,
             SLOT(antennaUpdateSlot()));
-
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -289,18 +292,19 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
 
 void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
+    auto nextPass = model->allPasses.at(0);
+    auto remaining = nextPass.passDetails.aos - DateTime::Now();
     ui->nextPassesView->repaint();
 
-    auto remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now();
-    if(remaining.Ticks() <= 0) {
+    if(nextPass.tracker->getElevationForObserver() >= 0) {
         ui->nextPassCountdownLabel->setText("Passando");
     } else {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
     ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
-    //QMap<QString, float> answerMap = control.send_state();
-    //ui->azLabel->setText(QString::number(answerMap.value("az")));
-    //ui->eleLabel->setText(QString::number(answerMap.value("ele")));
+    QMap<QString, float> answerMap = control.send_state();
+    ui->azLabel->setText(QString::number(answerMap.value("az")));
+    ui->eleLabel->setText(QString::number(answerMap.value("ele")));
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
@@ -316,6 +320,8 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satAzimuth->setText("");
         ui->satNextPass->setText("");
     }
+
+    model->getAllPasses();
 }
 
 double lerp(float t, float a, float b){
@@ -325,26 +331,38 @@ double lerp(float t, float a, float b){
 void MainWindow::antennaUpdateSlot() {
     TimeSpan remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now(true);
     auto nextPass = model->allPasses.at(0);
-    float secondsRemaining = remaining.Ticks() / (1000000.f);
-    //qDebug() << remaining.TotalSeconds();
-
+    float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
     float startLerping = 60;
 
-    if(nextPass.tracker->getObserverElevation() >= 0) {
-        qDebug() << "Passando";
-        qDebug() << nextPass.tracker->getObserverElevation();
+    bool qd = false;
+
+    if(nextPass.tracker->getElevationForObserver() >= 0) {
+        if(qd) { qDebug() << "Passando"; }
+        //qDebug() << nextPass.tracker->getObserverElevation();
+        //control.send_set(0, nextPass.tracker->getObserverElevation());
+        control.setTarget(nextPass.tracker->getAzimuthForObserver(),
+                          nextPass.tracker->getElevationForObserver());
     } else if(secondsRemaining <= startLerping &&
               secondsRemaining > 0) {
-        qDebug() << "Interpolando";
+        if(qd) { qDebug() << "Interpolando"; }
         // Interpolar entre elevação atual e 0
-        double t = (startLerping - secondsRemaining) / startLerping;
-        qDebug() << "Antena:";
-        qDebug() << lerp(t, 180, 0);
+        //double t = (startLerping - secondsRemaining) / startLerping;
+        //qDebug() << "Antena:";
+        //qDebug() << lerp(t, 180, 0);
+        //control.send_set(0, lerp(t, 180, 0));
+        control.setTarget(nextPass.tracker->getAzimuthForObserver(), 0);
+        if(qd) { qDebug() << nextPass.tracker->getElevationForObserver(); }
     } else {
-        qDebug() << "Contagem regressiva";
-        qDebug() << secondsRemaining - startLerping;
+        if(qd) {
+            qDebug() << "Contagem regressiva";
+            qDebug() << secondsRemaining;
+        }
+        //control.send_set(100, nextPass.tracker->getObserverElevation());
+        control.setTarget(180, 90);
     }
-    qDebug() << "--";
+
+    control.moveToTarget();
+    if(qd) { qDebug() << "--"; }
 }
 
 void MainWindow::clearSelectedTrackerSlot() {
@@ -369,6 +387,14 @@ void MainWindow::moveTrackerDownSlot() {
     ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
     ui->satellitesView->setModel(model);
     Settings::saveTrackers(model->getTrackers());
+}
+
+void MainWindow::debugarSlot(bool) {
+    for(int i = 0; i < 15; ++i) {
+        auto nextPass = model->allPasses.at(i);
+        qDebug() << nextPass.passDetails.reverse;
+        qDebug() << "-";
+    }
 }
 
 MainWindow::~MainWindow()

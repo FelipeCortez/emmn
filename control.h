@@ -96,7 +96,7 @@ public:
      *  @param ELE
      *  @param _cont_erro
      */
-    void send_set(float AZ, float ELE, int *_cont_erro); //OK
+    void send_set(float az, float ele); //OK
 
     /** \brief Send state - Um nome mais apropriado talvez seria "get state". Envia um sinal state pro Arduino e lê a resposta
      *
@@ -134,10 +134,14 @@ public:
     */
     void envia_reconhecimento(int _erro);
 
+    void setTarget(float az, float ele);
+    void moveToTarget();
 private:
     //VARIAVEIS DO ALGORITMO DE CONTROLE E COMUNICAÇÃO
-    float refAZ = 0.0, refELE = 0.0; //Posições de referência da antena (valor obtido de efem.get();)
-    float AZ = 0.0, ELE = 0.0; //Posição atual da antena (recebido do arduino e decodificada)
+    float az;
+    float ele;
+    float targetAz;
+    float targetEle;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)

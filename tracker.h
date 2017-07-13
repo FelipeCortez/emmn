@@ -18,6 +18,7 @@ struct PassDetails
     DateTime aos;
     DateTime los;
     double max_elevation;
+    bool reverse;
 };
 
 // Needed so you can wrap PassDetails in a QVariant
@@ -56,11 +57,13 @@ public:
         const DateTime& start_time = DateTime::Now(true),
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
         const int time_step = 180) const;
+    bool IsPassReverse(PassDetails pd) const;
     QString nextPass() const;
     QString getTitle() const;
     QString getFullTLE() const;
     QString getSatInfo(int info) const;
-    double getObserverElevation();
+    double getAzimuthForObserver();
+    double getElevationForObserver();
     void UpdateTLE() const;
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);

@@ -45,6 +45,7 @@ public slots:
    void rowChangedSlot(QItemSelection selected, QItemSelection);
    void addTrackerDialogSlot();
    void settingsDialogSlot(bool);
+   void debugarSlot(bool);
    void editSelectedTrackerSlot();
    void removeSelectedTrackerSlot();
    void acceptedTleSlot(int confirm);

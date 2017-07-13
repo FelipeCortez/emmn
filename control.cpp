@@ -22,23 +22,29 @@ Control::Control(const wchar_t* port) {
         qDebug() << "Erro ao abrir porta" << "(" << QString::fromStdWString(port) << ")";
         return; // TODO: substituir por throw error
     }
+
+    QMap<QString, float> answerMap = send_state();
+    az = answerMap.value("az");
+    ele = answerMap.value("ele");
+    qDebug() << az;
+    qDebug() << ele;
+
+    setTarget(180, 90);
 }
 
-void Control::send_set(float _refAZ, float _refELE, int *_cont_erro) {
-    //auxiliar para conversão de float para int
+void Control::send_set(float az, float ele) {
+    //auxiliar para conversão de float para int (??????)
     unsigned short temp = 0;
 
-    //printf("\nrefAZ:%f\nrefELE: %f\n\n", _refAZ, _refELE);
-
     //Gerar bytes A1, A0, E1, E0
-    _refAZ = _refAZ *(65535.0 / 360.0);
-    temp = round(_refAZ);
+    az = az *(65535.0 / 360.0);
+    temp = round(az);
 
     a0 = temp & 255;
     a1 = temp >> 8;
 
-    _refELE = _refELE * (65535.0 / 360.0);
-    temp = round(_refELE);
+    ele = ele * (65535.0 / 360.0);
+    temp = round(ele);
 
     e0 = temp & 255;
     e1 = temp >> 8;
@@ -75,7 +81,7 @@ void Control::send_set(float _refAZ, float _refELE, int *_cont_erro) {
         erro_ack = reconhecimento_arduino(input_ack);
 
         //Incrementa erro (se houver)
-        cont_erro += erro_ack;
+        //errors += erro_ack;
     }
 }
 
@@ -152,6 +158,34 @@ QMap<QString, float> Control::send_state()
     return answer;
 }
 
+void Control::setTarget(float az, float ele) {
+    targetAz = az;
+    targetEle = ele;
+}
+
+float clip(float val, float max) {
+    if(fabs(val) > max) {
+        return max * (fabs(val) / val);
+    } else {
+        return val;
+    }
+}
+
+void Control::moveToTarget() {
+    QMap<QString, float> answerMap = send_state();
+    az = answerMap.value("az");
+    ele = answerMap.value("ele");
+
+    float az_increment = targetAz - az;
+    az_increment = clip(az_increment, 10);
+    float ele_increment = targetEle - ele;
+    ele_increment = clip(ele_increment, 10);
+    send_set(az + az_increment, ele + ele_increment);
+    //qDebug() << "az:" << az << "|" << "increment:" << az_increment;
+    //qDebug() << "ele:" << ele << "|" << "increment:" << ele_increment;
+    //qDebug() << "--";
+}
+
 void Control::send_power(void)
 {
     erro_ack = 1;
@@ -163,8 +197,7 @@ void Control::send_power(void)
 
         if (input_ack[0] == 'A') {
             erro_ack = 0;
-        }
-        else {
+        } else {
             erro_ack = 1;
         }
     }// end While
@@ -199,6 +232,7 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
 
 }
 
+/*
 void Control::gerar_rampa(float *_rampa_AZ, float *_rampa_ELE)
 {
     float mAZ = 0, mELE = 0;
@@ -212,8 +246,9 @@ void Control::gerar_rampa(float *_rampa_AZ, float *_rampa_ELE)
         _rampa_ELE[k - 1] = ELE + k*mELE;
     }
 }
+*/
 
-    /*
+/*
 void Control::runProgram() {
     //INICIA COMUNICAÇÃO SERIAL
     serial.Open(port_name);
