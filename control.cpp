@@ -23,12 +23,7 @@ Control::Control(const wchar_t* port) {
         return; // TODO: substituir por throw error
     }
 
-    QMap<QString, float> answerMap = send_state();
-    az = answerMap.value("az");
-    ele = answerMap.value("ele");
-    qDebug() << az;
-    qDebug() << ele;
-
+    send_power();
     setTarget(180, 90);
 }
 
@@ -200,8 +195,8 @@ void Control::send_power(void)
         } else {
             erro_ack = 1;
         }
-    }// end While
-} //end function
+    }
+}
 
 int Control::verifica_checksum() {
     //verifica checksum

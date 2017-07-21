@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
   , satInfoTimer(this)
   , antennaTimer(this)
   , tableModel(nullptr)
-  , control(L"COM3")
+  , control(L"COM4")
 {
     model = new TrackerListModel();
 
@@ -185,7 +185,8 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                                                             << "Aquisição de sinal"
                                                             << "Perda de sinal"
                                                             << "El. máx."
-                                                            << "Duração");
+                                                            << "Duração"
+                                                            << "Inversa");
 
         if (allPasses.begin() == allPasses.end()) {
             qDebug() << "no passes found";
@@ -215,6 +216,10 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 text = QString::fromStdString((itr->passDetails.los - itr->passDetails.aos).ToString());
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 4, item);
+
+                text = itr->passDetails.reverse ? QString("Inversa") : QString("Normal");
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 5, item);
 
                 ++row;
             } while (++itr != allPasses.end());
@@ -332,32 +337,42 @@ void MainWindow::antennaUpdateSlot() {
     TimeSpan remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now(true);
     auto nextPass = model->allPasses.at(0);
     float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
-    float startLerping = 60;
+    float positioningTime = 60;
 
-    bool qd = false;
+    bool qd = true;
+
+    qDebug() << nextPass.passDetails.reverse;
 
     if(nextPass.tracker->getElevationForObserver() >= 0) {
         if(qd) { qDebug() << "Passando"; }
-        //qDebug() << nextPass.tracker->getObserverElevation();
-        //control.send_set(0, nextPass.tracker->getObserverElevation());
-        control.setTarget(nextPass.tracker->getAzimuthForObserver(),
-                          nextPass.tracker->getElevationForObserver());
-    } else if(secondsRemaining <= startLerping &&
+        double az = nextPass.tracker->getAzimuthForObserver();
+        double ele = nextPass.tracker->getElevationForObserver();
+        if(nextPass.passDetails.reverse) {
+            qDebug() << "passagem inversa";
+            qDebug() << az << "|" << ele;
+            az = 180 - az;
+            ele = 180 - ele;
+            qDebug() << az << "|" << ele;
+        }
+        control.setTarget(az, ele);
+    } else if(secondsRemaining <= positioningTime &&
               secondsRemaining > 0) {
-        if(qd) { qDebug() << "Interpolando"; }
-        // Interpolar entre elevação atual e 0
-        //double t = (startLerping - secondsRemaining) / startLerping;
-        //qDebug() << "Antena:";
-        //qDebug() << lerp(t, 180, 0);
-        //control.send_set(0, lerp(t, 180, 0));
-        control.setTarget(nextPass.tracker->getAzimuthForObserver(), 0);
-        if(qd) { qDebug() << nextPass.tracker->getElevationForObserver(); }
+        if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
+        double az = nextPass.tracker->getAzimuthForObserver();
+        double ele = 0;
+        if(nextPass.passDetails.reverse) {
+            qDebug() << "passagem inversa";
+            qDebug() << az << "|" << ele;
+            az = 180 - az;
+            ele = 180 - ele;
+            qDebug() << az << "|" << ele;
+        }
+        control.setTarget(az, ele);
     } else {
         if(qd) {
             qDebug() << "Contagem regressiva";
             qDebug() << secondsRemaining;
         }
-        //control.send_set(100, nextPass.tracker->getObserverElevation());
         control.setTarget(180, 90);
     }
 
@@ -390,11 +405,7 @@ void MainWindow::moveTrackerDownSlot() {
 }
 
 void MainWindow::debugarSlot(bool) {
-    for(int i = 0; i < 15; ++i) {
-        auto nextPass = model->allPasses.at(i);
-        qDebug() << nextPass.passDetails.reverse;
-        qDebug() << "-";
-    }
+    qDebug() << "Olá";
 }
 
 MainWindow::~MainWindow()
