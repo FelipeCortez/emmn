@@ -1,4 +1,5 @@
 #include "control.h"
+#include "helpers.h"
 
 FILE *arq;
 
@@ -158,23 +159,19 @@ void Control::setTarget(float az, float ele) {
     targetEle = ele;
 }
 
-float clip(float val, float max) {
-    if(fabs(val) > max) {
-        return max * (fabs(val) / val);
-    } else {
-        return val;
-    }
-}
-
 void Control::moveToTarget() {
     QMap<QString, float> answerMap = send_state();
     az = answerMap.value("az");
     ele = answerMap.value("ele");
 
+    //qDebug() << "---";
+    //qDebug() << az;
+    //qDebug() << ele;
     float az_increment = targetAz - az;
-    az_increment = clip(az_increment, 10);
+    az_increment = Helpers::clip(az_increment, 10);
     float ele_increment = targetEle - ele;
-    ele_increment = clip(ele_increment, 10);
+    ele_increment = Helpers::clip(ele_increment, 10);
+    //send_set(az + az_increment, ele + ele_increment);
     send_set(az + az_increment, ele + ele_increment);
     //qDebug() << "az:" << az << "|" << "increment:" << az_increment;
     //qDebug() << "ele:" << ele << "|" << "increment:" << ele_increment;

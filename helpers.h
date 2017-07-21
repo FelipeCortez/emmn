@@ -18,6 +18,7 @@ namespace Helpers {
     QString betterDate(DateTime date);
     QString betterTime(DateTime time);
     double radToDeg(double rad);
+    double clip(double val, double max);
 }
 
 #endif // HELPERS_H

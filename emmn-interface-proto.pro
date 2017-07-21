@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     network.cpp \
     settingsdialog.cpp \
     nextpassesview.cpp \
-    helpers.cpp
+    helpers.cpp \
+    manualcontroldialog.cpp \
+    joystickwidget.cpp
 
 HEADERS  += mainwindow.h \
     tracker.h \
@@ -46,11 +48,14 @@ HEADERS  += mainwindow.h \
     network.h \
     settingsdialog.h \
     nextpassesview.h \
-    helpers.h
+    helpers.h \
+    manualcontroldialog.h \
+    joystickwidget.h
 
 FORMS    += mainwindow.ui \
     tracker_dialog.ui \
-    settings_dialog.ui
+    settings_dialog.ui \
+    manualcontrol_dialog.ui
 
 LIBS +=        C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\libsgp4.a
 INCLUDEPATH += C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\include

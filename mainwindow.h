@@ -8,6 +8,7 @@
 #include "trackerlistmodel.h"
 #include "addtrackerdialog.h"
 #include "settingsdialog.h"
+#include "manualcontroldialog.h"
 #include "tracker.h"
 #include "helpers.h"
 #include "network.h"
@@ -30,6 +31,7 @@ private:
     Ui::MainWindow *ui;
     AddTrackerDialog addTrackerDialog;
     SettingsDialog settingsDialog;
+    ManualControlDialog manualControlDialog;
     TrackerListModel *model;
     QTimer satInfoTimer;
     QTimer antennaTimer;
@@ -45,6 +47,7 @@ public slots:
    void rowChangedSlot(QItemSelection selected, QItemSelection);
    void addTrackerDialogSlot();
    void settingsDialogSlot(bool);
+   void manualControlDialogSlot(bool);
    void debugarSlot(bool);
    void editSelectedTrackerSlot();
    void removeSelectedTrackerSlot();

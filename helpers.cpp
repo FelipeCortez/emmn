@@ -86,4 +86,12 @@ namespace Helpers {
         const double PI = 3.141592653589793238463;
         return rad * 180 / PI;
     }
+
+    double clip(double val, double max) {
+        if(fabs(val) > max) {
+            return max * (fabs(val) / val);
+        } else {
+            return val;
+        }
+    }
 }

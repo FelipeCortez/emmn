@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
   , ui(new Ui::MainWindow)
   , addTrackerDialog(this)
   , settingsDialog(this)
+  , manualControlDialog(this)
   , satInfoTimer(this)
   , antennaTimer(this)
   , tableModel(nullptr)
@@ -44,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(triggered(bool)),
             this,
             SLOT(settingsDialogSlot(bool)));
+    connect(ui->actionManualControl,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(manualControlDialogSlot(bool)));
     connect(ui->actionDebugar,
             SIGNAL(triggered(bool)),
             this,
@@ -241,6 +246,10 @@ void MainWindow::settingsDialogSlot(bool) {
     settingsDialog.exec();
 }
 
+void MainWindow::manualControlDialogSlot(bool) {
+    manualControlDialog.exec();
+}
+
 void MainWindow::editSelectedTrackerSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first().row();
     auto tracker = model->getTrackers()[index];
@@ -341,18 +350,18 @@ void MainWindow::antennaUpdateSlot() {
 
     bool qd = true;
 
-    qDebug() << nextPass.passDetails.reverse;
+    //qDebug() << nextPass.passDetails.reverse;
 
     if(nextPass.tracker->getElevationForObserver() >= 0) {
         if(qd) { qDebug() << "Passando"; }
         double az = nextPass.tracker->getAzimuthForObserver();
         double ele = nextPass.tracker->getElevationForObserver();
         if(nextPass.passDetails.reverse) {
-            qDebug() << "passagem inversa";
-            qDebug() << az << "|" << ele;
-            az = 180 - az;
-            ele = 180 - ele;
-            qDebug() << az << "|" << ele;
+            //qDebug() << "passagem inversa";
+            //qDebug() << az << "|" << ele;
+            //az = 180 - az;
+            //ele = 180 - ele;
+            //qDebug() << az << "|" << ele;
         }
         control.setTarget(az, ele);
     } else if(secondsRemaining <= positioningTime &&
@@ -361,23 +370,23 @@ void MainWindow::antennaUpdateSlot() {
         double az = nextPass.tracker->getAzimuthForObserver();
         double ele = 0;
         if(nextPass.passDetails.reverse) {
-            qDebug() << "passagem inversa";
-            qDebug() << az << "|" << ele;
-            az = 180 - az;
-            ele = 180 - ele;
-            qDebug() << az << "|" << ele;
+            //qDebug() << "passagem inversa";
+            //qDebug() << az << "|" << ele;
+            //az = fabs(180 - az);
+            //ele = 180 - ele;
+            //qDebug() << az << "|" << ele;
         }
         control.setTarget(az, ele);
     } else {
         if(qd) {
-            qDebug() << "Contagem regressiva";
-            qDebug() << secondsRemaining;
+            //qDebug() << "Contagem regressiva";
+            //qDebug() << secondsRemaining;
         }
         control.setTarget(180, 90);
     }
 
     control.moveToTarget();
-    if(qd) { qDebug() << "--"; }
+    //if(qd) { qDebug() << "--"; }
 }
 
 void MainWindow::clearSelectedTrackerSlot() {

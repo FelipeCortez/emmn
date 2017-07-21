@@ -7,6 +7,7 @@ NextPassesView::NextPassesView(QWidget *parent)
     : QWidget(parent)
     , trackers(nullptr)
 {
+    setMouseTracking(true);
     setMinimumHeight(1);
 }
 
@@ -33,6 +34,16 @@ void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
    drawText(painter, point.x(), point.y(), flags, text, boundingRect);
 }
 // ------------------
+
+/*
+void NextPassesView::mouseMoveEvent(QMouseEvent *event) {
+    if(trackers != nullptr) {
+        qDebug() << event->pos();
+        mouseCoords = event->pos();
+        repaint();
+    }
+}
+*/
 
 void NextPassesView::paintEvent(QPaintEvent *) {
     if(trackers != nullptr) {
