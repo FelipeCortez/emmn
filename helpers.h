@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QList>
+#include <QtSerialPort/QSerialPortInfo>
 #include "tracker.h"
 #include "DateTime.h"
 
@@ -12,6 +13,8 @@ namespace Settings {
     QList<Tracker> loadTrackers();
     bool getUseLocalTime();
     void setUseLocalTime(bool useLocalTime);
+    QString getSerialPort();
+    void setSerialPort(QString serialPort);
 }
 
 namespace Helpers {
@@ -19,6 +22,7 @@ namespace Helpers {
     QString betterTime(DateTime time);
     double radToDeg(double rad);
     double clip(double val, double max);
+    QList<QSerialPortInfo> getSerialPortsAvailable();
 }
 
 #endif // HELPERS_H

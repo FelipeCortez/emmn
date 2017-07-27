@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
   , satInfoTimer(this)
   , antennaTimer(this)
   , tableModel(nullptr)
-  , control(L"COM4")
+  , control(L"COM3")
 {
     model = new TrackerListModel();
 
@@ -247,6 +247,8 @@ void MainWindow::settingsDialogSlot(bool) {
 }
 
 void MainWindow::manualControlDialogSlot(bool) {
+    satInfoTimer.stop();
+    antennaTimer.stop();
     manualControlDialog.exec();
 }
 
@@ -301,6 +303,9 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
         Settings::setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
+
+        qDebug() << "prev" << Settings::getSerialPort();
+        Settings::setSerialPort(settingsDialog.serialPortsCombo->currentData().toString());
     }
 }
 
@@ -348,7 +353,7 @@ void MainWindow::antennaUpdateSlot() {
     float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
     float positioningTime = 60;
 
-    bool qd = true;
+    bool qd = false;
 
     //qDebug() << nextPass.passDetails.reverse;
 
@@ -414,7 +419,7 @@ void MainWindow::moveTrackerDownSlot() {
 }
 
 void MainWindow::debugarSlot(bool) {
-    qDebug() << "Olá";
+    Helpers::getSerialPortsAvailable();
 }
 
 MainWindow::~MainWindow()

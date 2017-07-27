@@ -45,6 +45,19 @@ namespace Settings {
         settings->setValue("useLocalTime", useLocalTime);
         delete settings;
     }
+
+    QString getSerialPort() {
+        QSettings* settings = Settings::getSettings();
+        QString serialPort = settings->value("serialPort").toString();
+        delete settings;
+        return serialPort;
+    }
+
+    void setSerialPort(QString serialPort) {
+        QSettings* settings = Settings::getSettings();
+        settings->setValue("serialPort", serialPort);
+        delete settings;
+    }
 }
 
 namespace Helpers {
@@ -93,5 +106,9 @@ namespace Helpers {
         } else {
             return val;
         }
+    }
+
+    QList<QSerialPortInfo> getSerialPortsAvailable() {
+        return QSerialPortInfo::availablePorts();
     }
 }

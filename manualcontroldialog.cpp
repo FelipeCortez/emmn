@@ -6,6 +6,19 @@ ManualControlDialog::ManualControlDialog(QWidget *parent) :
     ui(new Ui::ManualControlDialog)
 {
     ui->setupUi(this);
+
+    connect(ui->freeRadio,
+            SIGNAL(toggled(bool)),
+            ui->joystickWidget,
+            SLOT(setFreeSlot(bool)));
+    connect(ui->azimuthRadio,
+            SIGNAL(toggled(bool)),
+            ui->joystickWidget,
+            SLOT(setAzimuthSlot(bool)));
+    connect(ui->elevationRadio,
+            SIGNAL(toggled(bool)),
+            ui->joystickWidget,
+            SLOT(setElevationSlot(bool)));
 }
 
 ManualControlDialog::~ManualControlDialog()

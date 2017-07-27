@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>265</width>
-    <height>97</height>
+    <height>123</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,9 @@
          <string>Horário local</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QComboBox" name="serialPortsCombo"/>
       </item>
      </layout>
     </widget>

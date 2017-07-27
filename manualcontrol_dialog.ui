@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>220</width>
-    <height>289</height>
+    <height>358</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -79,6 +79,30 @@
     </layout>
    </item>
    <item>
+    <widget class="QRadioButton" name="freeRadio">
+     <property name="text">
+      <string>Movimento livre</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="azimuthRadio">
+     <property name="text">
+      <string>Apenas azimute</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="elevationRadio">
+     <property name="text">
+      <string>Apenas elevação</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -86,6 +110,29 @@
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Joystick</string>
+      </attribute>
+      <zorder>freeRadio</zorder>
+      <zorder></zorder>
+      <zorder>azimuthRadio</zorder>
+      <zorder>elevationRadio</zorder>
+      <zorder>buttonBox</zorder>
+      <zorder>joystickWidget</zorder>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Posição</string>
+      </attribute>
+     </widget>
     </widget>
    </item>
   </layout>
