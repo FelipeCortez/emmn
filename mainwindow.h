@@ -28,18 +28,19 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
     AddTrackerDialog addTrackerDialog;
     SettingsDialog settingsDialog;
     ManualControlDialog manualControlDialog;
-    TrackerListModel *model;
+    TrackerListModel* model;
     QTimer satInfoTimer;
     QTimer antennaTimer;
     QStandardItemModel* tableModel;
     Network network;
-    Control control;
+    Control* control;
     int counter;
 
+    void controlFromSettings();
     void loadTrackersFromSettings();
     QString betterDate(DateTime datetime);
 

@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
   , satInfoTimer(this)
   , antennaTimer(this)
   , tableModel(nullptr)
-  , control(L"COM3")
 {
     model = new TrackerListModel();
 
@@ -28,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->satellitesView->setDragDropMode(QAbstractItemView::InternalMove);
     ui->satellitesView->setDragEnabled(true);
+
+    controlFromSettings();
 
     satInfoTimer.start(1000);
     antennaTimer.start(500);
@@ -97,6 +98,16 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(antennaUpdateSlot()));
+}
+
+void MainWindow::controlFromSettings() {
+    // TODO: Urgentemente! Detectar se porta responde a validação e só abrir assim!
+    // Poxa vida
+    const QString portStr = Settings::getSerialPort();
+    wchar_t* port = new wchar_t[portStr.length() + 1];
+    portStr.toWCharArray(port);
+    port[portStr.length()] = '\0';
+    control = new Control(port);
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -304,8 +315,9 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
 
-        qDebug() << "prev" << Settings::getSerialPort();
+        delete control;
         Settings::setSerialPort(settingsDialog.serialPortsCombo->currentData().toString());
+        controlFromSettings();
     }
 }
 
@@ -321,7 +333,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
     ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
-    QMap<QString, float> answerMap = control.send_state();
+    QMap<QString, float> answerMap = control->send_state();
     ui->azLabel->setText(QString::number(answerMap.value("az")));
     ui->eleLabel->setText(QString::number(answerMap.value("ele")));
 
@@ -368,7 +380,7 @@ void MainWindow::antennaUpdateSlot() {
             ele = 180 - ele;
             qDebug() << az << "|" << ele;
         }
-        control.setTarget(az, ele);
+        control->setTarget(az, ele);
     } else if(secondsRemaining <= positioningTime &&
               secondsRemaining > 0) {
         if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
@@ -381,16 +393,16 @@ void MainWindow::antennaUpdateSlot() {
             //ele = 180 - ele;
             //qDebug() << az << "|" << ele;
         }
-        control.setTarget(az, ele);
+        control->setTarget(az, ele);
     } else {
         if(qd) {
             //qDebug() << "Contagem regressiva";
             //qDebug() << secondsRemaining;
         }
-        control.setTarget(180, 90);
+        control->setTarget(180, 90);
     }
 
-    control.moveToTarget();
+    control->moveToTarget();
     //if(qd) { qDebug() << "--"; }
 }
 
