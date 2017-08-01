@@ -362,11 +362,11 @@ void MainWindow::antennaUpdateSlot() {
         double az = nextPass.tracker->getAzimuthForObserver();
         double ele = nextPass.tracker->getElevationForObserver();
         if(nextPass.passDetails.reverse) {
-            //qDebug() << "passagem inversa";
-            //qDebug() << az << "|" << ele;
-            //az = 180 - az;
-            //ele = 180 - ele;
-            //qDebug() << az << "|" << ele;
+            qDebug() << "passagem inversa";
+            qDebug() << az << "|" << ele;
+            az = 180 - az;
+            ele = 180 - ele;
+            qDebug() << az << "|" << ele;
         }
         control.setTarget(az, ele);
     } else if(secondsRemaining <= positioningTime &&

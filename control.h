@@ -12,6 +12,7 @@ class Control
 {
 public:
     Control(const wchar_t *port);
+    ~Control();
 
     /*
     *   FUNÇÕES PARA CARREGAMENTO E TRATAMENTO DAS EFEMÉRIDES ---------------------

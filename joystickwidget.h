@@ -31,6 +31,7 @@ private:
     ControlAxes controlAxes;
 
     double getJoyCircleWidth();
+    QPointF getJoyCircleRealCenter();
 
 signals:
 

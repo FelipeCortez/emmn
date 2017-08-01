@@ -7,6 +7,8 @@ ManualControlDialog::ManualControlDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->azimuthEdit->setFocus(Qt::OtherFocusReason);
+
     connect(ui->freeRadio,
             SIGNAL(toggled(bool)),
             ui->joystickWidget,

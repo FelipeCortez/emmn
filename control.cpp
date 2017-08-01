@@ -28,6 +28,11 @@ Control::Control(const wchar_t* port) {
     setTarget(180, 90);
 }
 
+Control::~Control() {
+    send_power();
+    serial.Close();
+}
+
 void Control::send_set(float az, float ele) {
     //auxiliar para conversão de float para int (??????)
     unsigned short temp = 0;
