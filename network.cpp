@@ -9,7 +9,8 @@ Network::Network(QObject *parent)
 void Network::getTLE(const QString tle1) {
     QNetworkRequest req;
     req.setUrl(QUrl("http://celestrak.com/NORAD/elements/resource.txt"));
-    req.setRawHeader( "User-Agent" , "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17");
+    req.setRawHeader( "User-Agent" ,
+                      "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17");
     reply = manager.get(req);
     satName = tle1;
     connect(reply, SIGNAL(finished()), this, SLOT(downloadFinished()));

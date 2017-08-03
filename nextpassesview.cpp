@@ -33,17 +33,6 @@ void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
               const QString & text, QRectF * boundingRect = {}) {
    drawText(painter, point.x(), point.y(), flags, text, boundingRect);
 }
-// ------------------
-
-/*
-void NextPassesView::mouseMoveEvent(QMouseEvent *event) {
-    if(trackers != nullptr) {
-        qDebug() << event->pos();
-        mouseCoords = event->pos();
-        repaint();
-    }
-}
-*/
 
 void NextPassesView::paintEvent(QPaintEvent *) {
     if(trackers != nullptr) {
@@ -72,7 +61,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         auto hourNow = now.AddMinutes(60 - now.Minute());
         auto dateIt = hourNow;
 
-        // draws reference lines
+        // Desenha linhas de referência (eixo X)
         painter.setPen(Qt::gray);
         while(dateIt < later) {
             auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
@@ -87,7 +76,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             dateIt = dateIt.AddHours(1);
         }
 
-        // draws reference line for current time
+        // Desenha linha vertical para hora atual
         QString nowStr(QString::number(now.Hour()) + ":" + QString::number(now.Minute()));
         QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
         boundingRect.setWidth(boundingRect.width() + 10);
@@ -95,7 +84,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
                          QPointF(xAxisRect.left(), xAxisRect.bottom()));
 
-        // draws items
+        // Desenha blocos
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             QRectF itemRect(0, totalHeight, width(), trackerHeight);
 
@@ -128,7 +117,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             totalHeight += trackerHeight;
         }
 
-        // draws current time and background for readability
+        // Desenha hora atual
         painter.setPen(Qt::NoPen);
         QColor transpBgColor = palette().color(QPalette::Window);
         transpBgColor.setAlphaF(0.7);
@@ -143,12 +132,6 @@ void NextPassesView::paintEvent(QPaintEvent *) {
 
         totalHeight += margins * 2;
 
-        /*
-        QRectF fullRect(QPointF(1, 1),
-                        QPointF(width() - 1, totalHeight - 1));
-        painter.setPen(Qt::red);
-        painter.drawRect(fullRect);
-        */
         painter.end();
 
         setMinimumHeight(totalHeight);

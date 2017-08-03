@@ -10,14 +10,15 @@ JoystickWidget::JoystickWidget(QWidget *parent)
     , margins(10)
     , joyCircleProportion(0.5)
     , joyCircleCenter(0, 0)
-    , limitCircle(QPointF(0, 0),
-                  QSizeF(widgetSize - margins * 2,
-                         widgetSize - margins * 2))
     , dragging(false)
     , mouseOffset(0, 0)
     , refreshTimer(this)
     , controlAxes(ControlAxes::free)
 {
+    limitCircle.setTopLeft(QPointF(0, 0));
+    limitCircle.setSize(QSizeF(widgetSize - margins * 2,
+                               widgetSize - margins * 2));
+
     setMouseTracking(true);
     joyCircleCenter = QPointF(0, 0);
     refreshTimer.start(1000.0 / 60);
@@ -90,11 +91,10 @@ void JoystickWidget::mousePressEvent(QMouseEvent *event) {
     if(mouseToJoyDistance < (getJoyCircleWidth() / 2.0)) {
         dragging = true;
         mouseOffset = event->pos() - getJoyCircleRealCenter();
-        qDebug() << mouseOffset;
     }
 }
 
-void JoystickWidget::mouseReleaseEvent(QMouseEvent *event) {
+void JoystickWidget::mouseReleaseEvent(QMouseEvent *) {
     dragging = false;
 }
 

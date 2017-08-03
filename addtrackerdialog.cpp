@@ -1,7 +1,9 @@
 #include "addtrackerdialog.h"
 
-AddTrackerDialog::AddTrackerDialog(QWidget * parent) : QDialog(parent) {
-    // http://stackoverflow.com/questions/12470806/qdialog-exec-and-getting-result-value
+// http://stackoverflow.com/questions/12470806/qdialog-exec-and-getting-result-value
+AddTrackerDialog::AddTrackerDialog(QWidget * parent)
+    : QDialog(parent)
+{
     setupUi(this);
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     tleInput->setFont(fixedFont);

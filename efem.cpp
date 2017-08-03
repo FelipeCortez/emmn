@@ -45,6 +45,7 @@ void Efem::set_name(char *_sat_name)
     for (int i = 0; i < 7; i++) {
         sat_name[i] = _sat_name[i];
     }
+
     if (sat_name[0] == 'S' || sat_name[0] == 's') {
         sat_name[4] = NULL;
         sat_name[5] = NULL;

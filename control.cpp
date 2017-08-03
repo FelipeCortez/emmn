@@ -38,7 +38,7 @@ void Control::send_set(float az, float ele) {
     unsigned short temp = 0;
 
     //Gerar bytes A1, A0, E1, E0
-    az = az *(65535.0 / 360.0);
+    az = az * (65535.0 / 360.0);
     temp = round(az);
 
     a0 = temp & 255;
@@ -60,16 +60,6 @@ void Control::send_set(float az, float ele) {
     //Calcula checksum
     setString[5] = setString[0] ^ setString[1] ^ setString[2] ^ setString[3] ^ setString[4];
 
-    /*
-    printf("setString: {%d, %d, %d, %d, %d, %d} \n\n",
-           setString[0],
-            setString[1],
-            setString[2],
-            setString[3],
-            setString[4],
-            setString[5]);
-    */
-
     //loop para envio do comando SET e recepção da resposta do arduino
     //A resposta será ACK ou NACK, caso o arduino reconheça ou não, respectivamente
     //Caso o PC receba NACK, ele reenviará o comando SET
@@ -89,8 +79,6 @@ void Control::send_set(float az, float ele) {
 QMap<QString, float> Control::send_state()
 {
     QMap<QString, float> answer;
-    //variavel auxiliar de 16 bits
-    unsigned short temp = 0;
 
     //envia comando STATE
     serial.Write(state, 1);
@@ -114,21 +102,11 @@ QMap<QString, float> Control::send_state()
         cont_erro = cont_erro + erro_ack;
     }
 
-    /*
-    printf("Input String: {%d, %d, %d, %d, %d, %d, %d}\n\n",
-           input_state[0],
-           input_state[1],
-           input_state[2],
-           input_state[3],
-           input_state[4],
-           input_state[5],
-           input_state[6]);
-           */
-
     //Decodifica posições AZ e ELE
     a0 = input_state[2];
     a1 = input_state[1];
 
+    unsigned short temp = 0;
     temp = a1 << 8;
     temp = temp | a0;
 
@@ -169,27 +147,18 @@ void Control::moveToTarget() {
     az = answerMap.value("az");
     ele = answerMap.value("ele");
 
-    //qDebug() << "---";
-    //qDebug() << az;
-    //qDebug() << ele;
     float az_increment = targetAz - az;
     az_increment = Helpers::clip(az_increment, 10);
     float ele_increment = targetEle - ele;
     ele_increment = Helpers::clip(ele_increment, 10);
-    //send_set(az + az_increment, ele + ele_increment);
     send_set(az + az_increment, ele + ele_increment);
-    //qDebug() << "az:" << az << "|" << "increment:" << az_increment;
-    //qDebug() << "ele:" << ele << "|" << "increment:" << ele_increment;
-    //qDebug() << "--";
 }
 
-void Control::send_power(void)
-{
+void Control::send_power(void) {
     erro_ack = 1;
     while (erro_ack != 0) {
         //Envia POWER
         serial.Write(power, 1);
-
         serial.Read(input_ack, 1);
 
         if (input_ack[0] == 'A') {
@@ -228,78 +197,3 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
     }
 
 }
-
-/*
-void Control::gerar_rampa(float *_rampa_AZ, float *_rampa_ELE)
-{
-    float mAZ = 0, mELE = 0;
-    int k = 0;
-
-    mAZ = (refAZ - AZ) / 30.0;
-    mELE = (refELE - ELE) / 30.0;
-
-    for (k = 1; k <= 30; k++) {
-        _rampa_AZ[k - 1] = AZ + k*mAZ;
-        _rampa_ELE[k - 1] = ELE + k*mELE;
-    }
-}
-*/
-
-/*
-void Control::runProgram() {
-    //INICIA COMUNICAÇÃO SERIAL
-    serial.Open(port_name);
-    //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
-    serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
-    // Configura porta serial para na hora de ler bytes esperar até o numero solicitado, passado como argumento da função
-    serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
-
-    if (serial.IsOpen() == true) {
-        printf("Porta serial conectada\n\n");
-    } else {
-        printf("Erro ao abrir porta serial\n");
-        return; // TODO: substituir por throw error
-    }
-
-    //Envia comando STATE para saber STATUS atual do sistema
-    // Ou seja, "get" state
-    send_state(input_state, &AZ, &ELE, &cont_erro);
-
-    //Recebe a primeira efeméride da passagem
-    //passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-
-    //liga sistema e recebe estado atual da antena
-    send_power();
-    send_state(input_state, &AZ, &ELE, &cont_erro);
-
-    //gera rampa de posicionamento inicial
-    gerar_rampa(rampa_AZ, rampa_ELE);
-
-    //Envia sinal de controle com a rampa inicial
-    for (cont_aux = 1; cont_aux < 30; cont_aux++) {
-        //while (time(NULL) < (ef_time - 30 + cont_aux));
-        //system("cls");
-        //printf("Informacoes da passagem atual:\nData: %d/%d/%d Hora: %d:%d:%d  duracao: %f  max_ele: %f  Sat_name: %s\n\n",
-        //    horario->tm_mday, horario->tm_mon + 1, horario->tm_year + 1900, horario->tm_hour, horario->tm_min, horario->tm_sec, durat, max_ele, satelite);
-        //printf("RAMPA DE POSICIONAMENTO INICIAL\n\n");
-        send_set(rampa_AZ[cont_aux], rampa_ELE[cont_aux], setString, &cont_erro);
-        //Sleep(20);
-        send_state(input_state, &AZ, &ELE, &cont_erro);
-    }
-
-    // Enquanto tiver passagem
-    passagem[cont_pass].get_efem(&ef_time, &refAZ, &refELE, &range);
-    send_set(refAZ, refELE, setString, &cont_erro);
-    send_state(input_state, &AZ, &ELE, &cont_erro); // para verificar erro
-    gerar_rampa(180, 90); // posicionamento final
-
-    // No fim
-    send_power();
-    Sleep(20);
-    send_state(input_state, &AZ, &ELE, &cont_erro);
-
-
-    printf("Fim das passagens carregadas!!\n");
-    delete [] passagem;
-}
-    */

@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->satellitesView->setDragDropMode(QAbstractItemView::InternalMove);
     ui->satellitesView->setDragEnabled(true);
 
-    controlFromSettings();
+    setPortFromSettings();
 
     satInfoTimer.start(1000);
     antennaTimer.start(500);
@@ -100,9 +100,8 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(antennaUpdateSlot()));
 }
 
-void MainWindow::controlFromSettings() {
-    // TODO: Urgentemente! Detectar se porta responde a validação e só abrir assim!
-    // Poxa vida
+void MainWindow::setPortFromSettings() {
+    // TODO: Urgentemente! Abrir apenas se porta for validada!
     const QString portStr = Settings::getSerialPort();
     wchar_t* port = new wchar_t[portStr.length() + 1];
     portStr.toWCharArray(port);
@@ -142,8 +141,6 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->satelliteGroupBox->setTitle(tracker.getTitle());
         ui->nextPassesView->repaint();
 
-        //network.getTLE(tracker.getTitle());
-        //tracker.UpdateTLE();
         QList<PassDetails> pd = tracker.GeneratePassListQt();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
@@ -294,13 +291,12 @@ void MainWindow::acceptedTleSlot(int confirm) {
                     Settings::saveTrackers(model->getTrackers());
                 } else {
                     auto selectedIndex = selected.indexes().first();
-                    auto tracker = model->getTrackers()[selectedIndex.row()];
                     ui->satellitesView->selectionModel()->setCurrentIndex(selectedIndex, QItemSelectionModel::ClearAndSelect);
                     model->setTracker(selectedIndex.row(), t);
                     Settings::saveTrackers(model->getTrackers());
                     rowChangedSlot(selected, QItemSelection());
                 }
-            } catch(TleException e) {
+            } catch(TleException) {
                 qDebug() << "TLE inválida";
             }
         } else {
@@ -317,7 +313,7 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
 
         delete control;
         Settings::setSerialPort(settingsDialog.serialPortsCombo->currentData().toString());
-        controlFromSettings();
+        setPortFromSettings();
     }
 }
 

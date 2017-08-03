@@ -16,7 +16,7 @@ public:
     explicit JoystickWidget(QWidget *parent = 0);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
 
 private:

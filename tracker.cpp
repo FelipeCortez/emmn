@@ -182,34 +182,24 @@ DateTime Tracker::FindCrossingPoint(
         Eci eci = sgp4.FindPosition(middle_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        if (topo.elevation > 0.0)
-        {
+        if (topo.elevation > 0.0) {
             /*
              * satellite above horizon
              */
-            if (finding_aos)
-            {
+            if (finding_aos) {
                 time2 = middle_time;
-            }
-            else
-            {
+            } else {
                 time1 = middle_time;
             }
-        }
-        else
-        {
-            if (finding_aos)
-            {
+        } else {
+            if (finding_aos) {
                 time1 = middle_time;
-            }
-            else
-            {
+            } else {
                 time2 = middle_time;
             }
         }
 
-        if ((time2 - time1).TotalSeconds() < 1.0)
-        {
+        if ((time2 - time1).TotalSeconds() < 1.0) {
             /*
              * two times are within a second, stop
              */
@@ -231,16 +221,12 @@ DateTime Tracker::FindCrossingPoint(
      */
     running = true;
     cnt = 0;
-    while (running && cnt++ < 6)
-    {
+    while (running && cnt++ < 6) {
         Eci eci = sgp4.FindPosition(middle_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
-        if (topo.elevation > 0)
-        {
+        if (topo.elevation > 0) {
             middle_time = middle_time.AddSeconds(finding_aos ? -1 : 1);
-        }
-        else
-        {
+        } else {
             running = false;
         }
     }
@@ -266,8 +252,7 @@ std::list<PassDetails> Tracker::GeneratePassList(
     DateTime previous_time(start_time);
     DateTime current_time(start_time);
 
-    while (current_time < end_time)
-    {
+    while (current_time < end_time) {
         bool end_of_pass = false;
 
         /*
@@ -276,22 +261,18 @@ std::list<PassDetails> Tracker::GeneratePassList(
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        if (!found_aos && topo.elevation > 0.0)
-        {
+        if (!found_aos && topo.elevation > 0.0) {
             /*
              * aos hasnt occured yet, but the satellite is now above horizon
              * this must have occured within the last time_step
              */
-            if (start_time == current_time)
-            {
+            if (start_time == current_time) {
                 /*
                  * satellite was already above the horizon at the start,
                  * so use the start time
                  */
                 aos_time = start_time;
-            }
-            else
-            {
+            } else {
                 /*
                  * find the point at which the satellite crossed the horizon
                  */
@@ -301,9 +282,7 @@ std::list<PassDetails> Tracker::GeneratePassList(
                         true);
             }
             found_aos = true;
-        }
-        else if (found_aos && topo.elevation < 0.0)
-        {
+        } else if (found_aos && topo.elevation < 0.0) {
             found_aos = false;
             /*
              * end of pass, so move along more than time_step
@@ -333,23 +312,19 @@ std::list<PassDetails> Tracker::GeneratePassList(
          */
         previous_time = current_time;
 
-        if (end_of_pass)
-        {
+        if (end_of_pass) {
             /*
              * at the end of the pass move the time along by 30mins
              */
             current_time = current_time + TimeSpan(0, 30, 0);
-        }
-        else
-        {
+        } else {
             /*
              * move the time along by the time step value
              */
             current_time = current_time + TimeSpan(0, 0, time_step);
         }
 
-        if (current_time > end_time)
-        {
+        if (current_time > end_time) {
             /*
              * dont go past end time
              */
@@ -357,8 +332,7 @@ std::list<PassDetails> Tracker::GeneratePassList(
         }
     };
 
-    if (found_aos)
-    {
+    if (found_aos) {
         /*
          * satellite still above horizon at end of search period, so use end
          * time as los
@@ -392,8 +366,7 @@ QList<PassDetails> Tracker::GeneratePassListQt(
     DateTime previous_time(start_time);
     DateTime current_time(start_time);
 
-    while (current_time < end_time)
-    {
+    while (current_time < end_time) {
         bool end_of_pass = false;
 
         /*
@@ -402,22 +375,18 @@ QList<PassDetails> Tracker::GeneratePassListQt(
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        if (!found_aos && topo.elevation > 0.0)
-        {
+        if (!found_aos && topo.elevation > 0.0) {
             /*
              * aos hasnt occured yet, but the satellite is now above horizon
              * this must have occured within the last time_step
              */
-            if (start_time == current_time)
-            {
+            if (start_time == current_time) {
                 /*
                  * satellite was already above the horizon at the start,
                  * so use the start time
                  */
                 aos_time = start_time;
-            }
-            else
-            {
+            } else {
                 /*
                  * find the point at which the satellite crossed the horizon
                  */
@@ -427,9 +396,7 @@ QList<PassDetails> Tracker::GeneratePassListQt(
                         true);
             }
             found_aos = true;
-        }
-        else if (found_aos && topo.elevation < 0.0)
-        {
+        } else if (found_aos && topo.elevation < 0.0) {
             found_aos = false;
             /*
              * end of pass, so move along more than time_step
@@ -460,23 +427,19 @@ QList<PassDetails> Tracker::GeneratePassListQt(
          */
         previous_time = current_time;
 
-        if (end_of_pass)
-        {
+        if (end_of_pass) {
             /*
              * at the end of the pass move the time along by 30mins
              */
             current_time = current_time + TimeSpan(0, 30, 0);
-        }
-        else
-        {
+        } else {
             /*
              * move the time along by the time step value
              */
             current_time = current_time + TimeSpan(0, 0, time_step);
         }
 
-        if (current_time > end_time)
-        {
+        if (current_time > end_time) {
             /*
              * dont go past end time
              */
@@ -484,8 +447,7 @@ QList<PassDetails> Tracker::GeneratePassListQt(
         }
     };
 
-    if (found_aos)
-    {
+    if (found_aos) {
         /*
          * satellite still above horizon at end of search period, so use end
          * time as los

@@ -40,7 +40,7 @@ private:
     Control* control;
     int counter;
 
-    void controlFromSettings();
+    void setPortFromSettings();
     void loadTrackersFromSettings();
     QString betterDate(DateTime datetime);
 

@@ -10,7 +10,6 @@ namespace Settings {
         settings->beginWriteArray("trackers", trackers.length());
         int i;
         for(i = 0; i < trackers.length(); ++i) {
-            //qDebug() << trackers.at(i).getTitle();
             settings->setArrayIndex(i);
             settings->setValue("tracker", QVariant::fromValue(trackers[i]));
         }
