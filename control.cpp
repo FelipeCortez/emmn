@@ -9,7 +9,7 @@ FILE *arq;
 //Cria objeto da porta serial
 CSerial serial;
 
-Control::Control(const wchar_t* port) {
+Control::Control(const wchar_t* port, TrackerListModel *trackerListModel) {
     //INICIA COMUNICAÇÃO SERIAL
     serial.Open(port);
     //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
@@ -26,6 +26,8 @@ Control::Control(const wchar_t* port) {
 
     send_power();
     setTarget(180, 90);
+
+    this->trackerListModel = trackerListModel;
 }
 
 Control::~Control() {
@@ -196,4 +198,40 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
         return 1;
     }
 
+}
+
+void Control::updateAntennaPosition() {
+    TimeSpan remaining = trackerListModel->allPasses.at(0).passDetails.aos - DateTime::Now(true);
+    auto nextPass = trackerListModel->allPasses.at(0);
+    float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
+    float positioningTime = 60;
+
+    bool qd = false;
+
+    if(nextPass.tracker->getElevationForObserver() >= 0) {
+        if(qd) { qDebug() << "Passando"; }
+        double az = nextPass.tracker->getAzimuthForObserver();
+        double ele = nextPass.tracker->getElevationForObserver();
+        if(nextPass.passDetails.reverse) {
+            az = fabs(180 - az);
+            ele = fabs(180 - ele);
+        }
+
+        setTarget(az, ele);
+    } else if(secondsRemaining <= positioningTime &&
+              secondsRemaining > 0) {
+        if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
+        double az = nextPass.tracker->getAzimuthForObserver();
+        double ele = 0;
+        if(nextPass.passDetails.reverse) {
+            az = fabs(180 - az);
+            ele = fabs(180 - ele);
+        }
+
+        setTarget(az, ele);
+    } else {
+        setTarget(180, 90);
+    }
+
+    moveToTarget();
 }

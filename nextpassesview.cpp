@@ -17,7 +17,8 @@ void NextPassesView::setTrackers(QList<Tracker>* trackers) {
 
 // https://stackoverflow.com/questions/24831484/how-to-align-qpainter-drawtext-around-a-point-not-a-rectangle
 void drawText(QPainter & painter, qreal x, qreal y, Qt::Alignment flags,
-              const QString & text, QRectF * boundingRect = 0) {
+              const QString & text, QRectF * boundingRect = 0)
+{
    const qreal size = 32767.0;
    QPointF corner(x, y - size);
    if (flags & Qt::AlignHCenter) corner.rx() -= size/2.0;
@@ -30,7 +31,8 @@ void drawText(QPainter & painter, qreal x, qreal y, Qt::Alignment flags,
 }
 
 void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
-              const QString & text, QRectF * boundingRect = {}) {
+              const QString & text, QRectF * boundingRect = {})
+{
    drawText(painter, point.x(), point.y(), flags, text, boundingRect);
 }
 
@@ -65,7 +67,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         painter.setPen(Qt::gray);
         while(dateIt < later) {
             auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
-            float lineX = xAxisRect.left() + (xAxisRect.width() * linePercentage);
+            float lineX = floor(xAxisRect.left() + (xAxisRect.width() * linePercentage)) + 0.5;
             painter.drawLine(QPointF(lineX, xAxisRect.top()),
                              QPointF(lineX, xAxisRect.bottom()));
 
@@ -81,8 +83,8 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
         boundingRect.setWidth(boundingRect.width() + 10);
         boundingRect.moveCenter(QPointF(xAxisRect.left() + margins * 2, xAxisRect.top() + margins / 2 + 1));
-        painter.drawLine(QPointF(xAxisRect.left(), xAxisRect.top()),
-                         QPointF(xAxisRect.left(), xAxisRect.bottom()));
+        painter.drawLine(QPointF(xAxisRect.left() + 0.5, xAxisRect.top()),
+                         QPointF(xAxisRect.left() + 0.5, xAxisRect.bottom()));
 
         // Desenha blocos
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {

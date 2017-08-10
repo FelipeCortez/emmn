@@ -7,11 +7,12 @@
 #include <QDebug>
 #include "efem.h"
 #include "serial.h"
+#include "trackerlistmodel.h"
 
 class Control
 {
 public:
-    Control(const wchar_t *port);
+    Control(const wchar_t *port, TrackerListModel* trackerListModel);
     ~Control();
 
     /*
@@ -137,8 +138,9 @@ public:
 
     void setTarget(float az, float ele);
     void moveToTarget();
+    void updateAntennaPosition();
 private:
-    //VARIAVEIS DO ALGORITMO DE CONTROLE E COMUNICAÇÃO
+    TrackerListModel* trackerListModel;
     float az;
     float ele;
     float targetAz;

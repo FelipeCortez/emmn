@@ -6,7 +6,6 @@ ManualControlDialog::ManualControlDialog(QWidget *parent)
     , ui(new Ui::ManualControlDialog)
 {
     ui->setupUi(this);
-
     ui->azimuthEdit->setFocus(Qt::OtherFocusReason);
 
     connect(ui->freeRadio,
@@ -21,6 +20,12 @@ ManualControlDialog::ManualControlDialog(QWidget *parent)
             SIGNAL(toggled(bool)),
             ui->joystickWidget,
             SLOT(setElevationSlot(bool)));
+}
+
+void ManualControlDialog::setControlRef(Control* control) {
+    this->control = control;
+    QMap<QString, float> answerMap = control->send_state();
+    ui->azimuthLabel->setText(QString::number(answerMap.value("az")));
 }
 
 ManualControlDialog::~ManualControlDialog()

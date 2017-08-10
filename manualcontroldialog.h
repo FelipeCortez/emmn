@@ -2,6 +2,7 @@
 #define MANUALCONTROLDIALOG_H
 
 #include <QDialog>
+#include "control.h"
 
 namespace Ui {
 class ManualControlDialog;
@@ -13,10 +14,12 @@ class ManualControlDialog : public QDialog
 
 public:
     explicit ManualControlDialog(QWidget *parent = 0);
+    void setControlRef(Control* control);
     ~ManualControlDialog();
 
 private:
     Ui::ManualControlDialog *ui;
+    Control* control;
 };
 
 #endif // MANUALCONTROLDIALOG_H

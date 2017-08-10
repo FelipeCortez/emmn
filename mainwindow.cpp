@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->satellitesView->setDragEnabled(true);
 
     setPortFromSettings();
+    manualControlDialog.setControlRef(control);
 
     satInfoTimer.start(1000);
     antennaTimer.start(500);
@@ -106,7 +107,7 @@ void MainWindow::setPortFromSettings() {
     wchar_t* port = new wchar_t[portStr.length() + 1];
     portStr.toWCharArray(port);
     port[portStr.length()] = '\0';
-    control = new Control(port);
+    control = new Control(port, model);
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -351,55 +352,8 @@ void MainWindow::satInfoUpdateSlot() {
     model->getAllPasses();
 }
 
-double lerp(float t, float a, float b){
-      return ((1-t) * a) + (t * b);
-  }
-
 void MainWindow::antennaUpdateSlot() {
-    TimeSpan remaining = model->allPasses.at(0).passDetails.aos - DateTime::Now(true);
-    auto nextPass = model->allPasses.at(0);
-    float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
-    float positioningTime = 60;
-
-    bool qd = false;
-
-    //qDebug() << nextPass.passDetails.reverse;
-
-    if(nextPass.tracker->getElevationForObserver() >= 0) {
-        if(qd) { qDebug() << "Passando"; }
-        double az = nextPass.tracker->getAzimuthForObserver();
-        double ele = nextPass.tracker->getElevationForObserver();
-        if(nextPass.passDetails.reverse) {
-            qDebug() << "passagem inversa";
-            qDebug() << az << "|" << ele;
-            az = 180 - az;
-            ele = 180 - ele;
-            qDebug() << az << "|" << ele;
-        }
-        control->setTarget(az, ele);
-    } else if(secondsRemaining <= positioningTime &&
-              secondsRemaining > 0) {
-        if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
-        double az = nextPass.tracker->getAzimuthForObserver();
-        double ele = 0;
-        if(nextPass.passDetails.reverse) {
-            //qDebug() << "passagem inversa";
-            //qDebug() << az << "|" << ele;
-            //az = fabs(180 - az);
-            //ele = 180 - ele;
-            //qDebug() << az << "|" << ele;
-        }
-        control->setTarget(az, ele);
-    } else {
-        if(qd) {
-            //qDebug() << "Contagem regressiva";
-            //qDebug() << secondsRemaining;
-        }
-        control->setTarget(180, 90);
-    }
-
-    control->moveToTarget();
-    //if(qd) { qDebug() << "--"; }
+    control->updateAntennaPosition();
 }
 
 void MainWindow::clearSelectedTrackerSlot() {
