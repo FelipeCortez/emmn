@@ -12,7 +12,6 @@ JoystickWidget::JoystickWidget(QWidget *parent)
     , joyCircleCenter(0, 0)
     , dragging(false)
     , mouseOffset(0, 0)
-    , refreshTimer(this)
     , controlAxes(ControlAxes::free)
 {
     limitCircle.setTopLeft(QPointF(0, 0));
@@ -21,12 +20,6 @@ JoystickWidget::JoystickWidget(QWidget *parent)
 
     setMouseTracking(true);
     joyCircleCenter = QPointF(0, 0);
-    refreshTimer.start(1000.0 / 60);
-
-    connect(&refreshTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(refreshSlot()));
 }
 
 void JoystickWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -81,7 +74,24 @@ void JoystickWidget::refreshSlot() {
         joyCircleCenter.setY(joyCircleCenter.y() * 0.95);
     }
 
+    if(fabs(joyCircleCenter.x()) < 0.1) {
+        joyCircleCenter.setX(0);
+    }
+
+    if(fabs(joyCircleCenter.y()) < 0.1) {
+        joyCircleCenter.setY(0);
+    }
+
     update();
+}
+
+AzEle JoystickWidget::getDeltas() {
+    AzEle antennaInfo;
+    const double maxMov = 1;
+    double maxRadius = (limitCircle.width() / 2.0) - (getJoyCircleWidth() / 2.0);
+    antennaInfo.azimuth = maxMov * joyCircleCenter.x() / maxRadius;
+    antennaInfo.elevation = maxMov * joyCircleCenter.y() / maxRadius;
+    return antennaInfo;
 }
 
 void JoystickWidget::mousePressEvent(QMouseEvent *event) {

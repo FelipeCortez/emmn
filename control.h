@@ -6,79 +6,21 @@
 #include <Windows.h>
 #include <QDebug>
 #include "efem.h"
+#include "helpers.h"
 #include "serial.h"
 #include "trackerlistmodel.h"
 
-class Control
+class Control : public QObject
 {
+    Q_OBJECT
+
 public:
-    Control(const wchar_t *port, TrackerListModel* trackerListModel);
+    Control(const wchar_t *port, TrackerListModel* trackerListModel, QObject *parent = 0);
     ~Control();
 
     /*
-    *   FUNÇÕES PARA CARREGAMENTO E TRATAMENTO DAS EFEMÉRIDES ---------------------
-    */
-
-    /** \brief Conta passagens para um dado arquivo
-    *
-    *  Abre o arquivo arq_name, armazena o nome em sat_name e retorna o número de
-    *  passagens identificado ou -1 se houve erro na leitura do arquivo
-    *
-    *  @param arq_name o nome do arquivo que contém a tabela
-    *  @param _sat_name receberá o nome do satélite lido no arquivo
-    *  @return o número de passagens lido no arquivo
-    *  @todo Acrescentar contagem do numero de efemérides para futura utilização
-    */
-
-    int cont_passagem(char *arq_name, char *_sat_name);
-
-    /** \brief Atualiza array global passagem com dados do arquivo
-    *
-    *  Abre um arquivo de efemérides, e passa os dados de uma passagem
-    *  identificada no arquivo para um objeto Efem (hora de inicio e fim, duração,
-    *  máxima elevação, azimute, elevação e hora das efemerides) apontado pela
-    *  variável passagem. Os parâmetros _n_pass0 e _n_pass1 serão utilizados como
-    *  limites do intervalo das passagens que serão carregadas. Ex: se um segundo
-    *  arquivo carregado tem 10 passagens e o primeiro tem 5, então, para o
-    *  segundo arquivo, _n_pass0 = 5 e _n_pass1 = 15.  caso a função não consiga
-    *  carregar o arquivo, ela retornará -1. Caso contrário, retornará 0.
-    *
-    *  @param arq_name o nome do arquivo que contém a tabela
-    *  @param _n_pass0 limite inferior do intervalo de passagens
-    *  @param _n_pass1 limite superior do intervalo de passagens
-    *  @param _sat_name receberá o nome do satélite lido no arquivo
-    *  @return o número de passagens lido no arquivo
-    */
-
-    int load_efem(char *_arq_name, int _n_pass0, int _n_pass1, char *_sat_name);
-
-    /** \brief Realiza ajustes necessários nas passagens
-    *
-    *  Esta função realiza os ajustes necessários nas passagens: offset magnetico
-    *  e ajuste em caso de passagem pelo final de curso.
-    *
-    *  @param _n_pass número total de passagens
-    */
-
-    void tratar_efem(int _n_pass);
-
-    /** \brief Ordena passagens em ordem cronológica crescente
-    *
-    *  @param _n_pass número total de passagens
-    */
-
-    void ordenar_passagens(int _n_pass);
-
-    /* FALTA FAZER:
-    -Alocação dinâmica de memoria para as efemérides(AZ, ELE, RANGE, ETC): Utilizar função cont_pass
-    para realizar contagem de cada efeméride;
-    -Ajustar o programa para realizar rastreios de passagens que já estão ocorrendo
-    */
-
-
-    /*
-    *   FUNÇÕES PARA COMUNICAÇÃO SERIAL ARDUINO - PC -----------------------------
-    */
+     *   FUNÇÕES PARA COMUNICAÇÃO SERIAL ARDUINO - PC -----------------------------
+     */
 
     /** \brief Gera uma rapa
     *
@@ -104,7 +46,7 @@ public:
      *
      *  @todo verificar se o comando enviado foi entendido
      */
-    QMap<QString, float> send_state();
+    AzEle send_state();
 
     /** \brief Send power???
     *
@@ -136,6 +78,7 @@ public:
     */
     void envia_reconhecimento(int _erro);
 
+    void setDeltas(float deltaAz, float deltaEle);
     void setTarget(float az, float ele);
     void moveToTarget();
     void updateAntennaPosition();
@@ -145,6 +88,7 @@ private:
     float ele;
     float targetAz;
     float targetEle;
+    QTimer antennaTimer;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)
@@ -170,7 +114,8 @@ private:
     //Status do sistema
     int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
 
-
+public slots:
+    void updateSlot();
 };
 
 #endif // CONTROL_H

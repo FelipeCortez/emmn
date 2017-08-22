@@ -1,5 +1,4 @@
 #include "control.h"
-#include "helpers.h"
 
 FILE *arq;
 
@@ -9,8 +8,10 @@ FILE *arq;
 //Cria objeto da porta serial
 CSerial serial;
 
-Control::Control(const wchar_t* port, TrackerListModel *trackerListModel) {
-    //INICIA COMUNICAÇÃO SERIAL
+Control::Control(const wchar_t* port, TrackerListModel *trackerListModel, QObject *parent)
+    : QObject(parent)
+    , antennaTimer(this)
+{
     serial.Open(port);
     //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
     serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
@@ -25,9 +26,17 @@ Control::Control(const wchar_t* port, TrackerListModel *trackerListModel) {
     }
 
     send_power();
+    antennaTimer.start(500);
     setTarget(180, 90);
 
     this->trackerListModel = trackerListModel;
+
+    /*
+    connect(&antennaTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(updateSlot()));
+            */
 }
 
 Control::~Control() {
@@ -78,10 +87,8 @@ void Control::send_set(float az, float ele) {
     }
 }
 
-QMap<QString, float> Control::send_state()
+AzEle Control::send_state()
 {
-    QMap<QString, float> answer;
-
     //envia comando STATE
     serial.Write(state, 1);
     erro_ack = 1;
@@ -122,8 +129,9 @@ QMap<QString, float> Control::send_state()
 
     float ele = temp * (360.0 / 65535.0);
 
-    answer["az"] = az;
-    answer["ele"] = ele;
+    AzEle antennaInfo;
+    antennaInfo.azimuth = az;
+    antennaInfo.elevation = ele;
 
     //Decodificação do STATUS do sistema contido no byte 5 da mensagem
     m =    (input_state[5]) % 2;
@@ -136,7 +144,18 @@ QMap<QString, float> Control::send_state()
     //printf("\nP:%d  KA1: %d KA2: %d DAZ: %d  DEL: %d  M: %d  Erros: %d\n\n", p, ka1, ka2, daz, del, m, erro_ack);
     //printf("Erros detectados: %d\n\n", cont_erro);
 
-    return answer;
+    return antennaInfo;
+}
+
+void Control::setDeltas(float deltaAz, float deltaEle) {
+    AzEle antennaInfo = send_state();
+    az = antennaInfo.azimuth;
+    ele = antennaInfo.elevation;
+
+    if(az + deltaAz < 0 || az + deltaAz > 360) { deltaAz = 0; }
+    if(ele + deltaEle < 0 || ele + deltaEle > 360) { deltaEle = 0; }
+
+    send_set(az + deltaAz, ele + deltaEle);
 }
 
 void Control::setTarget(float az, float ele) {
@@ -145,15 +164,15 @@ void Control::setTarget(float az, float ele) {
 }
 
 void Control::moveToTarget() {
-    QMap<QString, float> answerMap = send_state();
-    az = answerMap.value("az");
-    ele = answerMap.value("ele");
+    AzEle antennaInfo = send_state();
+    az = antennaInfo.azimuth;
+    ele = antennaInfo.elevation;
 
-    float az_increment = targetAz - az;
-    az_increment = Helpers::clip(az_increment, 10);
-    float ele_increment = targetEle - ele;
-    ele_increment = Helpers::clip(ele_increment, 10);
-    send_set(az + az_increment, ele + ele_increment);
+    float incrementAz = targetAz - az;
+    incrementAz = Helpers::clip(incrementAz, 10);
+    float incrementEle = targetEle - ele;
+    incrementEle = Helpers::clip(incrementEle, 10);
+    send_set(az + incrementAz, ele + incrementEle);
 }
 
 void Control::send_power(void) {
@@ -200,7 +219,7 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
 
 }
 
-void Control::updateAntennaPosition() {
+void Control::updateSlot() {
     TimeSpan remaining = trackerListModel->allPasses.at(0).passDetails.aos - DateTime::Now(true);
     auto nextPass = trackerListModel->allPasses.at(0);
     float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "control.h"
+#include "helpers.h"
 
 namespace Ui {
 class ManualControlDialog;
@@ -20,6 +21,10 @@ public:
 private:
     Ui::ManualControlDialog *ui;
     Control* control;
+    QTimer joystickRefreshTimer;
+
+public slots:
+    void updateAntennaInfo();
 };
 
 #endif // MANUALCONTROLDIALOG_H

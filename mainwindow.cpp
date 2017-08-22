@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
   , settingsDialog(this)
   , manualControlDialog(this)
   , satInfoTimer(this)
-  , antennaTimer(this)
   , tableModel(nullptr)
 {
     model = new TrackerListModel();
@@ -32,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     manualControlDialog.setControlRef(control);
 
     satInfoTimer.start(1000);
-    antennaTimer.start(500);
 
     addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
 
@@ -95,10 +93,6 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(satInfoUpdateSlot()));
-    connect(&antennaTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(antennaUpdateSlot()));
 }
 
 void MainWindow::setPortFromSettings() {
@@ -160,6 +154,8 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
             int row = 0;
             QList<PassDetails>::const_iterator itr = pd.begin();
             do {
+                //QCoreApplication::processEvents();
+                //QEventLoop::processEvents();
                 QString text;
                 QStandardItem* item;
 
@@ -257,7 +253,6 @@ void MainWindow::settingsDialogSlot(bool) {
 
 void MainWindow::manualControlDialogSlot(bool) {
     satInfoTimer.stop();
-    antennaTimer.stop();
     manualControlDialog.exec();
 }
 
@@ -330,9 +325,9 @@ void MainWindow::satInfoUpdateSlot() {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
     ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
-    QMap<QString, float> answerMap = control->send_state();
-    ui->azLabel->setText(QString::number(answerMap.value("az")));
-    ui->eleLabel->setText(QString::number(answerMap.value("ele")));
+    AzEle antennaInfo = control->send_state();
+    ui->azLabel->setText(QString::number(antennaInfo.azimuth));
+    ui->eleLabel->setText(QString::number(antennaInfo.elevation));
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
@@ -350,10 +345,6 @@ void MainWindow::satInfoUpdateSlot() {
     }
 
     model->getAllPasses();
-}
-
-void MainWindow::antennaUpdateSlot() {
-    control->updateAntennaPosition();
 }
 
 void MainWindow::clearSelectedTrackerSlot() {

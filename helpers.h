@@ -7,6 +7,11 @@
 #include "tracker.h"
 #include "DateTime.h"
 
+typedef struct AzEle {
+    double azimuth;
+    double elevation;
+} AzEle;
+
 namespace Settings {
     QSettings* getSettings();
     void saveTrackers(QList<Tracker> trackers);

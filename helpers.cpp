@@ -60,6 +60,7 @@ namespace Settings {
 }
 
 namespace Helpers {
+
     QString betterDate(DateTime date) {
         QString zone;
 

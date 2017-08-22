@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QTimer>
+#include "helpers.h"
 
 enum class ControlAxes {
     azimuthOnly, elevationOnly, free
@@ -18,6 +19,7 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
+    AzEle getDeltas();
 
 private:
     const int widgetSize;
@@ -27,7 +29,6 @@ private:
     QRectF limitCircle;
     bool dragging;
     QPointF mouseOffset;
-    QTimer refreshTimer;
     ControlAxes controlAxes;
 
     double getJoyCircleWidth();

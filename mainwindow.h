@@ -34,7 +34,6 @@ private:
     ManualControlDialog manualControlDialog;
     TrackerListModel* model;
     QTimer satInfoTimer;
-    QTimer antennaTimer;
     QStandardItemModel* tableModel;
     Network network;
     Control* control;
@@ -55,7 +54,6 @@ public slots:
    void acceptedTleSlot(int confirm);
    void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
-   void antennaUpdateSlot();
    void clearSelectedTrackerSlot();
    void moveTrackerUpSlot();
    void moveTrackerDownSlot();
