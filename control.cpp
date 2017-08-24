@@ -10,6 +10,7 @@ CSerial serial;
 
 Control::Control(const wchar_t* port, TrackerListModel *trackerListModel, QObject *parent)
     : QObject(parent)
+    , controller(Controller::Schedule)
     , antennaTimer(this)
 {
     serial.Open(port);
@@ -153,12 +154,16 @@ void Control::setDeltas(float deltaAz, float deltaEle) {
     if(az + deltaAz < 0 || az + deltaAz > 360) { deltaAz = 0; }
     if(ele + deltaEle < 0 || ele + deltaEle > 360) { deltaEle = 0; }
 
-    send_set(az + deltaAz, ele + deltaEle);
+    setTarget(az + deltaAz, ele + deltaEle);
 }
 
 void Control::setTarget(float az, float ele) {
     targetAz = az;
     targetEle = ele;
+}
+
+void Control::setController(Controller controller) {
+    this->controller = controller;
 }
 
 void Control::moveToTarget() {
@@ -218,36 +223,38 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
 }
 
 void Control::updateSlot() {
-    TimeSpan remaining = trackerListModel->allPasses.at(0).passDetails.aos - DateTime::Now(true);
-    auto nextPass = trackerListModel->allPasses.at(0);
-    float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
-    float positioningTime = 60;
+    if(controller == Controller::Schedule) {
+        TimeSpan remaining = trackerListModel->allPasses.at(0).passDetails.aos - DateTime::Now(true);
+        auto nextPass = trackerListModel->allPasses.at(0);
+        float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
+        float positioningTime = 60;
 
-    bool qd = false;
+        bool qd = false;
 
-    if(nextPass.tracker->getElevationForObserver() >= 0) {
-        if(qd) { qDebug() << "Passando"; }
-        double az = nextPass.tracker->getAzimuthForObserver();
-        double ele = nextPass.tracker->getElevationForObserver();
-        if(nextPass.passDetails.reverse) {
-            az = fmod(az + 180, 360);
-            ele = 180 - ele;
+        if(nextPass.tracker->getElevationForObserver() >= 0) {
+            if(qd) { qDebug() << "Passando"; }
+            double az = nextPass.tracker->getAzimuthForObserver();
+            double ele = nextPass.tracker->getElevationForObserver();
+            if(nextPass.passDetails.reverse) {
+                az = fmod(az + 180, 360);
+                ele = 180 - ele;
+            }
+
+            setTarget(az, ele);
+        } else if(secondsRemaining <= positioningTime &&
+                  secondsRemaining > 0) {
+            if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
+            double az = nextPass.tracker->getAzimuthForObserver();
+            double ele = 0;
+            if(nextPass.passDetails.reverse) {
+                az = fmod(az + 180, 360);
+                ele = 180 - ele;
+            }
+
+            setTarget(az, ele);
+        } else {
+            setTarget(180, 90);
         }
-
-        setTarget(az, ele);
-    } else if(secondsRemaining <= positioningTime &&
-              secondsRemaining > 0) {
-        if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
-        double az = nextPass.tracker->getAzimuthForObserver();
-        double ele = 0;
-        if(nextPass.passDetails.reverse) {
-            az = fmod(az + 180, 360);
-            ele = 180 - ele;
-        }
-
-        setTarget(az, ele);
-    } else {
-        setTarget(180, 90);
     }
 
     moveToTarget();

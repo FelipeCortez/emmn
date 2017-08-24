@@ -254,10 +254,11 @@ void MainWindow::settingsDialogSlot(bool) {
 
 void MainWindow::manualControlDialogSlot(bool) {
     satInfoTimer.stop();
-    ManualControlDialog dialog(this);
-    dialog.setControlRef(control);
+    control->setController(Controller::Manual);
+    ManualControlDialog dialog(control, this);
     // exec bloqueia, de forma que o start do timer só rodará quando o dialog for fechado
     dialog.exec();
+    control->setController(Controller::Schedule);
     satInfoTimer.start();
 }
 

@@ -1,10 +1,10 @@
 #include "manualcontroldialog.h"
 #include "ui_manualcontrol_dialog.h"
 
-ManualControlDialog::ManualControlDialog(QWidget *parent)
+ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ManualControlDialog)
-    , control(nullptr)
+    , control(control)
     , joystickRefreshTimer(this)
 {
     ui->setupUi(this);
@@ -34,20 +34,18 @@ ManualControlDialog::ManualControlDialog(QWidget *parent)
             SLOT(updateAntennaInfo()));
 }
 
+/*
 void ManualControlDialog::setControlRef(Control* control) {
     this->control = control;
 }
+*/
 
 void ManualControlDialog::updateAntennaInfo() {
-    /*
-    if(control != nullptr) {
-        AzEle antennaInfo = control->send_state();
-        ui->azimuthLabel->setText(QString::number(antennaInfo.azimuth));
-        ui->elevationLabel->setText(QString::number(antennaInfo.elevation));
-        AzEle antennaDeltas = ui->joystickWidget->getDeltas();
-        control->setDeltas(antennaDeltas.azimuth, antennaDeltas.elevation);
-    }
-    */
+    AzEle antennaInfo = control->send_state();
+    ui->azimuthLabel->setText(QString::number(antennaInfo.azimuth));
+    ui->elevationLabel->setText(QString::number(antennaInfo.elevation));
+    AzEle antennaDeltas = ui->joystickWidget->getDeltas();
+    control->setDeltas(antennaDeltas.azimuth, antennaDeltas.elevation);
 }
 
 ManualControlDialog::~ManualControlDialog() {

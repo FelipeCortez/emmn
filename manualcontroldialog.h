@@ -14,8 +14,7 @@ class ManualControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ManualControlDialog(QWidget *parent = 0);
-    void setControlRef(Control* control);
+    explicit ManualControlDialog(Control *control, QWidget *parent = 0);
     ~ManualControlDialog();
 
 private:

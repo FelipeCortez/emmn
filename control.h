@@ -10,6 +10,10 @@
 #include "serial.h"
 #include "trackerlistmodel.h"
 
+enum class Controller {
+    Schedule, Manual
+};
+
 class Control : public QObject
 {
     Q_OBJECT
@@ -80,6 +84,7 @@ public:
 
     void setDeltas(float deltaAz, float deltaEle);
     void setTarget(float az, float ele);
+    void setController(Controller controller);
     void moveToTarget();
     void updateAntennaPosition();
 private:
@@ -88,6 +93,7 @@ private:
     float ele;
     float targetAz;
     float targetEle;
+    Controller controller;
     QTimer antennaTimer;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
 
