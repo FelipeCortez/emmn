@@ -10,6 +10,8 @@ class SettingsDialog : public QDialog, public Ui::SettingsDialog {
 public:
      SettingsDialog(QWidget * parent = 0);
      void updateWithSettings();
+public slots:
+     void accept();
 };
 
 #endif // SETTINGSDIALOG_H

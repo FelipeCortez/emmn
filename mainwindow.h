@@ -48,7 +48,6 @@ public slots:
    void debugarSlot(bool);
    void editSelectedTrackerSlot();
    void removeSelectedTrackerSlot();
-   void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
    void clearSelectedTrackerSlot();
    void moveTrackerUpSlot();

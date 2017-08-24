@@ -245,15 +245,11 @@ void MainWindow::editSelectedTrackerSlot() {
 }
 
 void MainWindow::settingsDialogSlot(bool) {
-
-    //settingsDialog.updateWithSettings();
-    /*
-    connect(&settingsDialog,
-            SIGNAL(finished(int)),
-            this,
-            SLOT(acceptedSettingsSlot(int)));
-            */
-    //settingsDialog.exec();
+    SettingsDialog dialog;
+    if(dialog.exec()) {
+        auto selected = ui->satellitesView->selectionModel()->selection();
+        rowChangedSlot(selected, QItemSelection());
+    }
 }
 
 void MainWindow::manualControlDialogSlot(bool) {
@@ -269,24 +265,11 @@ void MainWindow::removeSelectedTrackerSlot() {
     foreach(const QModelIndex &index, ui->satellitesView->selectionModel()->selectedIndexes()) {
         qDebug() << index.data(Qt::DisplayRole).toString();
         model->removeRow(index.row());
+        ui->satellitesView->selectionModel()->clear();
         Settings::saveTrackers(model->getTrackers());
     }
 
     ui->nextPassesView->repaint();
-}
-
-void MainWindow::acceptedSettingsSlot(int confirm) {
-    if(confirm) {
-        /*
-        Settings::setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
-        auto selected = ui->satellitesView->selectionModel()->selection();
-        rowChangedSlot(selected, QItemSelection());
-
-        delete control;
-        Settings::setSerialPort(settingsDialog.serialPortsCombo->currentData().toString());
-        setPortFromSettings();
-        */
-    }
 }
 
 void MainWindow::satInfoUpdateSlot() {
@@ -300,6 +283,7 @@ void MainWindow::satInfoUpdateSlot() {
     } else {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
+
     ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
     AzEle antennaInfo = control->send_state();
     ui->azLabel->setText(QString::number(antennaInfo.azimuth));

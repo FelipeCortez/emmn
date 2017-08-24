@@ -61,5 +61,5 @@ void AddTrackerDialog::accept() {
         return;
     }
 
-    QDialog::accept(); // TODO: rodar só se for sucesso!
+    QDialog::accept();
 }

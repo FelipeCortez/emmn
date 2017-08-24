@@ -16,8 +16,28 @@ SettingsDialog::SettingsDialog(QWidget * parent)
             serialPortsCombo->setCurrentIndex(serialPortsCombo->count() - 1);
         }
     }
+
+    updateWithSettings();
+
+    connect(settingsDialogButtonBox,
+            SIGNAL(accepted()),
+            this,
+            SLOT(accept()));
+    connect(settingsDialogButtonBox,
+            SIGNAL(rejected()),
+            this,
+            SLOT(reject()));
 }
 
 void SettingsDialog::updateWithSettings() {
     useLocalTimeCheckbox->setChecked(Settings::getUseLocalTime());
+}
+
+void SettingsDialog::accept() {
+    Settings::setUseLocalTime(useLocalTimeCheckbox->isChecked());
+
+    Settings::setSerialPort(serialPortsCombo->currentData().toString());
+    //setPortFromSettings();
+
+    QDialog::accept();
 }

@@ -31,12 +31,10 @@ Control::Control(const wchar_t* port, TrackerListModel *trackerListModel, QObjec
 
     this->trackerListModel = trackerListModel;
 
-    /*
     connect(&antennaTimer,
             SIGNAL(timeout()),
             this,
             SLOT(updateSlot()));
-            */
 }
 
 Control::~Control() {
