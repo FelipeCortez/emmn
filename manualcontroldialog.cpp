@@ -39,6 +39,7 @@ void ManualControlDialog::setControlRef(Control* control) {
 }
 
 void ManualControlDialog::updateAntennaInfo() {
+    /*
     if(control != nullptr) {
         AzEle antennaInfo = control->send_state();
         ui->azimuthLabel->setText(QString::number(antennaInfo.azimuth));
@@ -46,9 +47,9 @@ void ManualControlDialog::updateAntennaInfo() {
         AzEle antennaDeltas = ui->joystickWidget->getDeltas();
         control->setDeltas(antennaDeltas.azimuth, antennaDeltas.elevation);
     }
+    */
 }
 
-ManualControlDialog::~ManualControlDialog()
-{
+ManualControlDialog::~ManualControlDialog() {
     delete ui;
 }

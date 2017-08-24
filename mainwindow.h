@@ -29,9 +29,6 @@ public:
 
 private:
     Ui::MainWindow* ui;
-    AddTrackerDialog addTrackerDialog;
-    SettingsDialog settingsDialog;
-    ManualControlDialog manualControlDialog;
     TrackerListModel* model;
     QTimer satInfoTimer;
     QStandardItemModel* tableModel;
@@ -51,7 +48,6 @@ public slots:
    void debugarSlot(bool);
    void editSelectedTrackerSlot();
    void removeSelectedTrackerSlot();
-   void acceptedTleSlot(int confirm);
    void acceptedSettingsSlot(int confirm);
    void satInfoUpdateSlot();
    void clearSelectedTrackerSlot();

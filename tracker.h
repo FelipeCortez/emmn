@@ -64,7 +64,8 @@ public:
     QString getSatInfo(int info) const;
     double getAzimuthForObserver();
     double getElevationForObserver();
-    void UpdateTLE() const;
+    void setTle(QList<QString> tle);
+    void UpdateTLE();
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
 private:

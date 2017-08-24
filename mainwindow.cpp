@@ -7,9 +7,7 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
-  , addTrackerDialog(this)
-  , settingsDialog(this)
-  , manualControlDialog(this)
+//  , settingsDialog(this)
   , satInfoTimer(this)
   , tableModel(nullptr)
 {
@@ -28,14 +26,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->satellitesView->setDragEnabled(true);
 
     setPortFromSettings();
-    manualControlDialog.setControlRef(control);
 
     satInfoTimer.start(1000);
 
-    addTrackerDialog.tleInput->setWhatsThis("Two-line element set de um satélite. É possível adquiri-lo através de um site como CelesTrak (https://www.celestrak.com/)");
-
     loadTrackersFromSettings();
-    ui->nextPassesView->setTrackers(model->getTrackersRef());
+    ui->nextPassesView->setTrackers(model->getTrackersPointer());
 
     // Força atualização da tabela (meio gambiarra... talvez mudar)
     auto selected = ui->satellitesView->selectionModel()->selection();
@@ -81,14 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(clicked(bool)),
             this,
             SLOT(moveTrackerDownSlot()));
-    connect(&addTrackerDialog,
-            SIGNAL(finished(int)),
-            this,
-            SLOT(acceptedTleSlot(int)));
-    connect(&settingsDialog,
-            SIGNAL(finished(int)),
-            this,
-            SLOT(acceptedSettingsSlot(int)));
     connect(&satInfoTimer,
             SIGNAL(timeout()),
             this,
@@ -241,26 +228,41 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
 }
 
 void MainWindow::addTrackerDialogSlot() {
-    ui->satellitesView->selectionModel()->clear();
-    addTrackerDialog.tleInput->clear();
-    addTrackerDialog.exec();
-}
-
-void MainWindow::settingsDialogSlot(bool) {
-    settingsDialog.updateWithSettings();
-    settingsDialog.exec();
-}
-
-void MainWindow::manualControlDialogSlot(bool) {
-    satInfoTimer.stop();
-    manualControlDialog.exec();
+    AddTrackerDialog dialog(model, this);
+    if(dialog.exec()) {
+        ui->satellitesView->selectionModel()->clear();
+        ui->satellitesView->selectionModel()->setCurrentIndex(model->index(model->rowCount() - 1),
+                                                              QItemSelectionModel::ClearAndSelect);
+    }
 }
 
 void MainWindow::editSelectedTrackerSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first().row();
-    auto tracker = model->getTrackers()[index];
-    addTrackerDialog.tleInput->setPlainText(tracker.getFullTLE());
-    addTrackerDialog.exec();
+    Tracker* tracker = &model->getTrackersRef()[index];
+    AddTrackerDialog dialog(model, tracker, this);
+    if(dialog.exec()) {
+    }
+}
+
+void MainWindow::settingsDialogSlot(bool) {
+
+    //settingsDialog.updateWithSettings();
+    /*
+    connect(&settingsDialog,
+            SIGNAL(finished(int)),
+            this,
+            SLOT(acceptedSettingsSlot(int)));
+            */
+    //settingsDialog.exec();
+}
+
+void MainWindow::manualControlDialogSlot(bool) {
+    satInfoTimer.stop();
+    ManualControlDialog dialog(this);
+    dialog.setControlRef(control);
+    // exec bloqueia, de forma que o start do timer só rodará quando o dialog for fechado
+    dialog.exec();
+    satInfoTimer.start();
 }
 
 void MainWindow::removeSelectedTrackerSlot() {
@@ -273,36 +275,9 @@ void MainWindow::removeSelectedTrackerSlot() {
     ui->nextPassesView->repaint();
 }
 
-void MainWindow::acceptedTleSlot(int confirm) {
-    if(confirm) {
-        //qDebug() << addTrackerDialog.tleInput->toPlainText();
-        QStringList tle = addTrackerDialog.tleInput->toPlainText().split("\n");
-        if(tle.size() == 3) { // Check if two line element set has three lines :)
-            try {
-                Tracker t(tle);
-                auto selected = ui->satellitesView->selectionModel()->selection();
-                if(selected.isEmpty()) {
-                    auto index = model->addTracker(t);
-                    ui->satellitesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
-                    Settings::saveTrackers(model->getTrackers());
-                } else {
-                    auto selectedIndex = selected.indexes().first();
-                    ui->satellitesView->selectionModel()->setCurrentIndex(selectedIndex, QItemSelectionModel::ClearAndSelect);
-                    model->setTracker(selectedIndex.row(), t);
-                    Settings::saveTrackers(model->getTrackers());
-                    rowChangedSlot(selected, QItemSelection());
-                }
-            } catch(TleException) {
-                qDebug() << "TLE inválida";
-            }
-        } else {
-            qDebug() << "Wrong";
-        }
-    }
-}
-
 void MainWindow::acceptedSettingsSlot(int confirm) {
     if(confirm) {
+        /*
         Settings::setUseLocalTime(settingsDialog.useLocalTimeCheckbox->isChecked());
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
@@ -310,6 +285,7 @@ void MainWindow::acceptedSettingsSlot(int confirm) {
         delete control;
         Settings::setSerialPort(settingsDialog.serialPortsCombo->currentData().toString());
         setPortFromSettings();
+        */
     }
 }
 
@@ -354,7 +330,7 @@ void MainWindow::clearSelectedTrackerSlot() {
 void MainWindow::moveTrackerUpSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
     auto indexRow = index.row();
-    model->getTrackersRef()->swap(indexRow, indexRow - 1);
+    model->getTrackersPointer()->swap(indexRow, indexRow - 1);
     auto newIndex = model->index(indexRow - 1);
     ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
     ui->satellitesView->setModel(model);
@@ -364,7 +340,7 @@ void MainWindow::moveTrackerUpSlot() {
 void MainWindow::moveTrackerDownSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
     auto indexRow = index.row();
-    model->getTrackersRef()->swap(indexRow, indexRow + 1);
+    model->getTrackersPointer()->swap(indexRow, indexRow + 1);
     auto newIndex = model->index(indexRow + 1);
     ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
     ui->satellitesView->setModel(model);

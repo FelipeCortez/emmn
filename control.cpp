@@ -26,7 +26,7 @@ Control::Control(const wchar_t* port, TrackerListModel *trackerListModel, QObjec
     }
 
     send_power();
-    antennaTimer.start(500);
+    antennaTimer.start(1000);
     setTarget(180, 90);
 
     this->trackerListModel = trackerListModel;
@@ -232,8 +232,8 @@ void Control::updateSlot() {
         double az = nextPass.tracker->getAzimuthForObserver();
         double ele = nextPass.tracker->getElevationForObserver();
         if(nextPass.passDetails.reverse) {
-            az = fabs(180 - az);
-            ele = fabs(180 - ele);
+            az = fmod(az + 180, 360);
+            ele = 180 - ele;
         }
 
         setTarget(az, ele);
@@ -243,8 +243,8 @@ void Control::updateSlot() {
         double az = nextPass.tracker->getAzimuthForObserver();
         double ele = 0;
         if(nextPass.passDetails.reverse) {
-            az = fabs(180 - az);
-            ele = fabs(180 - ele);
+            az = fmod(az + 180, 360);
+            ele = 180 - ele;
         }
 
         setTarget(az, ele);

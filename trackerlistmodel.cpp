@@ -67,8 +67,12 @@ QList<Tracker> TrackerListModel::getTrackers() {
     return trackers;
 }
 
-QList<Tracker>* TrackerListModel::getTrackersRef() {
+QList<Tracker>* TrackerListModel::getTrackersPointer() {
     return &trackers;
+}
+
+QList<Tracker>& TrackerListModel::getTrackersRef() {
+    return trackers;
 }
 
 void TrackerListModel::setTracker(int row, Tracker tracker) {
@@ -81,8 +85,7 @@ bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) 
 
 QList<PassDetailsWithTracker> TrackerListModel::getAllPasses(const DateTime& start_time, const DateTime& end_time) {
     QList<PassDetailsWithTracker> allPassList;
-    // https://stackoverflow.com/questions/15176104/c11-range-based-loop-get-item-by-value-or-reference-to-const
-    for(auto &t : trackers) { // '&' avoids copying, making loop variable a reference
+    for(auto &t : trackers) {
         QList<PassDetails> pdList = t.GeneratePassListQt(start_time, end_time);
         for(auto pd : pdList) {
             PassDetailsWithTracker pdt;
