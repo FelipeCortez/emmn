@@ -249,6 +249,7 @@ void MainWindow::settingsDialogSlot(bool) {
     if(dialog.exec()) {
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
+        setPortFromSettings();
     }
 }
 
