@@ -295,14 +295,14 @@ void MainWindow::satInfoUpdateSlot() {
         auto selectedIndex = selected.indexes().first();
         auto tracker = model->getTrackers()[selectedIndex.row()];
 
-        ui->satElevation->setText(tracker.getSatInfo(Tracker::Elevation) + QString("°"));
-        ui->satAzimuth->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
+        ui->satEle->setText(tracker.getSatInfo(Tracker::Elevation) + QString("°"));
+        ui->satAz->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
         ui->satNextPass->setText(tracker.nextPass());
     } else {
         //satInfoTimer.stop();
         ui->satelliteGroupBox->setTitle("Satélite");
-        ui->satElevation->setText("");
-        ui->satAzimuth->setText("");
+        ui->satEle->setText("");
+        ui->satAz->setText("");
         ui->satNextPass->setText("");
     }
 

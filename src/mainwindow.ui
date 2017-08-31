@@ -68,14 +68,14 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>Elevação</string>
+            <string>Azimutes</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>Azimute</string>
+            <string>Elevação</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -83,14 +83,14 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLabel" name="satAzimuth">
+          <widget class="QLabel" name="satEle">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLabel" name="satElevation">
+          <widget class="QLabel" name="satAz">
            <property name="text">
             <string/>
            </property>
