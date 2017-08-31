@@ -262,12 +262,12 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>Elevação</string>
+                <string>Azimute</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLabel" name="eleLabel">
+              <widget class="QLabel" name="azLabel">
                <property name="text">
                 <string>---</string>
                </property>
@@ -276,12 +276,12 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>Azimute</string>
+                <string>Elevação</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QLabel" name="azLabel">
+              <widget class="QLabel" name="eleLabel">
                <property name="text">
                 <string>---</string>
                </property>

@@ -44,7 +44,7 @@ Control::~Control() {
 }
 
 void Control::send_set(float az, float ele) {
-    //auxiliar para conversão de float para int (??????)
+    //auxiliar para conversão de float para int
     unsigned short temp = 0;
 
     //Gerar bytes A1, A0, E1, E0

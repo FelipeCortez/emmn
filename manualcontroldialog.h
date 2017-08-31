@@ -20,10 +20,16 @@ public:
 private:
     Ui::ManualControlDialog *ui;
     Control* control;
+    QTimer antennaInfoUpdateTimer;
     QTimer joystickRefreshTimer;
 
 public slots:
+    void tabChanged(int index);
     void updateAntennaInfo();
+    void sendJoystickDeltas();
+    void sendAz();
+    void sendEle();
+    void sendBoth();
 };
 
 #endif // MANUALCONTROLDIALOG_H
