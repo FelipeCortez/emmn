@@ -1,0 +1,14 @@
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/CMakeFiles/edit_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4/CMakeFiles/sgp4.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4/CMakeFiles/edit_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4/CMakeFiles/rebuild_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/sattrack/CMakeFiles/sattrack.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/sattrack/CMakeFiles/edit_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/sattrack/CMakeFiles/rebuild_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/runtest/CMakeFiles/runtest.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/runtest/CMakeFiles/edit_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/runtest/CMakeFiles/rebuild_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/passpredict/CMakeFiles/passpredict.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/passpredict/CMakeFiles/edit_cache.dir
+C:/Users/Inpe/Documents/FelipeC/sgp4/build/passpredict/CMakeFiles/rebuild_cache.dir

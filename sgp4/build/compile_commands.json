@@ -1,0 +1,97 @@
+[
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\CoordGeodetic.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\CoordGeodetic.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/CoordGeodetic.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\CoordTopocentric.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\CoordTopocentric.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/CoordTopocentric.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\DateTime.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\DateTime.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/DateTime.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\DecayedException.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\DecayedException.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/DecayedException.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Eci.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Eci.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Eci.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Globals.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Globals.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Globals.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Observer.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Observer.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Observer.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\OrbitalElements.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\OrbitalElements.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/OrbitalElements.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\SGP4.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\SGP4.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/SGP4.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\SatelliteException.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\SatelliteException.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/SatelliteException.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\SolarPosition.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\SolarPosition.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/SolarPosition.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\TimeSpan.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\TimeSpan.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/TimeSpan.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Tle.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Tle.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Tle.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\TleException.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\TleException.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/TleException.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Util.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Util.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Util.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/libsgp4",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sgp4.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sgp4.dir\\Vector.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\libsgp4\\Vector.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/libsgp4/Vector.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/sattrack",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/sattrack.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\sattrack.dir\\sattrack.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\sattrack\\sattrack.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/sattrack/sattrack.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/runtest",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/runtest.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\runtest.dir\\runtest.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\runtest\\runtest.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/runtest/runtest.cpp"
+},
+{
+  "directory": "C:/Users/Inpe/Documents/FelipeC/sgp4/build/passpredict",
+  "command": "C:\\Qt\\Tools\\mingw530_32\\bin\\g++.exe   @CMakeFiles/passpredict.dir/includes_CXX.rsp  -Wall   -o CMakeFiles\\passpredict.dir\\passpredict.cpp.obj -c C:\\Users\\Inpe\\Documents\\FelipeC\\sgp4\\passpredict\\passpredict.cpp",
+  "file": "C:/Users/Inpe/Documents/FelipeC/sgp4/passpredict/passpredict.cpp"
+}
+]
