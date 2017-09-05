@@ -68,7 +68,7 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>Azimutes</string>
+            <string>Azimute</string>
            </property>
           </widget>
          </item>
