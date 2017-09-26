@@ -29,12 +29,13 @@ public:
     QList<Tracker> getTrackers();
     QList<Tracker>* getTrackersPointer();
     QList<Tracker>& getTrackersRef();
-    QList<PassDetailsWithTracker> getAllPasses(const DateTime& start_time = DateTime::Now(true),
-                                               const DateTime& end_time = DateTime::Now(true).AddHours(24));
+    void generatePassList(const DateTime& start_time = DateTime::Now(true),
+                          const DateTime& end_time = DateTime::Now(true).AddHours(24));
+    QList<PassDetailsWithTracker> getAllPasses();
     void setTracker(int row, Tracker tracker);
-    QList<PassDetailsWithTracker> allPasses;
 private:
     QList<Tracker> trackers;
+    QList<PassDetailsWithTracker> allPasses;
 };
 
 #endif // TRACKERLISTMODEL_H

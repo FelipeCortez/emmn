@@ -1,28 +1,17 @@
 #include "control.h"
 
-FILE *arq;
-
-//NOME DA PORTA SERIAL UTILIZADA
-//const wchar_t port_name[] = L"COM3"; //COLOCAR NOME DA PORTA SERIAL ENTRE AS ASPAS
-
-//Cria objeto da porta serial
-CSerial serial;
-
-Control::Control(const wchar_t* port, TrackerListModel *trackerListModel, QObject *parent)
+Control::Control(QString port, TrackerListModel *trackerListModel, QObject *parent)
     : QObject(parent)
+    , valid(false)
     , controller(Controller::Schedule)
     , antennaTimer(this)
 {
-    serial.Open(port);
-    //Configura comunicação: taxa de 9600 bps, byte com 8 bits, sem bit de paridade, 1 bit de parada
-    serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
-    // Configura porta serial para na hora de ler bytes esperar até o numero solicitado, passado como argumento da função
-    serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
+    changePort(port);
 
     if (serial.IsOpen() == true) {
-        qDebug() << "Porta serial conectada" << "(" << QString::fromStdWString(port) << ")";
+        qDebug() << "Porta serial conectada" << "(" << port << ")";
     } else {
-        qDebug() << "Erro ao abrir porta" << "(" << QString::fromStdWString(port) << ")";
+        qDebug() << "Erro ao abrir porta" << "(" << port << ")";
         return; // TODO: substituir por throw error
     }
 
@@ -146,6 +135,19 @@ AzEle Control::send_state()
     return antennaInfo;
 }
 
+void Control::changePort(QString port) {
+    if(serial.IsOpen()) {
+        serial.Close();
+    }
+
+    wchar_t* portWchar = new wchar_t[port.length() + 1];
+    port.toWCharArray(portWchar);
+    portWchar[port.length()] = '\0';
+    serial.Open(portWchar);
+    serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
+    serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
+}
+
 void Control::setDeltas(float deltaAz, float deltaEle) {
     AzEle antennaInfo = send_state();
     az = antennaInfo.azimuth;
@@ -211,8 +213,7 @@ void Control::envia_reconhecimento(int _erro) {
     }
 }
 
-int Control::reconhecimento_arduino(unsigned char *_input_ack)
-{
+int Control::reconhecimento_arduino(unsigned char *_input_ack) {
     serial.Read(_input_ack, 1);
     if (_input_ack[0] == 'A') { //reconhecido
         return 0;
@@ -224,26 +225,30 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack)
 
 void Control::updateSlot() {
     if(controller == Controller::Schedule) {
-        TimeSpan remaining = trackerListModel->allPasses.at(0).passDetails.aos - DateTime::Now(true);
-        auto nextPass = trackerListModel->allPasses.at(0);
+        if(trackerListModel->getAllPasses().empty()) {
+            setTarget(180, 90);
+            return;
+        }
+
+        auto nextPass = trackerListModel->getAllPasses().at(0);
+        TimeSpan remaining = nextPass.passDetails.aos - DateTime::Now(true);
         float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
         float positioningTime = 60;
 
-        bool qd = false;
-
         if(nextPass.tracker->getElevationForObserver() >= 0) {
-            if(qd) { qDebug() << "Passando"; }
             double az = nextPass.tracker->getAzimuthForObserver();
             double ele = nextPass.tracker->getElevationForObserver();
             if(nextPass.passDetails.reverse) {
+                qDebug() << az;
                 az = fmod(az + 180, 360);
+                qDebug() << az;
                 ele = 180 - ele;
+                qDebug() << "---";
             }
 
             setTarget(az, ele);
         } else if(secondsRemaining <= positioningTime &&
                   secondsRemaining > 0) {
-            if(qd) { qDebug() << "Interpolando para azimute inicial e elevação zero"; }
             double az = nextPass.tracker->getAzimuthForObserver();
             double ele = 0;
             if(nextPass.passDetails.reverse) {

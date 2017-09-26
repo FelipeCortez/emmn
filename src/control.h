@@ -19,7 +19,7 @@ class Control : public QObject
     Q_OBJECT
 
 public:
-    Control(const wchar_t *port, TrackerListModel* trackerListModel, QObject *parent = 0);
+    Control(QString, TrackerListModel* trackerListModel, QObject *parent = 0);
     ~Control();
 
     /*
@@ -82,19 +82,22 @@ public:
     */
     void envia_reconhecimento(int _erro);
 
+    void changePort(QString port);
     void setDeltas(float deltaAz, float deltaEle);
     void setTarget(float az, float ele);
     void setController(Controller controller);
     void moveToTarget();
     void updateAntennaPosition();
 private:
+    CSerial serial;
+    bool valid;
+    Controller controller;
+    QTimer antennaTimer;
     TrackerListModel* trackerListModel;
     float az;
     float ele;
     float targetAz;
     float targetEle;
-    Controller controller;
-    QTimer antennaTimer;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)

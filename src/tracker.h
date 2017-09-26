@@ -49,11 +49,7 @@ public:
         const DateTime& initial_time1,
         const DateTime& initial_time2,
         bool finding_aos) const;
-    std::list<PassDetails> GeneratePassList(
-        const DateTime& start_time = DateTime::Now(true),
-        const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
-        const int time_step = 180);
-    QList<PassDetails> GeneratePassListQt(
+    QList<PassDetails> GeneratePassList(
         const DateTime& start_time = DateTime::Now(true),
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
         const int time_step = 180) const;
@@ -73,6 +69,7 @@ private:
     QString tle1;
     QString tle2;
     QString tle3;
+    QList<PassDetails> passList;
 };
 
 Q_DECLARE_METATYPE(Tracker)

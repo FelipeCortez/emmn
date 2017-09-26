@@ -7,13 +7,12 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
-//  , settingsDialog(this)
   , satInfoTimer(this)
   , tableModel(nullptr)
+  , control(nullptr)
 {
     model = new TrackerListModel();
 
-    counter = 0;
     ui->setupUi(this);
     ui->satellitesView->setModel(model);
     //setWindowState(Qt::WindowMaximized);
@@ -84,11 +83,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::setPortFromSettings() {
     // TODO: Urgentemente! Abrir apenas se porta for validada!
-    const QString portStr = Settings::getSerialPort();
-    wchar_t* port = new wchar_t[portStr.length() + 1];
-    portStr.toWCharArray(port);
-    port[portStr.length()] = '\0';
-    control = new Control(port, model);
+    if(!control) {
+        control = new Control(Settings::getSerialPort(), model);
+    } else {
+        control->changePort(Settings::getSerialPort());
+    }
 }
 
 void MainWindow::loadTrackersFromSettings() {
@@ -123,7 +122,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->satelliteGroupBox->setTitle(tracker.getTitle());
         ui->nextPassesView->repaint();
 
-        QList<PassDetails> pd = tracker.GeneratePassListQt();
+        QList<PassDetails> pd = tracker.GeneratePassList();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;
@@ -276,7 +275,7 @@ void MainWindow::removeSelectedTrackerSlot() {
 
 void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
-    auto nextPass = model->allPasses.at(0);
+    auto nextPass = model->getAllPasses().at(0);
     auto remaining = nextPass.passDetails.aos - DateTime::Now();
     ui->nextPassesView->repaint();
 
@@ -286,7 +285,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
 
-    ui->nextPassSatLabel->setText(model->allPasses.at(0).tracker->getTitle());
+    ui->nextPassSatLabel->setText(model->getAllPasses().at(0).tracker->getTitle());
     AzEle antennaInfo = control->send_state();
     ui->azLabel->setText(QString::number(antennaInfo.azimuth));
     ui->eleLabel->setText(QString::number(antennaInfo.elevation));

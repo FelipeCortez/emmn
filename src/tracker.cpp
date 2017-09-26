@@ -242,121 +242,7 @@ DateTime Tracker::FindCrossingPoint(
     return middle_time;
 }
 
-std::list<PassDetails> Tracker::GeneratePassList(
-        const DateTime& start_time,
-        const DateTime& end_time,
-        const int time_step)
-{
-    std::list<PassDetails> pass_list;
-
-    Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
-
-    DateTime aos_time;
-    DateTime los_time;
-
-    bool found_aos = false;
-
-    DateTime previous_time(start_time);
-    DateTime current_time(start_time);
-
-    while (current_time < end_time) {
-        bool end_of_pass = false;
-
-        /*
-         * calculate satellite position
-         */
-        Eci eci = sgp4.FindPosition(current_time);
-        CoordTopocentric topo = obs.GetLookAngle(eci);
-
-        if (!found_aos && topo.elevation > 0.0) {
-            /*
-             * aos hasnt occured yet, but the satellite is now above horizon
-             * this must have occured within the last time_step
-             */
-            if (start_time == current_time) {
-                /*
-                 * satellite was already above the horizon at the start,
-                 * so use the start time
-                 */
-                aos_time = start_time;
-            } else {
-                /*
-                 * find the point at which the satellite crossed the horizon
-                 */
-                aos_time = FindCrossingPoint(
-                        previous_time,
-                        current_time,
-                        true);
-            }
-            found_aos = true;
-        } else if (found_aos && topo.elevation < 0.0) {
-            found_aos = false;
-            /*
-             * end of pass, so move along more than time_step
-             */
-            end_of_pass = true;
-            /*
-             * already have the aos, but now the satellite is below the horizon,
-             * so find the los
-             */
-            los_time = FindCrossingPoint(
-                    previous_time,
-                    current_time,
-                    false);
-
-            PassDetails pd;
-            pd.aos = aos_time;
-            pd.los = los_time;
-            pd.max_elevation = FindMaxElevation(
-                    aos_time,
-                    los_time);
-
-            pass_list.push_back(pd);
-        }
-
-        /*
-         * save current time
-         */
-        previous_time = current_time;
-
-        if (end_of_pass) {
-            /*
-             * at the end of the pass move the time along by 30mins
-             */
-            current_time = current_time + TimeSpan(0, 30, 0);
-        } else {
-            /*
-             * move the time along by the time step value
-             */
-            current_time = current_time + TimeSpan(0, 0, time_step);
-        }
-
-        if (current_time > end_time) {
-            /*
-             * dont go past end time
-             */
-            current_time = end_time;
-        }
-    };
-
-    if (found_aos) {
-        /*
-         * satellite still above horizon at end of search period, so use end
-         * time as los
-         */
-        PassDetails pd;
-        pd.aos = aos_time;
-        pd.los = end_time;
-        pd.max_elevation = FindMaxElevation(aos_time, end_time);
-
-        pass_list.push_back(pd);
-    }
-
-    return pass_list;
-}
-
-QList<PassDetails> Tracker::GeneratePassListQt(
+QList<PassDetails> Tracker::GeneratePassList(
         const DateTime& start_time,
         const DateTime& end_time,
         const int time_step) const
@@ -388,12 +274,23 @@ QList<PassDetails> Tracker::GeneratePassListQt(
              * aos hasnt occured yet, but the satellite is now above horizon
              * this must have occured within the last time_step
              */
+
             if (start_time == current_time) {
                 /*
                  * satellite was already above the horizon at the start,
                  * so use the start time
                  */
-                aos_time = start_time;
+
+                DateTime real_start = start_time.AddMicroseconds(-start_time.Microsecond());
+
+                float elevation = topo.elevation;
+                while(elevation > 0) {
+                    real_start = real_start.AddSeconds(-1);
+                    Eci eci2 = sgp4.FindPosition(real_start);
+                    CoordTopocentric topo2 = obs.GetLookAngle(eci2);
+                    elevation = topo2.elevation;
+                }
+                aos_time = real_start;
             } else {
                 /*
                  * find the point at which the satellite crossed the horizon
@@ -418,6 +315,28 @@ QList<PassDetails> Tracker::GeneratePassListQt(
                     previous_time,
                     current_time,
                     false);
+            //qDebug() << QString::fromStdString(los_time.ToString());
+
+            if(los_time.Microsecond() != 0) {
+                qDebug() << QString::fromStdString(los_time.ToString());
+            }
+
+            if((los_time - aos_time).Microseconds() != 0) {
+                qDebug() << "Q";
+            }
+            DateTime real_los = los_time.AddMicroseconds(-los_time.Microsecond());
+            //qDebug() << QString::fromStdString(real_los.ToString());
+            //while(true) {
+            //    Eci eci2 = sgp4.FindPosition(real_los);
+            //    CoordTopocentric topo2 = obs.GetLookAngle(eci2);
+            //    float elevation = topo2.elevation;
+            //    if(elevation > 0) {
+            //        real_los = real_los.AddSeconds(1);
+            //    } else {
+            //        break;
+            //    }
+            //}
+            los_time = real_los;
 
             PassDetails pd;
             pd.aos = aos_time;
@@ -474,7 +393,7 @@ QList<PassDetails> Tracker::GeneratePassListQt(
 double Tracker::getAzimuthForObserver() {
     Observer obs(user_geo);
     SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
-    Eci eci = sgp4.FindPosition(DateTime::Now());
+    Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
     CoordTopocentric topo = obs.GetLookAngle(eci);
     return Helpers::radToDeg(topo.azimuth);
 }
@@ -482,14 +401,14 @@ double Tracker::getAzimuthForObserver() {
 double Tracker::getElevationForObserver() {
     Observer obs(user_geo);
     SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
-    Eci eci = sgp4.FindPosition(DateTime::Now());
+    Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
     CoordTopocentric topo = obs.GetLookAngle(eci);
     return Helpers::radToDeg(topo.elevation);
 }
 
 QString Tracker::nextPass() const {
     if(getSatInfo(Elevation).toDouble() < 0) {
-        return QString::fromStdString((GeneratePassListQt()[0].aos - DateTime::Now()).ToString());
+        return QString::fromStdString((GeneratePassList()[0].aos - DateTime::Now()).ToString());
     } else {
         return QString("Passando");
     }

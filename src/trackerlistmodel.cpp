@@ -9,6 +9,7 @@ QModelIndex TrackerListModel::addTracker(const Tracker &tracker) {
     beginInsertRows(QModelIndex(), rowIndex, rowIndex);
     trackers.push_back(tracker);
     endInsertRows();
+    generatePassList();
     return index(rowIndex);
 }
 
@@ -28,7 +29,7 @@ QVariant TrackerListModel::data(const QModelIndex &index, int role) const {
         case Qt::DisplayRole:
             return trackers[index.row()].getTitle();
         case Roles::PassesRole:
-            return QVariant::fromValue(trackers[index.row()].GeneratePassListQt());
+            return QVariant::fromValue(trackers[index.row()].GeneratePassList());
         default:
             return QVariant();
     }
@@ -54,12 +55,12 @@ bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent)
     beginRemoveRows(parent, row, row + count - 1);
     int countLeft = count;
     while(countLeft--) {
-        //qDebug() << row + countLeft;
-        //qDebug() << "Removing: " << trackers.at(row + countLeft).getTitle();
         trackers.removeAt(row + countLeft);
     }
+
     endRemoveRows();
-    //qDebug() << trackers.length();
+    generatePassList();
+
     return true;
 }
 
@@ -77,16 +78,17 @@ QList<Tracker>& TrackerListModel::getTrackersRef() {
 
 void TrackerListModel::setTracker(int row, Tracker tracker) {
     trackers[row] = tracker;
+    generatePassList();
 }
 
 bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) {
     return pd1.passDetails.aos < pd2.passDetails.aos;
 }
 
-QList<PassDetailsWithTracker> TrackerListModel::getAllPasses(const DateTime& start_time, const DateTime& end_time) {
+void TrackerListModel::generatePassList(const DateTime& start_time, const DateTime& end_time) {
     QList<PassDetailsWithTracker> allPassList;
     for(auto &t : trackers) {
-        QList<PassDetails> pdList = t.GeneratePassListQt(start_time, end_time);
+        QList<PassDetails> pdList = t.GeneratePassList(start_time, end_time);
         for(auto pd : pdList) {
             PassDetailsWithTracker pdt;
             pdt.tracker = &t;
@@ -96,7 +98,17 @@ QList<PassDetailsWithTracker> TrackerListModel::getAllPasses(const DateTime& sta
     }
 
     std::sort(allPassList.begin(), allPassList.end(), comparePassDetails);
-
     allPasses = allPassList;
-    return allPassList;
+}
+
+QList<PassDetailsWithTracker> TrackerListModel::getAllPasses() {
+    auto it = allPasses.begin();
+    int pos = 0;
+
+    while(it->passDetails.los < DateTime::Now()) {
+        ++it;
+        ++pos;
+    }
+
+    return allPasses.mid(pos);
 }
