@@ -1,0 +1,98 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel} % Hifenização e dicionário
+\usepackage[left=3.00cm, right=2.00cm, top=3.00cm, bottom=2.00cm]{geometry}
+\usepackage{enumitem} % Para itemsep etc
+\usepackage{longtable} % Dependência do longtabu
+\usepackage{tabu} % Para melhor criação de tabelas
+\usepackage{listings} % Para códigos
+\usepackage{lstautogobble} % Códigos indentados corretamente
+\usepackage{color} % Para coloração de códigos
+\usepackage{libertine} % Linux Libertine
+\usepackage{parskip} % Linha em branco entre parágrafos em vez de recuo
+\usepackage{graphicx}
+\usepackage{verbatim} % Para comentários
+\usepackage[os=win]{menukeys} % Para botões, diretórios e teclas
+% http://repositorios.cpai.unb.br/ctan/macros/latex/contrib/menukeys/menukeys.pdf
+\usepackage{amssymb} % Para \blacktriangle e \blacktriangledown
+\usepackage[breaklinks]{hyperref}
+
+\renewmenumacro{\menu}[>]{angularmenus}
+\renewmenumacro{\keys}[+]{shadowedangularkeys}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+    \textsc{INPE - Instituto Nacional de Pesquisas Espaciais}
+
+    \vfill
+
+    Interface gráfica para Estação Multi-Missão de Natal \\
+    Manual de referência para Usuários
+
+    \vfill
+
+    \begin{flushright}
+    Desenvolvido por Felipe Cortez de Sá sob supervisão de José Marcelo e Lúcio Jotha
+    \end{flushright}
+
+    \vfill
+    Natal, 2017
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+% atalho \keys{\ctrl + \shift + F}
+\section{Adicionando, editando e removendo satélites}
+É possível adicionar um novo satélite clicando em \menu{Adicionar novo
+satélite}. Uma caixa de diálogo aparecerá, e um dos \emph{two-line element
+sets} disponíveis em \href{https://www.celestrak.com/NORAD/elements/resource.txt}{Celestrak}
+deve ser copiado e colado.
+
+Clicando num satélite na lista de satélites, é possível removê-lo ou alterar
+sua prioridade, e a caixa abaixo da lista de satélites adicionados mostra
+informações de azimute, elevação e próxima passagem para o satélite
+selecionado.
+
+\subsection{Definindo prioridades}
+Selecionado um satélite, \menu{$ \blacktriangle $} eleva sua prioridade e
+\menu{$ \blacktriangledown $} diminui. Isso significa que caso duas passagens
+ocorram no mesmo período, o satélite com maior prioridade será o rastreado pela
+antena.
+
+% \menu{\return}
+\section{Configurando porta USB}
+É possível escolher a porta USB para comunicação com dispositivo Arduino no
+menu \menu{Arquivo > Configurações}.
+
+\section{Controle manual}
+É possível movimentar a antena independentemente da lista de passagens através
+de \menu{Arquivo > Controle manual}.
+
+\subsection{Joystick}
+O joystick é controlado pelo mouse clicando e arrastando o círculo menor.
+Movimentar o joystick para a esquerda e direita diminui e aumenta o ângulo de
+azimute, respectivamente, e movimentar para baixo e cima altera a elevação da antena.
+
+\subsection{Posição}
+É possível mandar a antena para uma posição específica na aba de posição.
+Pode-se mandar azimute ou elevação desejados individualmente com botões de
+\menu{\textgreater} ou escolher uma posição específica e clicar em \menu{Mandar ambos}.
+
+\section{Lista de passagens}
+\subsection{Passagens inversas}
+Quando detecta-se que uma passagem faz a antena passar pelo fim de curso, os
+valores enviados para a antena são invertidos e a passagem é especificada como
+inversa na tabela.
+
+\section{Visualização gráfica de próximas passagens}
+É possível ver todas as passagens para os satélites cadastrados nas próximas 7
+horas. Cada retângulo representa uma passagem, com o tempo no eixo x, e a parte
+esquerda do retângulo representando a aquisição de sinal e a parte direita a
+perda de sinal.
+
+\end{document}

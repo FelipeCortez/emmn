@@ -1,0 +1,113 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel} % Hifenização e dicionário
+\usepackage[left=3.00cm, right=2.00cm, top=3.00cm, bottom=2.00cm]{geometry}
+\usepackage{enumitem} % Para itemsep etc
+\usepackage{longtable} % Dependência do longtabu
+\usepackage{tabu} % Para melhor criação de tabelas
+\usepackage{listings} % Para códigos
+\usepackage{lstautogobble} % Códigos indentados corretamente
+\usepackage{color} % Para coloração de códigos
+\usepackage{libertine} % Linux Libertine
+\usepackage{parskip} % Linha em branco entre parágrafos em vez de recuo
+\usepackage{graphicx}
+\usepackage{verbatim} % Para comentários
+\usepackage{amssymb} % Para \blacktriangle e \blacktriangledown
+\usepackage[breaklinks]{hyperref}
+
+\newcommand{\code}[1]{\textbf{\lstinline{#1}}}
+
+\usepackage{listings}
+\lstset{
+    autogobble,
+    columns=fullflexible,
+    showspaces=false,
+    showtabs=false,
+    breaklines=true,
+    showstringspaces=false,
+    breakatwhitespace=true,
+    escapeinside={(*@}{@*)},
+    basicstyle=\ttfamily\footnotesize,
+    frame=l,
+    framesep=12pt,
+    xleftmargin=12pt,
+    tabsize=4,
+    captionpos=b
+}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+    \textsc{INPE - Instituto Nacional de Pesquisas Espaciais}
+
+    \vfill
+
+    Interface gráfica para Estação Multi-Missão de Natal \\
+    Manual de referência para desenvolvedores
+
+    \vfill
+
+    \begin{flushright}
+    Desenvolvido por Felipe Cortez de Sá sob supervisão de José Marcelo e Lúcio Jotha
+    \end{flushright}
+
+    \vfill
+    Natal, 2017
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section{Classes}
+\subsection{Interface}
+\subsubsection{AddTrackerDialog}
+Referente à caixa de diálogo
+
+\subsubsection{JoystickWidget}
+Referente ao joystick virtual
+
+\subsubsection{MainWindow}
+A janela principal do programa. Responsável por conectar diversas partes da
+interface juntas.
+
+\subsubsection{ManualControlDialog}
+Referente à caixa de diálogo do controle manual, englobando tanto o joystick
+quanto o formulário de posicionamento
+
+\subsubsection{NextPassesView}
+Referente à visualização de próximas passagens visível na posição inferior do
+programa. Contém lógica de desenho.
+
+\subsubsection{SettingsDialog}
+Referente à caixa de diálogo com opções de configuração. As mudanças só são efetivadas ao clicar em aplicar.
+
+\subsection{Dados}
+\subsubsection{Efem}
+Não utilizado?
+
+\subsubsection{Tracker}
+Contém dados de um satélite rastreado
+
+\subsubsection{TrackerListModel}
+Armazena a lista de satélites rastreados em um formato compatível com o Qt
+necessário para ser visualizado numa lista.
+
+\subsection{Lógica e miscelânea}
+\subsubsection{Control}
+Contém a lógica de movimentação da antena, bem como a programação de passagens
+e conexão com a porta serial.
+
+\subsubsection{Helpers}
+Contém funções independentes de classe (estáticas) que ajudam em diversas
+partes do programa.
+
+\subsubsection{Network}
+Contém funções para conexão com a Internet.
+
+\subsubsection{Serial}
+Biblioteca para conexão serial.
+
+\end{document}
