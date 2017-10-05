@@ -189,7 +189,7 @@ void Control::moveToTarget() {
     send_set(az + incrementAz, ele + incrementEle);
 }
 
-bool Control::send_power(void) {
+bool Control::send_power() {
     int count = 0;
 
     while(true) {

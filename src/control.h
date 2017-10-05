@@ -22,45 +22,33 @@ public:
     Control(QString, TrackerListModel* trackerListModel, QObject *parent = 0);
     ~Control();
 
-    /*
-     *   FUNÇÕES PARA COMUNICAÇÃO SERIAL ARDUINO - PC -----------------------------
-     */
-
-    /** \brief Gera uma rapa
-    *
-    *  Essa função recebe como parametros dois arrays onde serão armazenados os
-    *  valores da rampa calculada (30 valores). Ela utiliza os valores atuais de
-    *  refAZ, refELE (referências atuais) e AZ e ELE (posição atual da antena) para
-    *  calcular as rampas.
-    *
-    *  @param _rampa_AZ azimute atual da antena
-    *  @param _rampa_ELE elevação atual da antena
-    */
-    void gerar_rampa(float *_rampa_AZ, float *_rampa_ELE);
-
-    /** \brief Send set
+    /** \brief Envia para o Arduino posições de azimute e elevação desejadas
      *
-     *  @param AZ
-     *  @param ELE
-     *  @param _cont_erro
-     */
-    void send_set(float az, float ele); //OK
-
-    /** \brief Send state - Um nome mais apropriado talvez seria "get state". Envia um sinal state pro Arduino e lê a resposta
      *
-     *  @todo verificar se o comando enviado foi entendido
+     *  @param az Azimute desejado
+     *  @param ele Elevação desejada
+     */
+    void send_set(float az, float ele);
+
+    /** \brief Envia um sinal state pro Arduino e lê a resposta
+     *
+     *  Um nome mais apropriado talvez seria "get state".
+     *
+     *  @todo Verificar se o comando enviado foi entendido
      */
     AzEle send_state();
 
-    /** \brief Send power???
-    *
-    */
-    bool send_power(void);
+    /** \brief Envia um sinal de power para o Arduino
+     *
+     * Utilizado para verificar se porta serial é válida
+     *
+     */
+    bool send_power();
 
     /** \brief Verifica se o último comando enviado foi entendido pelo Arduino
     *
     *  @returns 0 se o comando foi reconhecido, 1 se não foi
-    *  @todo trocar essa ordem...
+    *  @todo Trocar retorno por valor booleano
     */
     int reconhecimento_arduino(unsigned char *_input_aknow);
 
@@ -68,17 +56,17 @@ public:
     *
     *  @param _input_aknow
     *  @returns 0 se o comando foi reconhecido, 1 se não foi
-    *  @todo trocar essa ordem...
-    *  @todo trocar aknow por ack?
+    *  @todo Trocar retorno por valor booleano
+    *  @todo Refatorar aknow por ack
     */
     int verifica_checksum();
 
-    /** \brief Envia para o arduino se o ultimo comando recebido pelo PC foi reconhecido
-    *
-    *  Envia ACK caso reconhecido e NACK caso contrário
-    *
-    *  @param _erro
-    */
+    /** \brief Verifica se o último comando recebido pelo PC foi reconhecido
+      *
+      *  Envia ACK caso reconhecido e NACK caso contrário
+      *
+      *  @param _erro
+      */
     void envia_reconhecimento(int _erro);
 
     void changePort(QString port);
@@ -90,6 +78,7 @@ public:
     bool isPortValid();
 private:
     CSerial serial;
+    bool validPort;
     Controller controller;
     QTimer antennaTimer;
     TrackerListModel* trackerListModel;
@@ -98,7 +87,6 @@ private:
     float targetAz;
     float targetEle;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
-    bool validPort;
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)
     int cont_aux = 0;
@@ -111,13 +99,6 @@ private:
     unsigned char ack[1] = { 65 };      // 'A'
     unsigned char nack[1] = { 78 };     // 'N'
     unsigned char input_ack[1] = { 88 };// 'X' //será utilizada para verificar reconhecimento de mensagens enviadas e recebidas
-
-    //arrays que armazenarão rampas de posicionamento inicial e final
-    float rampa_AZ[30] = { 0 };
-    float rampa_ELE[30] = { 0 };
-
-    //contador de erros de comunicação
-    int cont_erro = 0;
 
     //Status do sistema
     int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
