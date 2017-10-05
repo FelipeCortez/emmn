@@ -2,22 +2,11 @@
 
 Control::Control(QString port, TrackerListModel *trackerListModel, QObject *parent)
     : QObject(parent)
-    , valid(false)
+    , validPort(false)
     , controller(Controller::Schedule)
     , antennaTimer(this)
 {
     changePort(port);
-
-    if (serial.IsOpen() == true) {
-        qDebug() << "Porta serial conectada" << "(" << port << ")";
-    } else {
-        qDebug() << "Erro ao abrir porta" << "(" << port << ")";
-        return; // TODO: substituir por throw error
-    }
-
-    send_power();
-    antennaTimer.start(1000);
-    setTarget(180, 90);
 
     this->trackerListModel = trackerListModel;
 
@@ -28,7 +17,10 @@ Control::Control(QString port, TrackerListModel *trackerListModel, QObject *pare
 }
 
 Control::~Control() {
-    send_power();
+    if(validPort) {
+        send_power();
+    }
+
     serial.Close();
 }
 
@@ -62,7 +54,7 @@ void Control::send_set(float az, float ele) {
     //loop para envio do comando SET e recepção da resposta do arduino
     //A resposta será ACK ou NACK, caso o arduino reconheça ou não, respectivamente
     //Caso o PC receba NACK, ele reenviará o comando SET
-    erro_ack = 1;
+    int erro_ack = 1;
     while (erro_ack != 0) {
         //envia comando set
         serial.Write(setString, 6);
@@ -79,7 +71,7 @@ AzEle Control::send_state()
 {
     //envia comando STATE
     serial.Write(state, 1);
-    erro_ack = 1;
+    int erro_ack = 1;
 
     //Loop para recepção e verificação de erro na mensagem
     //O programa irá receber a mensagem e verificar se contém erro
@@ -143,9 +135,28 @@ void Control::changePort(QString port) {
     wchar_t* portWchar = new wchar_t[port.length() + 1];
     port.toWCharArray(portWchar);
     portWchar[port.length()] = '\0';
-    serial.Open(portWchar);
-    serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
-    serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
+    if(serial.CheckPort(portWchar) == 0) {
+        serial.Open(portWchar);
+        serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
+        serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
+    }
+
+    if (serial.IsOpen() == true) {
+        qDebug() << "Porta serial conectada" << "(" << port << ")";
+    } else {
+        qDebug() << "Erro ao abrir porta" << "(" << port << ")";
+        return; // TODO: substituir por throw error
+    }
+
+    validPort = send_power();
+    qDebug() << "valid: " << validPort;
+
+    if(validPort) {
+        antennaTimer.start(1000);
+        setTarget(180, 90);
+    } else {
+        antennaTimer.stop();
+    }
 }
 
 void Control::setDeltas(float deltaAz, float deltaEle) {
@@ -180,17 +191,20 @@ void Control::moveToTarget() {
     send_set(az + incrementAz, ele + incrementEle);
 }
 
-void Control::send_power(void) {
-    erro_ack = 1;
-    while (erro_ack != 0) {
-        //Envia POWER
-        serial.Write(power, 1);
-        serial.Read(input_ack, 1);
+bool Control::send_power(void) {
+    int count = 0;
 
-        if (input_ack[0] == 'A') {
-            erro_ack = 0;
+    while(true) {
+        serial.Write(power, 1);
+        // Timeout de leitura de 50 ms
+        char data[50];
+        serial.Read(data, 1, 0, 0, 50);
+
+        if (data[0] == 'A') {
+            return true;
         } else {
-            erro_ack = 1;
+            if(count > 10) { return false; }
+            ++count;
         }
     }
 }
@@ -220,7 +234,10 @@ int Control::reconhecimento_arduino(unsigned char *_input_ack) {
     } else {
         return 1;
     }
+}
 
+bool Control::isPortValid() {
+    return validPort;
 }
 
 void Control::updateSlot() {

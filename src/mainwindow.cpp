@@ -82,11 +82,20 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::setPortFromSettings() {
-    // TODO: Urgentemente! Abrir apenas se porta for validada!
     if(!control) {
         control = new Control(Settings::getSerialPort(), model);
     } else {
         control->changePort(Settings::getSerialPort());
+    }
+
+    if(!control->isPortValid()) {
+        ui->actionManualControl->setEnabled(false);
+        ui->azLabel->setText("---");
+        ui->eleLabel->setText("---");
+        ui->powerLabel->setText("Porta inválida");
+    } else {
+        ui->actionManualControl->setEnabled(true);
+        ui->powerLabel->setText("Ligado");
     }
 }
 
@@ -286,9 +295,12 @@ void MainWindow::satInfoUpdateSlot() {
     }
 
     ui->nextPassSatLabel->setText(model->getAllPasses().at(0).tracker->getTitle());
-    AzEle antennaInfo = control->send_state();
-    ui->azLabel->setText(QString::number(antennaInfo.azimuth));
-    ui->eleLabel->setText(QString::number(antennaInfo.elevation));
+
+    if(control->isPortValid()) {
+        AzEle antennaInfo = control->send_state();
+        ui->azLabel->setText(QString::number(antennaInfo.azimuth));
+        ui->eleLabel->setText(QString::number(antennaInfo.elevation));
+    }
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();

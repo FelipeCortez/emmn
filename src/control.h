@@ -54,9 +54,8 @@ public:
 
     /** \brief Send power???
     *
-    *  @todo verificar se o comando enviado foi entendido
     */
-    void send_power(void);
+    bool send_power(void);
 
     /** \brief Verifica se o último comando enviado foi entendido pelo Arduino
     *
@@ -88,9 +87,9 @@ public:
     void setController(Controller controller);
     void moveToTarget();
     void updateAntennaPosition();
+    bool isPortValid();
 private:
     CSerial serial;
-    bool valid;
     Controller controller;
     QTimer antennaTimer;
     TrackerListModel* trackerListModel;
@@ -99,6 +98,7 @@ private:
     float targetAz;
     float targetEle;
     time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
+    bool validPort;
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)
     int cont_aux = 0;
@@ -111,7 +111,6 @@ private:
     unsigned char ack[1] = { 65 };      // 'A'
     unsigned char nack[1] = { 78 };     // 'N'
     unsigned char input_ack[1] = { 88 };// 'X' //será utilizada para verificar reconhecimento de mensagens enviadas e recebidas
-    int erro_ack = 0; //Variavel auxiliar para detecção de erros
 
     //arrays que armazenarão rampas de posicionamento inicial e final
     float rampa_AZ[30] = { 0 };
