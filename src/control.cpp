@@ -141,21 +141,19 @@ void Control::changePort(QString port) {
         serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
     }
 
-    if (serial.IsOpen() == true) {
-        qDebug() << "Porta serial conectada" << "(" << port << ")";
-    } else {
+    if (!serial.IsOpen()) {
         qDebug() << "Erro ao abrir porta" << "(" << port << ")";
-        return; // TODO: substituir por throw error
-    }
-
-    validPort = send_power();
-    qDebug() << "valid: " << validPort;
-
-    if(validPort) {
-        antennaTimer.start(1000);
-        setTarget(180, 90);
+        validPort = false;
     } else {
-        antennaTimer.stop();
+        validPort = send_power();
+        qDebug() << "valid: " << validPort;
+
+        if(validPort) {
+            antennaTimer.start(1000);
+            setTarget(180, 90);
+        } else {
+            antennaTimer.stop();
+        }
     }
 }
 
