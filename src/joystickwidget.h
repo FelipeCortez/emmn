@@ -6,10 +6,12 @@
 #include <QTimer>
 #include "helpers.h"
 
+//! Graus de liberdade do joystick
 enum class ControlAxes {
     azimuthOnly, elevationOnly, free
 };
 
+//! Classe responsável pelo desenho lógica de interação com usuário do widget de joystick virtual
 class JoystickWidget : public QWidget
 {
     Q_OBJECT
@@ -18,28 +20,53 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
+
+    /*! \brief Desenha joystick
+     */
     void paintEvent(QPaintEvent *);
+
+    /*! \brief Calcula deltas de azimute e elevação baseando-se na posição do joystick
+     *
+     * @todo Parametrizar delta máximo
+     */
     AzEle getDeltas();
 
 private:
-    const int widgetSize;
-    const int margins;
-    const double joyCircleProportion;
-    QPointF joyCircleCenter;
-    QRectF limitCircle;
-    bool dragging;
-    QPointF mouseOffset;
-    ControlAxes controlAxes;
+    const int widgetSize; //!< Tamanho da widget do joystick
+    const int margins; //!< Tamanho das margens internas
+    const double joyCircleProportion; //!< Razão de proporção entre tamanho do joystick e círculo externo
+    QPointF joyCircleCenter; //!< Armazena posição central do joystick
+    QRectF limitCircle; //!< Retângulo associado ao círculo do limite
+    bool dragging; //!< Armazena se o joystick está sendo arrastado pelo mouse
+    QPointF mouseOffset; //!< Armazena distância do mouse para o centro do joystick no momento do clique
+    ControlAxes controlAxes; //!< Armazena graus de liberdade disponíveis para movimentação do joystick
 
-    double getJoyCircleWidth();
-    QPointF getJoyCircleRealCenter();
+    double getJoyCircleWidth(); //!< Calcula tamanho do círculo do joystick
+    QPointF getJoyCircleRealCenter(); //!< Calcula centro real (não relativo) do círculo do joystick
 
 signals:
 
 public slots:
+    /*! \brief Função chamada múltiplas vezes por segundo para redesenhar o widget e retornar à posição central ao soltar o botão do mouse
+     */
     void refreshSlot();
+
+    /*! \brief Determina se joystick está livre para mexer em qualquer direção
+     *
+     * @param toggle Se true, libera movimento em todas as direções
+     */
     void setFreeSlot(bool toggled);
+
+    /*! \brief Determina se joystick está livre para mexer apenas o azimute
+     *
+     * @param toggle Se true, libera movimento apenas azimutal
+     */
     void setAzimuthSlot(bool toggled);
+
+    /*! \brief Determina se joystick está livre para mexer apenas a elevação
+     *
+     * @param toggle Se true, libera movimento apenas de elevação
+     */
     void setElevationSlot(bool toggled);
 };
 

@@ -7,26 +7,81 @@
 #include "tracker.h"
 #include "DateTime.h"
 
+//! Struct que armazena azimute e elevação quaisquer
 typedef struct AzEle {
     double azimuth;
     double elevation;
 } AzEle;
 
+//! Funções de configuração
 namespace Settings {
+    /*! \brief Retorna uma nova instância de settings
+     *
+     * Função criada para não precisar lembrar dos argumentos de inicialização
+     */
     QSettings* getSettings();
+
+    /*! \brief Salva lista de satélites persistentemente
+     */
     void saveTrackers(QList<Tracker> trackers);
+
+    /*! \brief Carrega lista de satélites salvos
+     */
     QList<Tracker> loadTrackers();
+
+    /*! \brief Carrega opção das configurações de usar tempo UTC ou GMT-3
+     */
     bool getUseLocalTime();
+
+    /*! \brief Salva opção das configurações de usar tempo UTC ou GMT-3
+     */
     void setUseLocalTime(bool useLocalTime);
+
+    /*! \brief Carrega nome da porta usada na última sessão do programa
+     */
     QString getSerialPort();
+
+    /*! \brief Salva nome da porta usada
+     */
     void setSerialPort(QString serialPort);
 }
 
+//! Funções úteis
 namespace Helpers {
+    /*! \brief Transforma uma data da classe DateTime (SGP4)  em string
+     *
+     * Formatação YYYY/MM/DD HH:MM:SS UTC/GMT
+     *
+     * @param date Classe DateTime da biblioteca SGP4
+     */
     QString betterDate(DateTime date);
+
+    /*! \brief Transforma um horário em string
+     *
+     * Formatação HH:MM
+     *
+     * @param time Classe DateTime da biblioteca SGP4
+     */
     QString betterTime(DateTime time);
+
+    /*! \brief Transforma radianos em graus
+     */
     double radToDeg(double rad);
+
+    /*! \brief Limita o módulo de val por um valor max
+     *
+     * Para -10, 5, saída é -5 <br>
+     * Para  10, 5, saída é 5 <br>
+     * Para  3, 4, saída é 3 <br>
+     * Para  -3, 4, saída é -3 <br>
+     *
+     * @param val Valor a ser limitado
+     * @param max Módulo máximo (limite)
+     */
     double clip(double val, double max);
+
+    /*! \brief Retorna uma lista de portas seriais disponíveis
+     */
     QList<QSerialPortInfo> getSerialPortsAvailable();
 }
 

@@ -191,7 +191,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                                                             << "Perda de sinal"
                                                             << "El. máx."
                                                             << "Duração"
-                                                            << "Inversa");
+                                                            << "Tipo");
 
         if (allPasses.begin() == allPasses.end()) {
             qDebug() << "no passes found";
@@ -297,7 +297,7 @@ void MainWindow::satInfoUpdateSlot() {
     ui->nextPassSatLabel->setText(model->getAllPasses().at(0).tracker->getTitle());
 
     if(control->isPortValid()) {
-        AzEle antennaInfo = control->send_state();
+        AzEle antennaInfo = control->getState();
         ui->azLabel->setText(QString::number(antennaInfo.azimuth));
         ui->eleLabel->setText(QString::number(antennaInfo.elevation));
     }

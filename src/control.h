@@ -10,10 +10,12 @@
 #include "serial.h"
 #include "trackerlistmodel.h"
 
+//!  Modo de controle da antena.
 enum class Controller {
     Schedule, Manual
 };
 
+//!  Classe responsável pela manipulação da antena
 class Control : public QObject
 {
     Q_OBJECT
@@ -22,71 +24,96 @@ public:
     Control(QString, TrackerListModel* trackerListModel, QObject *parent = 0);
     ~Control();
 
-    /** \brief Envia para o Arduino posições de azimute e elevação desejadas
+    /*! \brief Envia para o Arduino posições de azimute e elevação desejadas
      *
      *
      *  @param az Azimute desejado
      *  @param ele Elevação desejada
      */
-    void send_set(float az, float ele);
+    void sendPosition(float az, float ele);
 
-    /** \brief Envia um sinal state pro Arduino e lê a resposta
-     *
-     *  Um nome mais apropriado talvez seria "get state".
+    /*! \brief Envia um sinal state pro Arduino e lê a resposta
      *
      *  @todo Verificar se o comando enviado foi entendido
      */
-    AzEle send_state();
+    AzEle getState();
 
-    /** \brief Envia um sinal de power para o Arduino
+    /*! \brief Envia um sinal de power para o Arduino
      *
      * Utilizado para verificar se porta serial é válida
      *
      */
-    bool send_power();
+    bool sendPower();
 
-    /** \brief Verifica se o último comando enviado foi entendido pelo Arduino
-    *
-    *  @returns 0 se o comando foi reconhecido, 1 se não foi
-    *  @todo Trocar retorno por valor booleano
-    */
-    int reconhecimento_arduino(unsigned char *_input_aknow);
+    /*! \brief Verifica se o último comando enviado foi entendido pelo Arduino
+     *
+     *  @returns 0 se o comando foi reconhecido, 1 se não foi
+     *  @todo Trocar retorno por valor booleano
+     */
+    int acknowledge(unsigned char *_input_aknow);
 
-    /** \brief Verifica se o checksum do string de STATE recebido está correto
-    *
-    *  @param _input_aknow
-    *  @returns 0 se o comando foi reconhecido, 1 se não foi
-    *  @todo Trocar retorno por valor booleano
-    *  @todo Refatorar aknow por ack
-    */
-    int verifica_checksum();
+    /*! \brief Verifica se o checksum do string de STATE recebido está correto
+     *
+     *  @param _input_aknow
+     *  @returns 0 se o comando foi reconhecido, 1 se não foi
+     *  @todo Trocar retorno por valor booleano
+     *  @todo Refatorar aknow por ack
+     */
+    int verifyChecksum();
 
-    /** \brief Verifica se o último comando recebido pelo PC foi reconhecido
-      *
-      *  Envia ACK caso reconhecido e NACK caso contrário
-      *
-      *  @param _erro
-      */
-    void envia_reconhecimento(int _erro);
+    /*! \brief Verifica se o último comando recebido pelo PC foi reconhecido
+     *
+     *  Envia ACK caso reconhecido e NACK caso contrário
+     */
+    void sendAck(int _erro);
 
+    /*! \brief Altera porta da comunicação com Arduino
+     *
+     *  @param port Nome da porta (e.g. "COM3")
+     */
     void changePort(QString port);
+
+    /*! \brief Atualiza valores alvo para a antena baseados em deltas em vez de posições absolutas
+     *
+     * @param deltaAz
+     * @param deltaEle
+     *
+     * @todo Mudar para struct AzEle
+     */
     void setDeltas(float deltaAz, float deltaEle);
+
+    /*! \brief Atualiza valores alvo para a antena
+     *
+     * @param az
+     * @param ele
+     */
     void setTarget(float az, float ele);
+
+    /*! \brief Determina como a posição da antena será atualizada
+     *
+     * @param controller Modo de controle (manual ou automático)
+     *
+     * @todo Refatorar para setControlMode
+     */
     void setController(Controller controller);
+
+    /*! \brief Atualiza posição da antena baseado nos valores alvo registrados
+     */
     void moveToTarget();
-    void updateAntennaPosition();
+
+    /*! \brief Verifica se porta escolhida é válida
+      */
     bool isPortValid();
 private:
-    CSerial serial;
-    bool validPort;
-    Controller controller;
-    QTimer antennaTimer;
-    TrackerListModel* trackerListModel;
-    float az;
-    float ele;
-    float targetAz;
-    float targetEle;
-    time_t ef_time; // Horário da proxima efeméride em segundos desde 1 de janeiro de 1970 (Unix time)
+    bool validPort; //!< true se porta verdadeira é um dispotivo Arduino válido
+    Controller controller; //!< Modo de controle da antena
+    QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
+    CSerial serial; //!< Classe de comunicação serial
+    TrackerListModel* trackerListModel; //!< Ponteiro para lista que armazena todos os satélites cadastrados
+    float az; //!< Mudar para blocos
+    float ele; //!< Mudar para blocos
+    float targetAz; //!< Azimute alvo para a antena
+    float targetEle; //!< Elevação alvo para a antena
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)
     int cont_aux = 0;
@@ -104,6 +131,7 @@ private:
     int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
 
 public slots:
+    //! Lógica de atualização da posição da antena
     void updateSlot();
 };
 

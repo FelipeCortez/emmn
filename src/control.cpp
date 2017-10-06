@@ -18,13 +18,13 @@ Control::Control(QString port, TrackerListModel *trackerListModel, QObject *pare
 
 Control::~Control() {
     if(validPort) {
-        send_power();
+        sendPower();
     }
 
     serial.Close();
 }
 
-void Control::send_set(float az, float ele) {
+void Control::sendPosition(float az, float ele) {
     //auxiliar para conversão de float para int
     unsigned short temp = 0;
 
@@ -60,14 +60,14 @@ void Control::send_set(float az, float ele) {
         serial.Write(setString, 6);
 
         //Recebe comando ACK ou NACK vindo do arduino e armazena código de erro
-        erro_ack = reconhecimento_arduino(input_ack);
+        erro_ack = acknowledge(input_ack);
 
         //Incrementa erro (se houver)
         //errors += erro_ack;
     }
 }
 
-AzEle Control::send_state()
+AzEle Control::getState()
 {
     //envia comando STATE
     serial.Write(state, 1);
@@ -82,13 +82,10 @@ AzEle Control::send_state()
         serial.Read(input_state, 7);
 
         //verifica checksum: retorna 0 se estiver OK
-        erro_ack = verifica_checksum();
+        erro_ack = verifyChecksum();
 
         //envia ack ou nack dependendo do erro do checksum
-        envia_reconhecimento(erro_ack);
-
-        //incrementa contagem de erros (se houver)
-        cont_erro = cont_erro + erro_ack;
+        sendAck(erro_ack);
     }
 
     //Decodifica posições AZ e ELE
@@ -145,7 +142,7 @@ void Control::changePort(QString port) {
         qDebug() << "Erro ao abrir porta" << "(" << port << ")";
         validPort = false;
     } else {
-        validPort = send_power();
+        validPort = sendPower();
         qDebug() << "valid: " << validPort;
 
         if(validPort) {
@@ -158,7 +155,7 @@ void Control::changePort(QString port) {
 }
 
 void Control::setDeltas(float deltaAz, float deltaEle) {
-    AzEle antennaInfo = send_state();
+    AzEle antennaInfo = getState();
     az = antennaInfo.azimuth;
     ele = antennaInfo.elevation;
 
@@ -178,7 +175,7 @@ void Control::setController(Controller controller) {
 }
 
 void Control::moveToTarget() {
-    AzEle antennaInfo = send_state();
+    AzEle antennaInfo = getState();
     az = antennaInfo.azimuth;
     ele = antennaInfo.elevation;
 
@@ -186,10 +183,10 @@ void Control::moveToTarget() {
     incrementAz = Helpers::clip(incrementAz, 10);
     float incrementEle = targetEle - ele;
     incrementEle = Helpers::clip(incrementEle, 10);
-    send_set(az + incrementAz, ele + incrementEle);
+    sendPosition(az + incrementAz, ele + incrementEle);
 }
 
-bool Control::send_power() {
+bool Control::sendPower() {
     int count = 0;
 
     while(true) {
@@ -207,7 +204,7 @@ bool Control::send_power() {
     }
 }
 
-int Control::verifica_checksum() {
+int Control::verifyChecksum() {
     //verifica checksum
     if ((input_state[0] ^ input_state[1] ^ input_state[2] ^ input_state[3] ^ input_state[4] ^ input_state[5]) == input_state[6]) {
         return 0;
@@ -217,7 +214,7 @@ int Control::verifica_checksum() {
 
 }
 
-void Control::envia_reconhecimento(int _erro) {
+void Control::sendAck(int _erro) {
     if (_erro == 0) {
         serial.Write(ack, 1);
     } else {
@@ -225,7 +222,7 @@ void Control::envia_reconhecimento(int _erro) {
     }
 }
 
-int Control::reconhecimento_arduino(unsigned char *_input_ack) {
+int Control::acknowledge(unsigned char *_input_ack) {
     serial.Read(_input_ack, 1);
     if (_input_ack[0] == 'A') { //reconhecido
         return 0;

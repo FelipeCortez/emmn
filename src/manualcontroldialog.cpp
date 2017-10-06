@@ -69,7 +69,7 @@ void ManualControlDialog::tabChanged(int index) {
 }
 
 void ManualControlDialog::updateAntennaInfo() {
-    AzEle antennaInfo = control->send_state();
+    AzEle antennaInfo = control->getState();
     ui->azimuthLabel->setText(QString::number(antennaInfo.azimuth));
     ui->elevationLabel->setText(QString::number(antennaInfo.elevation));
 }
@@ -86,11 +86,11 @@ void ManualControlDialog::sendBoth() {
 
 void ManualControlDialog::sendAz() {
     control->setTarget(ui->azimuthLineEdit->text().toDouble(),
-                       control->send_state().elevation);
+                       control->getState().elevation);
 }
 
 void ManualControlDialog::sendEle() {
-    control->setTarget(control->send_state().azimuth,
+    control->setTarget(control->getState().azimuth,
                        ui->elevationLineEdit->text().toDouble());
 }
 
