@@ -13,18 +13,20 @@
 #include <QMetaType>
 #include "network.h"
 
+/*! Detalhes de uma passagem */
 struct PassDetails
 {
-    DateTime aos;
-    DateTime los;
-    double max_elevation;
-    bool reverse;
+    DateTime aos; //!< Data/hora de aquisição do sinal
+    DateTime los; //!< Data/hora de perda do sinal
+    double max_elevation; //!< Elevação máxima durante passagem
+    bool reverse; //!< Passagem faz antena passar pelo fim de curso ou não
 };
 
-// Needed so you can wrap PassDetails in a QVariant
+// Necessário para tratar PassDetails como QVariant para salvar dados no sistema (serialização)
 Q_DECLARE_METATYPE(PassDetails)
 Q_DECLARE_METATYPE(QList<PassDetails>)
 
+/*! Classe que armazena TLEs de um satélite */
 class Tracker
 {
 public:
@@ -37,7 +39,8 @@ public:
         Altitude
     };
 
-    // it's better for these to use std::string instead of QString because they belong to the SGP4 lib
+    // std::string utilizada pelo construtor para facilitar integração com biblioteca SGP4
+
     Tracker();
     Tracker(std::vector<std::string> tle_list);
     Tracker(QList<QString> tle_list);

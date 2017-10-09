@@ -7,16 +7,6 @@ SettingsDialog::SettingsDialog(QWidget * parent)
 {
     setupUi(this);
 
-    QList<QSerialPortInfo> serialList = Helpers::getSerialPortsAvailable();
-    for(auto serialPort : serialList) {
-        serialPortsCombo->addItem(serialPort.portName() + " (" + serialPort.description() + ")",
-                                  serialPort.portName());
-
-        if(Settings::getSerialPort() == serialPort.portName()) {
-            serialPortsCombo->setCurrentIndex(serialPortsCombo->count() - 1);
-        }
-    }
-
     updateWithSettings();
 
     connect(settingsDialogButtonBox,
@@ -30,6 +20,16 @@ SettingsDialog::SettingsDialog(QWidget * parent)
 }
 
 void SettingsDialog::updateWithSettings() {
+    QList<QSerialPortInfo> serialList = Helpers::getSerialPortsAvailable();
+    for(auto serialPort : serialList) {
+        serialPortsCombo->addItem(serialPort.portName() + " (" + serialPort.description() + ")",
+                                  serialPort.portName());
+
+        if(Settings::getSerialPort() == serialPort.portName()) {
+            serialPortsCombo->setCurrentIndex(serialPortsCombo->count() - 1);
+        }
+    }
+
     useLocalTimeCheckbox->setChecked(Settings::getUseLocalTime());
 }
 

@@ -8,10 +8,16 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
     , control(control)
     , antennaInfoUpdateTimer(this)
     , joystickRefreshTimer(this)
+    , validAz(false)
+    , validEle(false)
 {
     ui->setupUi(this);
 
-    antennaInfoUpdateTimer.start(1000.0f / 30);
+    ui->sendAzButton->setEnabled(false);
+    ui->sendEleButton->setEnabled(false);
+    ui->sendBothButton->setEnabled(false);
+
+    antennaInfoUpdateTimer.start(1000);
     joystickRefreshTimer.start(1000.0f / 30);
 
     // Tab --------
@@ -57,6 +63,15 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
             SIGNAL(clicked(bool)),
             this,
             SLOT(sendBoth()));
+    connect(ui->elevationLineEdit,
+            SIGNAL(textChanged(QString)),
+            this,
+            SLOT(validateElevation(QString)));
+    connect(ui->azimuthLineEdit,
+            SIGNAL(textChanged(QString)),
+            this,
+            SLOT(validateAzimuth(QString)));
+
 }
 
 void ManualControlDialog::tabChanged(int index) {
@@ -92,6 +107,38 @@ void ManualControlDialog::sendAz() {
 void ManualControlDialog::sendEle() {
     control->setTarget(control->getState().azimuth,
                        ui->elevationLineEdit->text().toDouble());
+}
+
+void ManualControlDialog::validateBoth() {
+    ui->sendBothButton->setEnabled(validAz && validEle);
+}
+
+void ManualControlDialog::validateAzimuth(QString azimuth) {
+    bool ok;
+    double az = azimuth.toDouble(&ok);
+    if(ok && az >= 0 && az < 360) {
+        ui->sendAzButton->setEnabled(true);
+        validAz = true;
+    } else {
+        ui->sendAzButton->setEnabled(false);
+        validAz = false;
+    }
+
+    validateBoth();
+}
+
+void ManualControlDialog::validateElevation(QString elevation) {
+    bool ok;
+    double ele = elevation.toDouble(&ok);
+    if(ok && ele >= 0 && ele < 360) {
+        ui->sendEleButton->setEnabled(true);
+        validEle = true;
+    } else {
+        ui->sendEleButton->setEnabled(false);
+        validEle = false;
+    }
+
+    validateBoth();
 }
 
 ManualControlDialog::~ManualControlDialog() {

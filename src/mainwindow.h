@@ -40,9 +40,13 @@ private:
     //Network network; //! Conexão com a Internet
     Control* control; //! Controle da antena
 
+    /*! \brief Modifica porta serial utilizada pelo programa basead
+     */
     void setPortFromSettings();
+
+    /*! \brief Carrega satélites salvos persistentemente e insere-os na classe do ListModel
+     */
     void loadTrackersFromSettings();
-    QString betterDate(DateTime datetime);
 
 public slots:
     /*! \brief Slot chamado automaticamente ao selecionar-se um satélite
