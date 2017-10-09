@@ -67,8 +67,7 @@ void Control::sendPosition(float az, float ele) {
     }
 }
 
-AzEle Control::getState()
-{
+AzEle Control::getState() {
     //envia comando STATE
     serial.Write(state, 1);
     int erro_ack = 1;
@@ -106,9 +105,8 @@ AzEle Control::getState()
 
     float ele = temp * (360.0 / 65535.0);
 
-    AzEle antennaInfo;
-    antennaInfo.azimuth = az;
-    antennaInfo.elevation = ele;
+    lastAzEle.azimuth = az;
+    lastAzEle.elevation = ele;
 
     //Decodificação do STATUS do sistema contido no byte 5 da mensagem
     m =    (input_state[5]) % 2;
@@ -121,7 +119,7 @@ AzEle Control::getState()
     //printf("\nP:%d  KA1: %d KA2: %d DAZ: %d  DEL: %d  M: %d  Erros: %d\n\n", p, ka1, ka2, daz, del, m, erro_ack);
     //printf("Erros detectados: %d\n\n", cont_erro);
 
-    return antennaInfo;
+    return lastAzEle;
 }
 
 void Control::changePort(QString port) {
@@ -155,14 +153,10 @@ void Control::changePort(QString port) {
 }
 
 void Control::setDeltas(float deltaAz, float deltaEle) {
-    AzEle antennaInfo = getState();
-    az = antennaInfo.azimuth;
-    ele = antennaInfo.elevation;
+    if(lastAzEle.azimuth + deltaAz < 0 || lastAzEle.azimuth + deltaAz >= 360) { deltaAz = 0; }
+    if(lastAzEle.elevation + deltaEle < 0 || lastAzEle.elevation + deltaEle >= 360) { deltaEle = 0; }
 
-    if(az + deltaAz < 0 || az + deltaAz > 360) { deltaAz = 0; }
-    if(ele + deltaEle < 0 || ele + deltaEle > 360) { deltaEle = 0; }
-
-    setTarget(az + deltaAz, ele + deltaEle);
+    setTarget(lastAzEle.azimuth + deltaAz, lastAzEle.elevation + deltaEle);
 }
 
 void Control::setTarget(float az, float ele) {
@@ -175,15 +169,13 @@ void Control::setController(Controller controller) {
 }
 
 void Control::moveToTarget() {
-    AzEle antennaInfo = getState();
-    az = antennaInfo.azimuth;
-    ele = antennaInfo.elevation;
+    lastAzEle = getState();
 
-    float incrementAz = targetAz - az;
+    float incrementAz = targetAz - lastAzEle.azimuth;
     incrementAz = Helpers::clip(incrementAz, 10);
-    float incrementEle = targetEle - ele;
+    float incrementEle = targetEle - lastAzEle.elevation;
     incrementEle = Helpers::clip(incrementEle, 10);
-    sendPosition(az + incrementAz, ele + incrementEle);
+    sendPosition(lastAzEle.azimuth + incrementAz, lastAzEle.elevation + incrementEle);
 }
 
 bool Control::sendPower() {
@@ -251,11 +243,8 @@ void Control::updateSlot() {
             double az = nextPass.tracker->getAzimuthForObserver();
             double ele = nextPass.tracker->getElevationForObserver();
             if(nextPass.passDetails.reverse) {
-                qDebug() << az;
                 az = fmod(az + 180, 360);
-                qDebug() << az;
                 ele = 180 - ele;
-                qDebug() << "---";
             }
 
             setTarget(az, ele);

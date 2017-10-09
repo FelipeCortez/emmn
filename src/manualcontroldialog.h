@@ -5,6 +5,8 @@
 #include "control.h"
 #include "helpers.h"
 
+const int joystickRefreshRate = 1000.0f / 60; //!< Período utilizado por timer
+
 namespace Ui {
 class ManualControlDialog;
 }

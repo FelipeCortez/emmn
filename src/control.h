@@ -110,8 +110,7 @@ private:
     QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
     CSerial serial; //!< Classe de comunicação serial
     TrackerListModel* trackerListModel; //!< Ponteiro para lista que armazena todos os satélites cadastrados
-    float az; //!< Mudar para blocos
-    float ele; //!< Mudar para blocos
+    AzEle lastAzEle; //!< Última posição lida
     float targetAz; //!< Azimute alvo para a antena
     float targetEle; //!< Elevação alvo para a antena
 

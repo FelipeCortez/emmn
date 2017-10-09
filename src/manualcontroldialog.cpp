@@ -18,7 +18,7 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
     ui->sendBothButton->setEnabled(false);
 
     antennaInfoUpdateTimer.start(1000);
-    joystickRefreshTimer.start(1000.0f / 30);
+    joystickRefreshTimer.start(joystickRefreshRate);
 
     // Tab --------
     connect(ui->controlSourceTab,
@@ -76,7 +76,7 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
 
 void ManualControlDialog::tabChanged(int index) {
     if(index == 0) {
-        joystickRefreshTimer.start(1000.0f / 30);
+        joystickRefreshTimer.start(joystickRefreshRate);
     } else if(index == 1) {
         joystickRefreshTimer.stop();
         ui->azimuthLineEdit->setFocus(Qt::OtherFocusReason);
