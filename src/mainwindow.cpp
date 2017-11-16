@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionDebugar,
             SIGNAL(triggered(bool)),
             this,
-            SLOT(debugarSlot(bool)));
+            SLOT(debugSlot(bool)));
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -55,10 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(clicked(bool)),
             this,
             SLOT(addTrackerDialogSlot()));
-    connect(ui->editTrackerButton,
-            SIGNAL(clicked(bool)),
-            this,
-            SLOT(editSelectedTrackerSlot()));
     connect(ui->removeTrackerButton,
             SIGNAL(clicked(bool)),
             this,
@@ -108,7 +104,6 @@ void MainWindow::loadTrackersFromSettings() {
 
 void MainWindow::enableSatelliteButtons(bool enable) {
     ui->removeTrackerButton->setEnabled(enable);
-    ui->editTrackerButton->setEnabled(enable);
     ui->showAllPassesButton->setEnabled(enable);
     auto selected = ui->satellitesView->selectionModel()->selection();
     if(enable) {
@@ -244,14 +239,6 @@ void MainWindow::addTrackerDialogSlot() {
     }
 }
 
-void MainWindow::editSelectedTrackerSlot() {
-    auto index = ui->satellitesView->selectionModel()->selectedIndexes().first().row();
-    Tracker* tracker = &model->getTrackersRef()[index];
-    AddTrackerDialog dialog(model, tracker, this);
-    if(dialog.exec()) {
-    }
-}
-
 void MainWindow::settingsDialogSlot(bool) {
     SettingsDialog dialog;
     if(dialog.exec()) {
@@ -344,8 +331,21 @@ void MainWindow::moveTrackerDownSlot() {
     Settings::saveTrackers(model->getTrackers());
 }
 
-void MainWindow::debugarSlot(bool) {
-    Helpers::getSerialPortsAvailable();
+void MainWindow::debugSlot(bool) {
+    //network.getSpaceTrackCookies();
+    //network.getTLE("CBERS 4");
+
+    //QStringList strList;
+    //strList << "0 COSMOS 839 DEB *";
+    //strList << "1 21957U 76067BV  17302.49927365 +.00000067 +00000-0 +25021-3 0  9994";
+    //strList << "2 21957 065.4602 114.6225 0729855 352.8553 006.2474 12.63766133198387";
+
+    //Helpers::saveTLEList(strList);
+
+    Helpers::readTLEList();
+
+    //qDebug() << Helpers::getSpaceTrackCredentials().at(0);
+    //qDebug() << Helpers::getSpaceTrackCredentials().at(1);
 }
 
 MainWindow::~MainWindow()

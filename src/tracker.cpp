@@ -40,10 +40,8 @@ void Tracker::UpdateTLE() {
 
 void Tracker::setTle(QList<QString> tle) {
     tle1 = tle[0];
-    qDebug() << tle[0];
     tle2 = tle[1];
     tle3 = tle[2];
-    qDebug() << tle1;
 }
 
 QString Tracker::getSatInfo(int info) const {

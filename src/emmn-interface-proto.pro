@@ -55,9 +55,16 @@ HEADERS += mainwindow.h \
 FORMS   += mainwindow.ui \
         tracker_dialog.ui \
         settings_dialog.ui \
-        manualcontrol_dialog.ui
+        manualcontrol_dialog.ui \
+    tlesearchdialog.ui
 
 LIBS +=        ..\sgp4\build\libsgp4\libsgp4.a
 INCLUDEPATH += ..\sgp4\build\libsgp4\include
 #LIBS +=        C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\libsgp4.a
 #INCLUDEPATH += C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\include
+
+DISTFILES += \
+    credentials.txt
+
+RESOURCES += \
+    resources.qrc

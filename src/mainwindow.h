@@ -39,6 +39,7 @@ private:
     QStandardItemModel* tableModel; //! Elementos de tabela de passagens
     //Network network; //! Conexão com a Internet
     Control* control; //! Controle da antena
+    Network network;
 
     /*! \brief Modifica porta serial utilizada pelo programa basead
      */
@@ -71,11 +72,7 @@ public slots:
      *
      * Para testes em geral.
      */
-   void debugarSlot(bool);
-
-    /*! \brief Slot chamado ao selecionar um satélite e clicar em Editar
-     */
-   void editSelectedTrackerSlot();
+   void debugSlot(bool);
 
     /*! \brief Slot chamado ao selecionar um satélite e clicar em Remover
      */

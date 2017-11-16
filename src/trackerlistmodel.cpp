@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <algorithm>
 
-TrackerListModel::TrackerListModel(QObject*) {}
+TrackerListModel::TrackerListModel() {}
 
 QModelIndex TrackerListModel::addTracker(const Tracker &tracker) {
     int rowIndex = rowCount();
@@ -76,11 +76,6 @@ QList<Tracker>& TrackerListModel::getTrackersRef() {
     return trackers;
 }
 
-void TrackerListModel::setTracker(int row, Tracker tracker) {
-    trackers[row] = tracker;
-    generatePassList();
-}
-
 bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) {
     return pd1.passDetails.aos < pd2.passDetails.aos;
 }
@@ -112,3 +107,9 @@ QList<PassDetailsWithTracker> TrackerListModel::getAllPasses() {
 
     return allPasses.mid(pos);
 }
+
+void TrackerListModel::setTracker(int row, Tracker tracker) {
+    trackers[row] = tracker;
+    generatePassList();
+}
+

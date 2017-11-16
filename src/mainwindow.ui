@@ -116,16 +116,6 @@
       <item>
        <layout class="QHBoxLayout" name="selectedSatOptions">
         <item>
-         <widget class="QPushButton" name="editTrackerButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Editar</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="removeTrackerButton">
           <property name="enabled">
            <bool>false</bool>

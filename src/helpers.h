@@ -5,6 +5,7 @@
 #include <QList>
 #include <QtSerialPort/QSerialPortInfo>
 #include "tracker.h"
+#include "trackerlistmodel.h"
 #include "DateTime.h"
 
 //! Struct que armazena azimute e elevação quaisquer
@@ -18,6 +19,8 @@ namespace Settings {
     /*! \brief Retorna uma nova instância de settings
      *
      * Função criada para não precisar lembrar dos argumentos de inicialização
+     *
+     *  @todo Inicializar só no começo do programa e deletar no final
      */
     QSettings* getSettings();
 
@@ -83,6 +86,17 @@ namespace Helpers {
     /*! \brief Retorna uma lista de portas seriais disponíveis
      */
     QList<QSerialPortInfo> getSerialPortsAvailable();
+
+    /*! \brief Salva a mais recentemente obtida lista de TLEs recebida pelo SpaceTrack
+     */
+
+    bool saveTLEList(QStringList tleList);
+
+    QStringListModel* readTLEList();
+
+    QStringList getSpaceTrackCredentials();
+
+    QStringList findInTLEList(QString catalogNumber);
 }
 
 #endif // HELPERS_H
