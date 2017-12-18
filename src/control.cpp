@@ -5,8 +5,10 @@ Control::Control(QString port,
                  QObject *parent)
     : QObject(parent)
     , validPort(false)
-    , controlMode(ControlMode::Schedule)
+    , controlMode(ControlMode::None)
     , antennaTimer(this)
+    , speed(0)
+    , maxSpeed(10)
 {
     changePort(port);
 
@@ -175,10 +177,16 @@ void Control::moveToTarget() {
     lastAzEle = getState();
     logger->addLog(lastAzEle);
 
+    speed = Helpers::clip(speed + acceleration);
+
+    qDebug() << speed;
+
+    // restrição de intensidade de movimento
     float incrementAz = targetAz - lastAzEle.azimuth;
-    incrementAz = Helpers::clip(incrementAz, 10);
+    incrementAz = Helpers::clip(incrementAz, speed);
     float incrementEle = targetEle - lastAzEle.elevation;
-    incrementEle = Helpers::clip(incrementEle, 10);
+    incrementEle = Helpers::clip(incrementEle, speed);
+
     sendPosition(lastAzEle.azimuth + incrementAz, lastAzEle.elevation + incrementEle);
 }
 
@@ -235,35 +243,34 @@ void Control::updateSlot() {
     if (controlMode == ControlMode::Schedule) {
         if(trackerListModel->getAllPasses().empty()) {
             setTarget(180, 90);
-            return;
-        }
-
-        auto nextPass = trackerListModel->getAllPasses().at(0);
-        TimeSpan remaining = nextPass.passDetails.aos - DateTime::Now(true);
-        float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
-        float positioningTime = 60;
-
-        if(nextPass.tracker->getElevationForObserver() >= 0) {
-            double az = nextPass.tracker->getAzimuthForObserver();
-            double ele = nextPass.tracker->getElevationForObserver();
-            if(nextPass.passDetails.reverse) {
-                az = fmod(az + 180, 360);
-                ele = 180 - ele;
-            }
-
-            setTarget(az, ele);
-        } else if(secondsRemaining <= positioningTime &&
-                  secondsRemaining > 0) {
-            double az = nextPass.tracker->getAzimuthForObserver();
-            double ele = 0;
-            if(nextPass.passDetails.reverse) {
-                az = fmod(az + 180, 360);
-                ele = 180 - ele;
-            }
-
-            setTarget(az, ele);
         } else {
-            setTarget(180, 90);
+            auto nextPass = trackerListModel->getAllPasses().at(0);
+            TimeSpan remaining = nextPass.passDetails.aos - DateTime::Now(true);
+            float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
+            float positioningTime = 60;
+
+            if(nextPass.tracker->getElevationForObserver() >= 0) {
+                double az = nextPass.tracker->getAzimuthForObserver();
+                double ele = nextPass.tracker->getElevationForObserver();
+                if(nextPass.passDetails.reverse) {
+                    az = fmod(az + 180, 360);
+                    ele = 180 - ele;
+                }
+
+                setTarget(az, ele);
+            } else if(secondsRemaining <= positioningTime &&
+                      secondsRemaining > 0) {
+                double az = nextPass.tracker->getAzimuthForObserver();
+                double ele = 0;
+                if(nextPass.passDetails.reverse) {
+                    az = fmod(az + 180, 360);
+                    ele = 180 - ele;
+                }
+
+                setTarget(az, ele);
+            } else {
+                setTarget(180, 90);
+            }
         }
     } else if (controlMode == ControlMode::None) {
         setTarget(180, 90);

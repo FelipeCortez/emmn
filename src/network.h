@@ -18,6 +18,8 @@ private:
     QNetworkReply* reply;
     QNetworkCookieJar jar;
     QString satName;
+    bool cookiesAcquired;
+
 
 public slots:
     QStringList tleDownloadFinished();

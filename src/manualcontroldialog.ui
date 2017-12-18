@@ -136,19 +136,6 @@
        <string>Posição</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Azimute</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="azimuthLineEdit"/>
-       </item>
        <item row="0" column="2">
         <widget class="QPushButton" name="sendAzButton">
          <property name="maximumSize">
@@ -165,6 +152,22 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Azimute</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="azimuthLineEdit"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="elevationLineEdit"/>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -175,19 +178,26 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="elevationLineEdit"/>
-       </item>
        <item row="3" column="0" colspan="3">
-        <widget class="QRadioButton" name="radioButton">
-         <property name="enabled">
-          <bool>false</bool>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0" colspan="3">
+        <widget class="QPushButton" name="sendBothButton">
          <property name="text">
-          <string>Enviar continuamente</string>
+          <string>Enviar ambos</string>
          </property>
-         <property name="checked">
-          <bool>true</bool>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -206,39 +216,6 @@
           <bool>false</bool>
          </property>
         </widget>
-       </item>
-       <item row="4" column="0" colspan="3">
-        <widget class="QRadioButton" name="radioButton_2">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Enviar uma vez</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="3">
-        <widget class="QPushButton" name="sendBothButton">
-         <property name="text">
-          <string>Enviar ambos</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -262,8 +239,6 @@
   <tabstop>elevationLineEdit</tabstop>
   <tabstop>sendEleButton</tabstop>
   <tabstop>sendBothButton</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>radioButton_2</tabstop>
   <tabstop>controlSourceTab</tabstop>
   <tabstop>freeRadio</tabstop>
  </tabstops>

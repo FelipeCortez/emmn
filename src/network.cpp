@@ -5,6 +5,7 @@
 Network::Network(QObject *parent)
     : QObject(parent)
     , reply(nullptr)
+    , cookiesAcquired(false)
 {
 }
 

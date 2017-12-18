@@ -34,7 +34,7 @@ void AddTrackerDialog::accept() {
     qDebug() << satCatNumber;
     qDebug() << trackedSatellites->rowCount();
     qDebug() << satelliteCatalogue->rowCount();
-    auto satellite = satelliteCatalogue->findTracker(satCatNumber);
+    //auto satellite = satelliteCatalogue->findTracker(satCatNumber);
     /*
     if(satellite) {
         Settings::saveTrackers(model->getTrackers());

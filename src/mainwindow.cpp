@@ -350,21 +350,21 @@ void MainWindow::trackSatellitesCheckboxChanged(int state) {
 }
 
 void MainWindow::debugSlot(bool) {
-    //network.getSpaceTrackCookies();
-    //network.getTLE("CBERS 4");
+    network.getSpaceTrackCookies();
+    network.getTLE("CBERS 4");
 
-    //QStringList strList;
-    //strList << "0 COSMOS 839 DEB *";
-    //strList << "1 21957U 76067BV  17302.49927365 +.00000067 +00000-0 +25021-3 0  9994";
-    //strList << "2 21957 065.4602 114.6225 0729855 352.8553 006.2474 12.63766133198387";
+    QStringList strList;
+    strList << "0 COSMOS 839 DEB *";
+    strList << "1 21957U 76067BV  17302.49927365 +.00000067 +00000-0 +25021-3 0  9994";
+    strList << "2 21957 065.4602 114.6225 0729855 352.8553 006.2474 12.63766133198387";
 
-    //Helpers::saveTLEList(strList);
+    Helpers::saveTLEList(strList);
 
-    //Helpers::readTLEList();
-    //qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
+    Helpers::readTLEList();
+    qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
 
-    //qDebug() << Helpers::getSpaceTrackCredentials().at(0);
-    //qDebug() << Helpers::getSpaceTrackCredentials().at(1);
+    qDebug() << Helpers::getSpaceTrackCredentials().at(0);
+    qDebug() << Helpers::getSpaceTrackCredentials().at(1);
 }
 
 MainWindow::~MainWindow()
