@@ -9,10 +9,11 @@
 #include "helpers.h"
 #include "serial.h"
 #include "trackerlistmodel.h"
+#include "logger.h"
 
 //!  Modo de controle da antena.
-enum class Controller {
-    Schedule, Manual
+enum class ControlMode {
+    Schedule, Manual, None
 };
 
 //!  Classe responsável pela manipulação da antena
@@ -95,7 +96,7 @@ public:
      *
      * @todo Refatorar para setControlMode
      */
-    void setController(Controller controller);
+    void setControlMode(ControlMode controlMode);
 
     /*! \brief Atualiza posição da antena baseado nos valores alvo registrados
      */
@@ -106,11 +107,12 @@ public:
     bool isPortValid();
 private:
     bool validPort; //!< true se porta verdadeira é um dispotivo Arduino válido
-    Controller controller; //!< Modo de controle da antena
+    ControlMode controlMode; //!< Modo de controle da antena
     QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
     CSerial serial; //!< Classe de comunicação serial
     TrackerListModel* trackerListModel; //!< Ponteiro para lista que armazena todos os satélites cadastrados
     AzEle lastAzEle; //!< Última posição lida
+    Logger* logger;
     float targetAz; //!< Azimute alvo para a antena
     float targetEle; //!< Elevação alvo para a antena
 

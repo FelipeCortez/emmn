@@ -1,5 +1,5 @@
 #include "manualcontroldialog.h"
-#include "ui_manualcontrol_dialog.h"
+#include "ui_manualcontroldialog.h"
 #include <QTime>
 
 ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
@@ -17,7 +17,7 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
     ui->sendEleButton->setEnabled(false);
     ui->sendBothButton->setEnabled(false);
 
-    antennaInfoUpdateTimer.start(1000);
+    antennaInfoUpdateTimer.start(100);
     joystickRefreshTimer.start(joystickRefreshRate);
 
     // Tab --------

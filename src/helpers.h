@@ -92,7 +92,9 @@ namespace Helpers {
 
     bool saveTLEList(QStringList tleList);
 
-    QStringListModel* readTLEList();
+    TrackerListModel* readTLEList();
+
+    QStringListModel *QStringListModelFromSatelliteCatalog(TrackerListModel *trackerList);
 
     QStringList getSpaceTrackCredentials();
 

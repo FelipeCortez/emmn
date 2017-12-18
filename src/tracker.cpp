@@ -5,48 +5,41 @@
 
 Tracker::Tracker()
     : user_geo(-5.7793, -35.201, 0.014)
+    , commonName("")
     , tle1("")
     , tle2("")
-    , tle3("")
-{
-}
+{}
 
 Tracker::Tracker(std::vector<std::string> tle_list)
     : user_geo(-5.7793, -35.201, 0.014)
-    , tle1(QString::fromStdString(tle_list[0]))
-    , tle2(QString::fromStdString(tle_list[1]))
-    , tle3(QString::fromStdString(tle_list[2]))
-{
-}
+    , commonName(QString::fromStdString(tle_list[0]))
+    , tle1(QString::fromStdString(tle_list[1]))
+    , tle2(QString::fromStdString(tle_list[2]))
+{}
 
 Tracker::Tracker(QList<QString> tle_list)
     : user_geo(-5.7793, -35.201, 0.014)
-    , tle1(tle_list[0])
-    , tle2(tle_list[1])
-    , tle3(tle_list[2])
-{
-}
+    , commonName(tle_list[0])
+    , tle1(tle_list[1])
+    , tle2(tle_list[2])
+{}
 
-Tracker::Tracker(std::string tle1, std::string tle2, std::string tle3)
+Tracker::Tracker(std::string commonName, std::string tle1, std::string tle2)
     : user_geo(-5.7793, -35.201, 0.014)
+    , commonName(QString::fromStdString(commonName))
     , tle1(QString::fromStdString(tle1))
     , tle2(QString::fromStdString(tle2))
-    , tle3(QString::fromStdString(tle3))
-{
-}
-
-void Tracker::UpdateTLE() {
-}
+{}
 
 void Tracker::setTle(QList<QString> tle) {
-    tle1 = tle[0];
-    tle2 = tle[1];
-    tle3 = tle[2];
+    commonName = tle[0];
+    tle1 = tle[1];
+    tle2 = tle[2];
 }
 
 QString Tracker::getSatInfo(int info) const {
     const double PI = 3.141592653589793238463;
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now());
     Observer obs(user_geo);
     switch(info) {
@@ -60,12 +53,16 @@ QString Tracker::getSatInfo(int info) const {
     return QString("");
 }
 
+QString Tracker::getSatCatNumber() const {
+    return tle1.simplified().split(" ").at(1);
+}
+
 double Tracker::FindMaxElevation(
         const DateTime& aos,
         const DateTime& los) const
 {
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
 
     bool running;
 
@@ -139,7 +136,7 @@ double Tracker::FindMaxElevation(
 bool Tracker::IsPassReverse(PassDetails pd) const
 {
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
 
     double time_step = 60; // in seconds
     DateTime current_time(pd.aos);
@@ -168,7 +165,7 @@ DateTime Tracker::FindCrossingPoint(
         bool finding_aos) const
 {
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
 
     bool running;
     int cnt;
@@ -248,7 +245,7 @@ QList<PassDetails> Tracker::GeneratePassList(
     QList<PassDetails> pass_list;
 
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
 
     DateTime aos_time;
     DateTime los_time;
@@ -390,7 +387,7 @@ QList<PassDetails> Tracker::GeneratePassList(
 
 double Tracker::getAzimuthForObserver() {
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
     CoordTopocentric topo = obs.GetLookAngle(eci);
     return Helpers::radToDeg(topo.azimuth);
@@ -398,7 +395,7 @@ double Tracker::getAzimuthForObserver() {
 
 double Tracker::getElevationForObserver() {
     Observer obs(user_geo);
-    SGP4 sgp4(Tle(tle1.toStdString(), tle2.toStdString(), tle3.toStdString()));
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
     CoordTopocentric topo = obs.GetLookAngle(eci);
     return Helpers::radToDeg(topo.elevation);
@@ -414,25 +411,25 @@ QString Tracker::nextPass() const {
 
 QString Tracker::getFullTLE() const {
     QStringList tle;
-    tle << tle1 << tle2 << tle3;
+    tle << commonName << tle1 << tle2;
     return tle.join("\n");
 }
 
-QString Tracker::getTitle() const {
-    return tle1.trimmed();
+QString Tracker::getCommonName() const {
+    return commonName.trimmed();
 }
 
 QDataStream &operator <<(QDataStream &stream, const Tracker &val) {
     //CoordGeodetic user_geo;
+    stream << val.commonName;
     stream << val.tle1;
     stream << val.tle2;
-    stream << val.tle3;
     return stream;
 }
 
 QDataStream &operator >>(QDataStream &stream, Tracker &val) {
+    stream >> val.commonName;
     stream >> val.tle1;
     stream >> val.tle2;
-    stream >> val.tle3;
     return stream;
 }

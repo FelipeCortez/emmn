@@ -11,6 +11,7 @@
 class NextPassesView : public QWidget
 {
     Q_OBJECT
+
 public:
     /*! \brief Inicializa classe com ponteiro de satélites nullptr e habilitando detecção do mouse
      */

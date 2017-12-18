@@ -2,7 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
-#include "ui_settings_dialog.h"
+#include "ui_settingsdialog.h"
 
 /*! Caixa de diálogo de configurações */
 class SettingsDialog : public QDialog, public Ui::SettingsDialog {

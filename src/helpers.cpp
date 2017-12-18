@@ -137,24 +137,7 @@ namespace Helpers {
         return true;
     }
 
-    class TLEListModel : QAbstractListModel {
-        Q_OBJECT
-
-    public:
-        TLEModel(QObject *parent = 0);
-        inline int rowCount(const QModelIndex &parent = QModelIndex()) const override {
-            return 1;
-        }
-
-        inline QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
-            return QVariant("Hello");
-        }
-
-    private:
-        QList<QStringList> tleList;
-    };
-
-    QStringListModel* readTLEList() {
+    TrackerListModel* readTLEList() {
         auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if(path.isEmpty()) {
             qFatal("Cannot determine settings storage location");
@@ -162,10 +145,9 @@ namespace Helpers {
 
         QDir d{path};
 
-        QRegularExpression re(" DEB");
+        QRegularExpression re(" DEB"); //! ignora TLEs do tipo DEBRIS
 
-        QStringListModel* listModel = new QStringListModel();
-        QStringList titles;
+        TrackerListModel* tles = new TrackerListModel();
 
         if(QDir::setCurrent(d.absolutePath())) {
             QFile f("tleList.txt");
@@ -176,18 +158,32 @@ namespace Helpers {
                         line1 = line1.remove(0, 2).replace("\n", "");
                         QString line2 = f.readLine().trimmed().replace("\n", "");
                         QString line3 = f.readLine().trimmed().replace("\n", "");
-                        line1 += " [" + (line2.simplified().split(' ').at(1)) + "]";
 
-                        titles << line1;
+                        QStringList tleStringList;
+                        tleStringList << line1 << line2 << line3;
+                        Tracker t(tleStringList);
+                        tles->addTracker(t, false);
                     }
                 }
             }
+        }
+
+        return tles;
+    }
+
+    QStringListModel* QStringListModelFromSatelliteCatalog(TrackerListModel* trackerList) {
+        QStringListModel* listModel = new QStringListModel();
+        QStringList titles;
+
+        for(auto &t : trackerList->getTrackersRef()) {
+            titles << t.getCommonName() + " [" + (t.getSatCatNumber()) + "]";
         }
 
         listModel->setStringList(titles);
         return listModel;
     }
 
+    /*
     QStringList findInTLEList(QString catalogNumber) {
         auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if(path.isEmpty()) {
@@ -200,6 +196,10 @@ namespace Helpers {
 
         QStringList tle;
 
+        qDebug() << "Tentando achar" << catalogNumber;
+        QRegularExpression re2("\\[(\\w+)\\]");
+        qDebug() << re2.match(catalogNumber).captured(1);
+
         if(QDir::setCurrent(d.absolutePath())) {
             QFile f("tleList.txt");
             if(f.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -210,16 +210,20 @@ namespace Helpers {
                         QString line2 = f.readLine().trimmed().replace("\n", "");
                         QString line3 = f.readLine().trimmed().replace("\n", "");
                         QString satCat = line2.simplified().split(' ').at(1);
-                        if(line2 == satCat) {
+                        if(satCat == catalogNumber) {
                             tle << line1 << line2 << line3;
-                            qDebug() << line2;
+                            qDebug() << "achô";
+                            qDebug() << line1;
                             return tle;
                         }
                     }
                 }
             }
         }
+
+        return QStringList();
     }
+    */
 
     QStringList getSpaceTrackCredentials() {
         QFile file(":/txt/credentials.txt");

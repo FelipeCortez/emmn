@@ -44,7 +44,7 @@ public:
     Tracker();
     Tracker(std::vector<std::string> tle_list);
     Tracker(QList<QString> tle_list);
-    Tracker(std::string tle1, std::string tle2, std::string tle3);
+    Tracker(std::string commonName, std::string tle1, std::string tle2);
     double FindMaxElevation(
         const DateTime& aos,
         const DateTime& los) const;
@@ -58,20 +58,21 @@ public:
         const int time_step = 180) const;
     bool IsPassReverse(PassDetails pd) const;
     QString nextPass() const;
-    QString getTitle() const;
+    QString getCommonName() const;
     QString getFullTLE() const;
     QString getSatInfo(int info) const;
+    QString getSatCatNumber() const;
     double getAzimuthForObserver();
     double getElevationForObserver();
     void setTle(QList<QString> tle);
-    void UpdateTLE();
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
 private:
     CoordGeodetic user_geo;
+    QString commonName;
     QString tle1;
     QString tle2;
-    QString tle3;
+    QString satelliteCatalogNumber;
     QList<PassDetails> passList;
 };
 

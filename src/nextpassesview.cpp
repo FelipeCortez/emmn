@@ -48,8 +48,8 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         int textMaxWidth = 0;
         for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             Tracker t = *it;
-            if(textMaxWidth < painter.fontMetrics().width(t.getTitle())) {
-                textMaxWidth = painter.fontMetrics().width(t.getTitle());
+            if(textMaxWidth < painter.fontMetrics().width(t.getCommonName())) {
+                textMaxWidth = painter.fontMetrics().width(t.getCommonName());
             }
         }
 
@@ -95,7 +95,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             drawText(painter,
                      QPointF(margins, itemRect.center().y()),
                      Qt::AlignVCenter,
-                     tracker.getTitle());
+                     tracker.getCommonName());
 
             auto passes = tracker.GeneratePassList(now, later);
             for(QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {

@@ -11,11 +11,12 @@ MainWindow::MainWindow(QWidget *parent)
   , tableModel(nullptr)
   , control(nullptr)
 {
-    model = new TrackerListModel();
+    trackedSatellites = new TrackerListModel();
+    satelliteCatalogue = Helpers::readTLEList();
+    qDebug() << satelliteCatalogue->rowCount();
 
     ui->setupUi(this);
-    ui->satellitesView->setModel(model);
-    //setWindowState(Qt::WindowMaximized);
+    ui->satellitesView->setModel(trackedSatellites);
     //ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
@@ -26,10 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     setPortFromSettings();
 
-    satInfoTimer.start(1000);
+    satInfoTimer.start(100);
 
     loadTrackersFromSettings();
-    ui->nextPassesView->setTrackers(model->getTrackersPointer());
+    ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
 
     // Força atualização da tabela (meio gambiarra... talvez mudar)
     auto selected = ui->satellitesView->selectionModel()->selection();
@@ -75,11 +76,15 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(satInfoUpdateSlot()));
+    connect(ui->trackSatellitesCheckbox,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(trackSatellitesCheckboxChanged(int)));
 }
 
 void MainWindow::setPortFromSettings() {
     if(!control) {
-        control = new Control(Settings::getSerialPort(), model);
+        control = new Control(Settings::getSerialPort(), trackedSatellites);
     } else {
         control->changePort(Settings::getSerialPort());
     }
@@ -98,7 +103,7 @@ void MainWindow::setPortFromSettings() {
 void MainWindow::loadTrackersFromSettings() {
     auto trackers = Settings::loadTrackers();
     for(auto t : trackers) {
-        model->addTracker(t);
+        trackedSatellites->addTracker(t);
     }
 }
 
@@ -109,7 +114,7 @@ void MainWindow::enableSatelliteButtons(bool enable) {
     if(enable) {
         auto selectedIndex = selected.indexes().first();
         ui->moveTrackerUpButton->setEnabled(selectedIndex.row() > 0);
-        ui->moveTrackerDownButton->setEnabled(selectedIndex.row() < model->rowCount() - 1);
+        ui->moveTrackerDownButton->setEnabled(selectedIndex.row() < trackedSatellites->rowCount() - 1);
     } else {
         ui->moveTrackerUpButton->setEnabled(false);
         ui->moveTrackerDownButton->setEnabled(false);
@@ -119,11 +124,11 @@ void MainWindow::enableSatelliteButtons(bool enable) {
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
-        auto tracker = model->getTrackers()[selectedIndex.row()];
+        auto tracker = trackedSatellites->getTrackers()[selectedIndex.row()];
         enableSatelliteButtons();
         satInfoUpdateSlot();
-        ui->passesViewLabel->setText("Passagens para " + tracker.getTitle());
-        ui->satelliteGroupBox->setTitle(tracker.getTitle());
+        ui->passesViewLabel->setText("Passagens para " + tracker.getCommonName());
+        ui->satelliteGroupBox->setTitle(tracker.getCommonName());
         ui->nextPassesView->repaint();
 
         QList<PassDetails> pd = tracker.GeneratePassList();
@@ -176,17 +181,21 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->passesViewLabel->setText("Todas as passagens");
         enableSatelliteButtons(false);
 
-        QList<PassDetailsWithTracker> allPasses = model->getAllPasses();
+        QList<PassDetailsWithTracker> allPasses = trackedSatellites->getAllPasses();
         const int numRows = allPasses.size();
         const int numColumns = 1;
+
+        QStringList headers;
+        headers << "Satélite"
+                << "Aquisição de sinal"
+                << "Perda de sinal"
+                << "El. máx."
+                << "Duração"
+                << "Tipo";
+
         if(tableModel) { delete tableModel; }
         tableModel = new QStandardItemModel(numRows, numColumns);
-        tableModel->setHorizontalHeaderLabels(QStringList() << "Satélite"
-                                                            << "Aquisição de sinal"
-                                                            << "Perda de sinal"
-                                                            << "El. máx."
-                                                            << "Duração"
-                                                            << "Tipo");
+        tableModel->setHorizontalHeaderLabels(headers);
 
         if (allPasses.begin() == allPasses.end()) {
             qDebug() << "no passes found";
@@ -197,7 +206,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 QString text;
                 QStandardItem* item;
 
-                text = itr->tracker->getTitle();
+                text = itr->tracker->getCommonName();
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 0, item);
 
@@ -231,11 +240,13 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
 }
 
 void MainWindow::addTrackerDialogSlot() {
-    AddTrackerDialog dialog(model, this);
+    AddTrackerDialog dialog(satelliteCatalogue, trackedSatellites, this);
     if(dialog.exec()) {
-        ui->satellitesView->selectionModel()->clear();
-        ui->satellitesView->selectionModel()->setCurrentIndex(model->index(model->rowCount() - 1),
-                                                              QItemSelectionModel::ClearAndSelect);
+        auto selectionModel = ui->satellitesView->selectionModel();
+        auto idx = trackedSatellites->index(trackedSatellites->rowCount() - 1);
+        selectionModel->clear();
+        selectionModel->setCurrentIndex(idx,
+                                        QItemSelectionModel::ClearAndSelect);
     }
 }
 
@@ -250,20 +261,22 @@ void MainWindow::settingsDialogSlot(bool) {
 
 void MainWindow::manualControlDialogSlot(bool) {
     satInfoTimer.stop();
-    control->setController(Controller::Manual);
+    ui->azLabel->setText("---");
+    ui->eleLabel->setText("---");
+    control->setControlMode(ControlMode::Manual);
     ManualControlDialog dialog(control, this);
     // exec bloqueia, de forma que o start do timer só rodará quando o dialog for fechado
     dialog.exec();
-    control->setController(Controller::Schedule);
+    control->setControlMode(ControlMode::Schedule);
     satInfoTimer.start();
 }
 
 void MainWindow::removeSelectedTrackerSlot() {
     foreach(const QModelIndex &index, ui->satellitesView->selectionModel()->selectedIndexes()) {
         qDebug() << index.data(Qt::DisplayRole).toString();
-        model->removeRow(index.row());
+        trackedSatellites->removeRow(index.row());
         ui->satellitesView->selectionModel()->clear();
-        Settings::saveTrackers(model->getTrackers());
+        Settings::saveTrackers(trackedSatellites->getTrackers());
     }
 
     ui->nextPassesView->repaint();
@@ -271,7 +284,7 @@ void MainWindow::removeSelectedTrackerSlot() {
 
 void MainWindow::satInfoUpdateSlot() {
     auto selected = ui->satellitesView->selectionModel()->selection();
-    auto nextPass = model->getAllPasses().at(0);
+    auto nextPass = trackedSatellites->getAllPasses().at(0);
     auto remaining = nextPass.passDetails.aos - DateTime::Now();
     ui->nextPassesView->repaint();
 
@@ -281,7 +294,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
     }
 
-    ui->nextPassSatLabel->setText(model->getAllPasses().at(0).tracker->getTitle());
+    ui->nextPassSatLabel->setText(trackedSatellites->getAllPasses().at(0).tracker->getCommonName());
 
     if(control->isPortValid()) {
         AzEle antennaInfo = control->getState();
@@ -291,7 +304,7 @@ void MainWindow::satInfoUpdateSlot() {
 
     if(!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
-        auto tracker = model->getTrackers()[selectedIndex.row()];
+        auto tracker = trackedSatellites->getTrackers()[selectedIndex.row()];
 
         ui->satEle->setText(tracker.getSatInfo(Tracker::Elevation) + QString("°"));
         ui->satAz->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
@@ -304,7 +317,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satNextPass->setText("");
     }
 
-    model->getAllPasses();
+    trackedSatellites->getAllPasses();
 }
 
 void MainWindow::clearSelectedTrackerSlot() {
@@ -314,21 +327,26 @@ void MainWindow::clearSelectedTrackerSlot() {
 void MainWindow::moveTrackerUpSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
     auto indexRow = index.row();
-    model->getTrackersPointer()->swap(indexRow, indexRow - 1);
-    auto newIndex = model->index(indexRow - 1);
+    trackedSatellites->getTrackersPointer()->swap(indexRow, indexRow - 1);
+    auto newIndex = trackedSatellites->index(indexRow - 1);
     ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
-    ui->satellitesView->setModel(model);
-    Settings::saveTrackers(model->getTrackers());
+    ui->satellitesView->setModel(trackedSatellites);
+    Settings::saveTrackers(trackedSatellites->getTrackers());
 }
 
 void MainWindow::moveTrackerDownSlot() {
     auto index = ui->satellitesView->selectionModel()->selectedIndexes().first();
     auto indexRow = index.row();
-    model->getTrackersPointer()->swap(indexRow, indexRow + 1);
-    auto newIndex = model->index(indexRow + 1);
+    trackedSatellites->getTrackersPointer()->swap(indexRow, indexRow + 1);
+    auto newIndex = trackedSatellites->index(indexRow + 1);
     ui->satellitesView->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::ClearAndSelect);
-    ui->satellitesView->setModel(model);
-    Settings::saveTrackers(model->getTrackers());
+    ui->satellitesView->setModel(trackedSatellites);
+    Settings::saveTrackers(trackedSatellites->getTrackers());
+}
+
+void MainWindow::trackSatellitesCheckboxChanged(int state) {
+    ControlMode mode = (state == 0) ? ControlMode::None : ControlMode::Schedule;
+    control->setControlMode(mode);
 }
 
 void MainWindow::debugSlot(bool) {
@@ -342,7 +360,8 @@ void MainWindow::debugSlot(bool) {
 
     //Helpers::saveTLEList(strList);
 
-    Helpers::readTLEList();
+    //Helpers::readTLEList();
+    //qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
 
     //qDebug() << Helpers::getSpaceTrackCredentials().at(0);
     //qDebug() << Helpers::getSpaceTrackCredentials().at(1);

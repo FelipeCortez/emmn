@@ -2,7 +2,7 @@
 #define ADDTRACKERDIALOG_H
 #include <QDialog>
 #include <QCompleter>
-#include "ui_tracker_dialog.h"
+#include "ui_trackerdialog.h"
 #include "trackerlistmodel.h"
 #include "tracker.h"
 
@@ -11,16 +11,18 @@ class AddTrackerDialog : public QDialog, public Ui::AddTrackerDialog {
     Q_OBJECT
 
 public:
-     //! \brief Construtor base. Connecta signals e slots e configura apresentação
     AddTrackerDialog(QWidget* parent = 0);
 
-     /*! \brief Construtor para acrescentar um novo satélite
+     /*! \brief Construtor para acrescentar um novo satélite. Connecta signals e slots e configura apresentação
       *
       * @param model Ponteiro para lista que armazena satélites cadastrados
       */
-    AddTrackerDialog(TrackerListModel* model, QWidget* parent = 0);
+    AddTrackerDialog(TrackerListModel* satelliteCatalogue,
+                     TrackerListModel* trackedSatellites,
+                     QWidget* parent = 0);
 private:
-    TrackerListModel* model; //!< A lista de satélites do sistema do programa principal
+    TrackerListModel* satelliteCatalogue; //!< A lista de satélites do sistema do programa principal
+    TrackerListModel* trackedSatellites; //!< A lista de satélites do sistema do programa principal
     QCompleter* completer;
     QStringListModel* s;
 public slots:

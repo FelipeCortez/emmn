@@ -1,14 +1,17 @@
 #include "control.h"
 
-Control::Control(QString port, TrackerListModel *trackerListModel, QObject *parent)
+Control::Control(QString port,
+                 TrackerListModel *trackerListModel,
+                 QObject *parent)
     : QObject(parent)
     , validPort(false)
-    , controller(Controller::Schedule)
+    , controlMode(ControlMode::Schedule)
     , antennaTimer(this)
 {
     changePort(port);
 
     this->trackerListModel = trackerListModel;
+    this->logger = new Logger();
 
     connect(&antennaTimer,
             SIGNAL(timeout()),
@@ -144,7 +147,7 @@ void Control::changePort(QString port) {
         qDebug() << "valid: " << validPort;
 
         if(validPort) {
-            antennaTimer.start(1000);
+            antennaTimer.start(100);
             setTarget(180, 90);
         } else {
             antennaTimer.stop();
@@ -164,12 +167,13 @@ void Control::setTarget(float az, float ele) {
     targetEle = ele;
 }
 
-void Control::setController(Controller controller) {
-    this->controller = controller;
+void Control::setControlMode(ControlMode controlMode) {
+    this->controlMode = controlMode;
 }
 
 void Control::moveToTarget() {
     lastAzEle = getState();
+    logger->addLog(lastAzEle);
 
     float incrementAz = targetAz - lastAzEle.azimuth;
     incrementAz = Helpers::clip(incrementAz, 10);
@@ -228,7 +232,7 @@ bool Control::isPortValid() {
 }
 
 void Control::updateSlot() {
-    if(controller == Controller::Schedule) {
+    if (controlMode == ControlMode::Schedule) {
         if(trackerListModel->getAllPasses().empty()) {
             setTarget(180, 90);
             return;
@@ -261,6 +265,8 @@ void Control::updateSlot() {
         } else {
             setTarget(180, 90);
         }
+    } else if (controlMode == ControlMode::None) {
+        setTarget(180, 90);
     }
 
     moveToTarget();

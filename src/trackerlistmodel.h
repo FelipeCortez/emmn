@@ -20,6 +20,7 @@ public:
             IdRole = Qt::UserRole + 1,
             NameRole,
             PassesRole,
+            SatCatRole,
     };
 
     TrackerListModel();
@@ -31,7 +32,7 @@ public:
      * @param tracker Referência à classe do satélite
      * @todo Gerar apenas novas passagens e adicioná-las à lista
      */
-    QModelIndex addTracker(const Tracker& tracker);
+    QModelIndex addTracker(const Tracker& tracker, bool recalculatePassList = true);
 
     /*! \brief Retorna o número de satélites armazenados
      *
@@ -67,6 +68,9 @@ public:
 
     /*! \brief Retorna referência para lista de satélites rastreados */
     QList<Tracker>& getTrackersRef();
+
+    /*! \brief Retorna ponteiro para satélite com satCatNumber informado */
+    Tracker* findTracker(QString satCatNumber);
 
     /*! \brief Gera lista com todas as passagens */
     void generatePassList(const DateTime& start_time = DateTime::Now(true),

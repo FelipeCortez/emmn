@@ -4,12 +4,12 @@
 
 TrackerListModel::TrackerListModel() {}
 
-QModelIndex TrackerListModel::addTracker(const Tracker &tracker) {
+QModelIndex TrackerListModel::addTracker(const Tracker &tracker, bool recalculatePassList) {
     int rowIndex = rowCount();
     beginInsertRows(QModelIndex(), rowIndex, rowIndex);
     trackers.push_back(tracker);
     endInsertRows();
-    generatePassList();
+    if(recalculatePassList) { generatePassList(); }
     return index(rowIndex);
 }
 
@@ -27,9 +27,11 @@ QVariant TrackerListModel::data(const QModelIndex &index, int role) const {
             return index.row();
         case Roles::NameRole:
         case Qt::DisplayRole:
-            return trackers[index.row()].getTitle();
+            return trackers[index.row()].getCommonName();
         case Roles::PassesRole:
             return QVariant::fromValue(trackers[index.row()].GeneratePassList());
+        case Roles::SatCatRole:
+            return QVariant::fromValue(trackers[index.row()].getSatCatNumber());
         default:
             return QVariant();
     }
@@ -74,6 +76,16 @@ QList<Tracker>* TrackerListModel::getTrackersPointer() {
 
 QList<Tracker>& TrackerListModel::getTrackersRef() {
     return trackers;
+}
+
+Tracker* TrackerListModel::findTracker(QString satCatNumber) {
+    for(auto &t : trackers) {
+        if(t.getSatCatNumber() == satCatNumber) {
+            return &t;
+        }
+    }
+
+    return nullptr;
 }
 
 bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) {

@@ -34,11 +34,13 @@ public:
 
 private:
     Ui::MainWindow* ui; //! Ponteiro para elementos de interface gráfica do arquivo .ui
-    TrackerListModel* model; //! Lista de todos os satélites rastreados
+    TrackerListModel* trackedSatellites; //! Lista de todos os satélites rastreados
+    TrackerListModel* satelliteCatalogue; //! Lista de todos os satélites catalogados pelo SpaceTrack
     QTimer satInfoTimer; //! Timer para recarregar informações do satélite todo segundo
     QStandardItemModel* tableModel; //! Elementos de tabela de passagens
     //Network network; //! Conexão com a Internet
     Control* control; //! Controle da antena
+    Logger* logger;
     Network network;
 
     /*! \brief Modifica porta serial utilizada pelo programa basead
@@ -93,6 +95,10 @@ public slots:
     /*! \brief Slot chamado ao clicar no botão de baixar prioridade
      */
    void moveTrackerDownSlot();
+
+    /*! \brief Slot chamado ao clicar na checkbox para habilitar rastreio
+     */
+   void trackSatellitesCheckboxChanged(int state);
 };
 
 #endif // MAINWINDOW_H

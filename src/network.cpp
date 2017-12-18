@@ -104,4 +104,6 @@ QStringList Network::tlesDownloadFinished() {
     }
 
     reply->deleteLater();
+
+    return QStringList();
 }
