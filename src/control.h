@@ -110,10 +110,8 @@ private:
     ControlMode controlMode; //!< Modo de controle da antena
     QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
     double speedAz;
-    double speedEle;
-    double desiredSpeedAz;
-    double desiredSpeedEle;
     double accelerationAz;
+    double speedEle;
     double accelerationEle;
     double maxSpeed;
     double maxAcceleration;

@@ -37,12 +37,19 @@ void Tracker::setTle(QList<QString> tle) {
     tle2 = tle[2];
 }
 
+QList<QString> Tracker::getTle() {
+    QStringList tle;
+    tle << commonName << tle1 << tle2;
+    return tle;
+}
+
 QString Tracker::getSatInfo(int info) const {
     const double PI = 3.141592653589793238463;
     SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now());
     Observer obs(user_geo);
-    switch(info) {
+
+    switch (info) {
         case Satellite::Elevation:
             return QString::number(obs.GetLookAngle(eci).elevation * 180 / PI);
         case Satellite::Azimuth:
@@ -50,6 +57,7 @@ QString Tracker::getSatInfo(int info) const {
         case Satellite::Range:
             return QString::number(obs.GetLookAngle(eci).range);
     }
+
     return QString("");
 }
 

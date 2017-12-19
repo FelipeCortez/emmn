@@ -29,17 +29,15 @@ AddTrackerDialog::AddTrackerDialog(TrackerListModel* satelliteCatalogue,
 
 void AddTrackerDialog::accept() {
     QString tleTitle = titleInput->text();
-    QRegularExpression re2("\\[(\\w+)\\]");
+    QRegularExpression re2("\\[(\\w+)\\]"); // extrai parte entre colchetes
     QString satCatNumber = re2.match(tleTitle).captured(1);
-    qDebug() << satCatNumber;
-    qDebug() << trackedSatellites->rowCount();
-    qDebug() << satelliteCatalogue->rowCount();
-    //auto satellite = satelliteCatalogue->findTracker(satCatNumber);
-    /*
-    if(satellite) {
-        Settings::saveTrackers(model->getTrackers());
+
+    auto satellite = satelliteCatalogue->findTracker(satCatNumber);
+
+    if (satellite) {
+        trackedSatellites->addTracker(*satellite);
+        Settings::saveTrackers(trackedSatellites->getTrackers());
     }
-    */
 
     QDialog::accept();
 }

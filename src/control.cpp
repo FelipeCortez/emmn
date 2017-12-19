@@ -8,10 +8,8 @@ Control::Control(QString port,
     , controlMode(ControlMode::None)
     , antennaTimer(this)
     , speedAz(0)
-    , desiredSpeedAz(0)
     , accelerationAz(0)
     , speedEle(0)
-    , desiredSpeedEle(0)
     , accelerationEle(0)
     , maxSpeed(7.0)
     , maxAcceleration(1.0)
@@ -164,10 +162,12 @@ void Control::changePort(QString port) {
 }
 
 void Control::setDeltas(float deltaAz, float deltaEle) {
-    if(lastAzEle.azimuth + deltaAz < 0 || lastAzEle.azimuth + deltaAz >= 360) { deltaAz = 0; }
-    if(lastAzEle.elevation + deltaEle < 0 || lastAzEle.elevation + deltaEle >= 360) { deltaEle = 0; }
+    if (fabs(deltaAz) > 1e-3 || fabs(deltaEle) > 1e-3) {
+        if(lastAzEle.azimuth + deltaAz < 0 || lastAzEle.azimuth + deltaAz >= 360) { deltaAz = 0; }
+        if(lastAzEle.elevation + deltaEle < 0 || lastAzEle.elevation + deltaEle >= 360) { deltaEle = 0; }
 
-    setTarget(lastAzEle.azimuth + deltaAz, lastAzEle.elevation + deltaEle);
+        setTarget(lastAzEle.azimuth + deltaAz, lastAzEle.elevation + deltaEle);
+    }
 }
 
 void Control::setTarget(float az, float ele) {
@@ -181,9 +181,11 @@ void Control::setControlMode(ControlMode controlMode) {
 
 void Control::moveToTarget() {
     lastAzEle = getState();
-    logger->addLog(lastAzEle);
+    //logger->addLog(lastAzEle);
 
     double incrementAz = targetAz - lastAzEle.azimuth;
+    double incrementEle = targetEle - lastAzEle.elevation;
+
     if (fabs(incrementAz) > maxSpeed) {
         accelerationAz = Helpers::clip(incrementAz, maxAcceleration);
         speedAz = Helpers::clip(speedAz + accelerationAz, maxSpeed);
@@ -191,7 +193,6 @@ void Control::moveToTarget() {
         speedAz = Helpers::clip(incrementAz, maxSpeed);
     }
 
-    double incrementEle = targetEle - lastAzEle.elevation;
     if (fabs(incrementEle) > maxSpeed) {
         accelerationEle = Helpers::clip(incrementEle, maxAcceleration);
         speedEle = Helpers::clip(speedEle + accelerationEle, maxSpeed);
@@ -273,7 +274,7 @@ void Control::updateSlot() {
             float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
             float positioningTime = 60;
 
-            if(nextPass.tracker->getElevationForObserver() >= 0) {
+            if(nextPass.tracker->getElevationForObserver() >= 3.0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
                 double ele = nextPass.tracker->getElevationForObserver();
                 if(nextPass.passDetails.reverse) {
@@ -285,7 +286,7 @@ void Control::updateSlot() {
             } else if(secondsRemaining <= positioningTime &&
                       secondsRemaining > 0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
-                double ele = 0;
+                double ele = 3.0;
                 if(nextPass.passDetails.reverse) {
                     az = fmod(az + 180, 360);
                     ele = 180 - ele;

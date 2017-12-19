@@ -127,7 +127,6 @@ namespace Helpers {
             if(f.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream stream(&f);
                 stream.setCodec("UTF-8");
-                stream << "contents";
                 for(auto& str : tleList) {
                     stream << str << endl;
                 }
@@ -143,7 +142,7 @@ namespace Helpers {
             qFatal("Cannot determine settings storage location");
         }
 
-        QDir d{path};
+        QDir d(path);
 
         QRegularExpression re(" DEB"); //! ignora TLEs do tipo DEBRIS
 
@@ -182,48 +181,6 @@ namespace Helpers {
         listModel->setStringList(titles);
         return listModel;
     }
-
-    /*
-    QStringList findInTLEList(QString catalogNumber) {
-        auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        if(path.isEmpty()) {
-            qFatal("Cannot determine settings storage location");
-        }
-
-        QDir d{path};
-
-        QRegularExpression re(" DEB");
-
-        QStringList tle;
-
-        qDebug() << "Tentando achar" << catalogNumber;
-        QRegularExpression re2("\\[(\\w+)\\]");
-        qDebug() << re2.match(catalogNumber).captured(1);
-
-        if(QDir::setCurrent(d.absolutePath())) {
-            QFile f("tleList.txt");
-            if(f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                while(!f.atEnd()) {
-                    QString line1 = f.readLine().trimmed().replace("\n", "");
-                    if(line1.at(0) == '0' && !re.match(line1).hasMatch()) {
-                        line1 = line1.remove(0, 2).replace("\n", "");
-                        QString line2 = f.readLine().trimmed().replace("\n", "");
-                        QString line3 = f.readLine().trimmed().replace("\n", "");
-                        QString satCat = line2.simplified().split(' ').at(1);
-                        if(satCat == catalogNumber) {
-                            tle << line1 << line2 << line3;
-                            qDebug() << "achô";
-                            qDebug() << line1;
-                            return tle;
-                        }
-                    }
-                }
-            }
-        }
-
-        return QStringList();
-    }
-    */
 
     QStringList getSpaceTrackCredentials() {
         QFile file(":/txt/credentials.txt");

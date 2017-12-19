@@ -13,11 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     trackedSatellites = new TrackerListModel();
     satelliteCatalogue = Helpers::readTLEList();
-    qDebug() << satelliteCatalogue->rowCount();
 
     ui->setupUi(this);
     ui->satellitesView->setModel(trackedSatellites);
-    //ui->satellitesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
     ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -102,9 +100,17 @@ void MainWindow::setPortFromSettings() {
 
 void MainWindow::loadTrackersFromSettings() {
     auto trackers = Settings::loadTrackers();
-    for(auto t : trackers) {
-        trackedSatellites->addTracker(t);
+
+    for (auto& tSaved : trackers) {
+        for (auto& tCatalog : satelliteCatalogue->getTrackersRef()) {
+            if (tCatalog.getSatCatNumber() == tSaved.getSatCatNumber()) {
+                tSaved.setTle(tCatalog.getTle());
+                trackedSatellites->addTracker(tSaved);
+            }
+        }
     }
+
+    Settings::saveTrackers(trackedSatellites->getTrackersRef());
 }
 
 void MainWindow::enableSatelliteButtons(bool enable) {
@@ -351,21 +357,15 @@ void MainWindow::trackSatellitesCheckboxChanged(int state) {
 }
 
 void MainWindow::debugSlot(bool) {
-    network.getSpaceTrackCookies();
-    network.getTLE("CBERS 4");
+    //QFileInfo::lastModified()
+    //network.getSpaceTrackCookies();
 
-    QStringList strList;
-    strList << "0 COSMOS 839 DEB *";
-    strList << "1 21957U 76067BV  17302.49927365 +.00000067 +00000-0 +25021-3 0  9994";
-    strList << "2 21957 065.4602 114.6225 0729855 352.8553 006.2474 12.63766133198387";
 
-    Helpers::saveTLEList(strList);
+    //Helpers::readTLEList();
+    //qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
 
-    Helpers::readTLEList();
-    qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
-
-    qDebug() << Helpers::getSpaceTrackCredentials().at(0);
-    qDebug() << Helpers::getSpaceTrackCredentials().at(1);
+    //qDebug() << Helpers::getSpaceTrackCredentials().at(0);
+    //qDebug() << Helpers::getSpaceTrackCredentials().at(1);
 }
 
 MainWindow::~MainWindow()

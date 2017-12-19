@@ -21,17 +21,16 @@ void Network::getTLE(const QString tle1) {
 
 QStringList Network::tleDownloadFinished() {
     QStringList tle;
-    while(reply->canReadLine()) {
+    while (reply->canReadLine()) {
         QString line = QString(reply->readLine()).replace("\r\n", "");
-        qDebug() << line;
-        if(line.trimmed() == satName) {
+
+        if (line.trimmed() == satName) {
             tle << QString(reply->readLine()).replace("\r\n", "");
             tle << QString(reply->readLine()).replace("\r\n", "");
 
         }
     }
 
-    qDebug() << tle;
     return tle;
 }
 
@@ -47,7 +46,7 @@ void Network::getSpaceTrackCookies() {
     postData.addQueryItem("identity", credentials[0]);
     postData.addQueryItem("password", credentials[1]);
 
-    qDebug() << postData.toString(QUrl::FullyEncoded).toUtf8();
+    //qDebug() << postData.toString(QUrl::FullyEncoded).toUtf8();
     reply = manager.post(req, postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, SIGNAL(finished()), this, SLOT(cookiesDownloadFinished()));
 
@@ -98,13 +97,15 @@ void Network::getTLEs() {
     connect(reply, SIGNAL(finished()), this, SLOT(tlesDownloadFinished()));
 }
 
-QStringList Network::tlesDownloadFinished() {
+void Network::tlesDownloadFinished() {
+    QStringList tleList;
+
     while(reply->canReadLine()) {
-        QString line = QString(reply->readLine()).replace("\r\n", "");
-        qDebug() << line;
+        tleList << QString(reply->readLine()).replace("\r\n", "");
+        qDebug() << tleList.last();
     }
 
-    reply->deleteLater();
+    Helpers::saveTLEList(tleList);
 
-    return QStringList();
+    reply->deleteLater();
 }

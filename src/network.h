@@ -23,7 +23,7 @@ private:
 
 public slots:
     QStringList tleDownloadFinished();
-    QStringList tlesDownloadFinished();
+    void tlesDownloadFinished();
     void cookiesDownloadFinished();
 #ifndef QT_NO_SSL
     void sslErrors(const QList<QSslError> &errors);
