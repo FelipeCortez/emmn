@@ -7,8 +7,14 @@ Control::Control(QString port,
     , validPort(false)
     , controlMode(ControlMode::None)
     , antennaTimer(this)
-    , speed(0)
-    , maxSpeed(10)
+    , speedAz(0)
+    , desiredSpeedAz(0)
+    , accelerationAz(0)
+    , speedEle(0)
+    , desiredSpeedEle(0)
+    , accelerationEle(0)
+    , maxSpeed(7.0)
+    , maxAcceleration(1.0)
 {
     changePort(port);
 
@@ -177,17 +183,35 @@ void Control::moveToTarget() {
     lastAzEle = getState();
     logger->addLog(lastAzEle);
 
-    speed = Helpers::clip(speed + acceleration);
+    double incrementAz = targetAz - lastAzEle.azimuth;
+    if (fabs(incrementAz) > maxSpeed) {
+        accelerationAz = Helpers::clip(incrementAz, maxAcceleration);
+        speedAz = Helpers::clip(speedAz + accelerationAz, maxSpeed);
+    } else {
+        speedAz = Helpers::clip(incrementAz, maxSpeed);
+    }
 
-    qDebug() << speed;
+    double incrementEle = targetEle - lastAzEle.elevation;
+    if (fabs(incrementEle) > maxSpeed) {
+        accelerationEle = Helpers::clip(incrementEle, maxAcceleration);
+        speedEle = Helpers::clip(speedEle + accelerationEle, maxSpeed);
+    } else {
+        speedEle = Helpers::clip(incrementEle, maxSpeed);
+    }
 
+    sendPosition(lastAzEle.azimuth + speedAz,
+                 lastAzEle.elevation + speedEle);
+
+    /*
     // restrição de intensidade de movimento
     float incrementAz = targetAz - lastAzEle.azimuth;
-    incrementAz = Helpers::clip(incrementAz, speed);
+    incrementAz = Helpers::clip(incrementAz, maxSpeed);
+
     float incrementEle = targetEle - lastAzEle.elevation;
-    incrementEle = Helpers::clip(incrementEle, speed);
+    incrementEle = Helpers::clip(incrementEle, maxSpeed);
 
     sendPosition(lastAzEle.azimuth + incrementAz, lastAzEle.elevation + incrementEle);
+    */
 }
 
 bool Control::sendPower() {

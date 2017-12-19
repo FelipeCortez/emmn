@@ -109,9 +109,14 @@ private:
     bool validPort; //!< true se porta verdadeira é um dispotivo Arduino válido
     ControlMode controlMode; //!< Modo de controle da antena
     QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
-    double speed;
+    double speedAz;
+    double speedEle;
+    double desiredSpeedAz;
+    double desiredSpeedEle;
+    double accelerationAz;
+    double accelerationEle;
     double maxSpeed;
-    double acceleration;
+    double maxAcceleration;
     CSerial serial; //!< Classe de comunicação serial
     TrackerListModel* trackerListModel; //!< Ponteiro para lista que armazena todos os satélites cadastrados
     AzEle lastAzEle; //!< Última posição lida

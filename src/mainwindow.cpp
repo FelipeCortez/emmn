@@ -267,7 +267,8 @@ void MainWindow::manualControlDialogSlot(bool) {
     ManualControlDialog dialog(control, this);
     // exec bloqueia, de forma que o start do timer só rodará quando o dialog for fechado
     dialog.exec();
-    control->setControlMode(ControlMode::Schedule);
+    control->setControlMode(ControlMode::None);
+    ui->trackSatellitesCheckbox->setChecked(false);
     satInfoTimer.start();
 }
 
