@@ -90,7 +90,7 @@ AzEle JoystickWidget::getDeltas() {
     const double maxMov = 5;
     double maxRadius = (limitCircle.width() / 2.0) - (getJoyCircleWidth() / 2.0);
     antennaInfo.azimuth = maxMov * joyCircleCenter.x() / maxRadius;
-    antennaInfo.elevation = maxMov * joyCircleCenter.y() / maxRadius;
+    antennaInfo.elevation = -maxMov * joyCircleCenter.y() / maxRadius;
     return antennaInfo;
 }
 
