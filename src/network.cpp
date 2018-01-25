@@ -74,9 +74,9 @@ void Network::cookiesDownloadFinished() {
     QByteArray bytes = reply->readAll(); // bytes
     QString replyString(bytes); // string
     QVariant cookieVar = reply->header(QNetworkRequest::SetCookieHeader);
-    if(cookieVar.isValid()) {
+    if (cookieVar.isValid()) {
         QList<QNetworkCookie> cookies = cookieVar.value<QList<QNetworkCookie>>();
-        for(QNetworkCookie cookie : cookies) {
+        for (QNetworkCookie cookie : cookies) {
             jar.insertCookie(cookie);
         }
     }
@@ -100,7 +100,7 @@ void Network::getTLEs() {
 void Network::tlesDownloadFinished() {
     QStringList tleList;
 
-    while(reply->canReadLine()) {
+    while (reply->canReadLine()) {
         tleList << QString(reply->readLine()).replace("\r\n", "");
         qDebug() << tleList.last();
     }

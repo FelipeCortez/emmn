@@ -9,7 +9,7 @@ QModelIndex TrackerListModel::addTracker(const Tracker &tracker, bool recalculat
     beginInsertRows(QModelIndex(), rowIndex, rowIndex);
     trackers.push_back(tracker);
     endInsertRows();
-    if(recalculatePassList) { generatePassList(); }
+    if (recalculatePassList) { generatePassList(); }
     return index(rowIndex);
 }
 
@@ -18,7 +18,7 @@ int TrackerListModel::rowCount(const QModelIndex &) const {
 }
 
 QVariant TrackerListModel::data(const QModelIndex &index, int role) const {
-    if(index.row() >= trackers.size()) {
+    if (index.row() >= trackers.size()) {
        return QVariant();
     }
 
@@ -38,7 +38,7 @@ QVariant TrackerListModel::data(const QModelIndex &index, int role) const {
 }
 
 bool TrackerListModel::setData(const QModelIndex &index, const QVariant &, int) {
-    if(index.row() >= trackers.size()) {
+    if (index.row() >= trackers.size()) {
        return false;
     }
 
@@ -46,7 +46,7 @@ bool TrackerListModel::setData(const QModelIndex &index, const QVariant &, int) 
 }
 
 bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent) {
-    if(   row < 0
+    if (   row < 0
        || row >= rowCount()
        || row < 0
        || (row + count) > rowCount())
@@ -56,7 +56,7 @@ bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent)
 
     beginRemoveRows(parent, row, row + count - 1);
     int countLeft = count;
-    while(countLeft--) {
+    while (countLeft--) {
         trackers.removeAt(row + countLeft);
     }
 
@@ -79,8 +79,8 @@ QList<Tracker>& TrackerListModel::getTrackersRef() {
 }
 
 Tracker* TrackerListModel::findTracker(QString satCatNumber) {
-    for(auto &t : trackers) {
-        if(t.getSatCatNumber() == satCatNumber) {
+    for (auto &t : trackers) {
+        if (t.getSatCatNumber() == satCatNumber) {
             return &t;
         }
     }
@@ -94,9 +94,9 @@ bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) 
 
 void TrackerListModel::generatePassList(const DateTime& start_time, const DateTime& end_time) {
     QList<PassDetailsWithTracker> allPassList;
-    for(auto &t : trackers) {
+    for (auto &t : trackers) {
         QList<PassDetails> pdList = t.GeneratePassList(start_time, end_time);
-        for(auto pd : pdList) {
+        for (auto pd : pdList) {
             PassDetailsWithTracker pdt;
             pdt.tracker = &t;
             pdt.passDetails = pd;
@@ -112,7 +112,7 @@ QList<PassDetailsWithTracker> TrackerListModel::getAllPasses() {
     auto it = allPasses.begin();
     int pos = 0;
 
-    while(it->passDetails.los < DateTime::Now()) {
+    while (it->passDetails.los < DateTime::Now()) {
         ++it;
         ++pos;
     }

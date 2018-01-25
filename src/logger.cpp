@@ -16,7 +16,7 @@ Logger::Logger(QObject *parent)
 {
     path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 
-    if(path.isEmpty()) {
+    if (path.isEmpty()) {
         qFatal("Cannot determine settings storage location");
     }
 
@@ -24,7 +24,7 @@ Logger::Logger(QObject *parent)
 
     auto now = QDateTime::currentDateTime();
 
-    if(dir.mkpath(dir.absolutePath()) && QDir::setCurrent(dir.absolutePath())) {
+    if (dir.mkpath(dir.absolutePath()) && QDir::setCurrent(dir.absolutePath())) {
         QString filename("log-" + now.date().toString(Qt::DateFormat::ISODate) + ".csv");
 
         bool newFile = !fileExists(filename);

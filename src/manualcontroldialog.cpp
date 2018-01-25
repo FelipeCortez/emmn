@@ -75,9 +75,9 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
 }
 
 void ManualControlDialog::tabChanged(int index) {
-    if(index == 0) {
+    if (index == 0) {
         joystickRefreshTimer.start(joystickRefreshRate);
-    } else if(index == 1) {
+    } else if (index == 1) {
         joystickRefreshTimer.stop();
         ui->azimuthLineEdit->setFocus(Qt::OtherFocusReason);
     }
@@ -116,7 +116,7 @@ void ManualControlDialog::validateBoth() {
 void ManualControlDialog::validateAzimuth(QString azimuth) {
     bool ok;
     double az = azimuth.toDouble(&ok);
-    if(ok && az >= 0 && az < 360) {
+    if (ok && az >= 0 && az < 360) {
         ui->sendAzButton->setEnabled(true);
         validAz = true;
     } else {
@@ -130,7 +130,7 @@ void ManualControlDialog::validateAzimuth(QString azimuth) {
 void ManualControlDialog::validateElevation(QString elevation) {
     bool ok;
     double ele = elevation.toDouble(&ok);
-    if(ok && ele >= 0 && ele < 360) {
+    if (ok && ele >= 0 && ele < 360) {
         ui->sendEleButton->setEnabled(true);
         validEle = true;
     } else {

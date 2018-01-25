@@ -93,13 +93,13 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::setPortFromSettings() {
-    if(!control) {
+    if (!control) {
         control = new Control(Settings::getSerialPort(), trackedSatellites);
     } else {
         control->changePort(Settings::getSerialPort());
     }
 
-    if(!control->isPortValid()) {
+    if (!control->isPortValid()) {
         ui->actionManualControl->setEnabled(false);
         ui->azLabel->setText("---");
         ui->eleLabel->setText("---");
@@ -129,7 +129,7 @@ void MainWindow::enableSatelliteButtons(bool enable) {
     ui->removeTrackerButton->setEnabled(enable);
     ui->showAllPassesButton->setEnabled(enable);
     auto selected = ui->satellitesView->selectionModel()->selection();
-    if(enable) {
+    if (enable) {
         auto selectedIndex = selected.indexes().first();
         ui->moveTrackerUpButton->setEnabled(selectedIndex.row() > 0);
         ui->moveTrackerDownButton->setEnabled(selectedIndex.row() < trackedSatellites->rowCount() - 1);
@@ -140,7 +140,7 @@ void MainWindow::enableSatelliteButtons(bool enable) {
 }
 
 void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
-    if(!selected.isEmpty()) {
+    if (!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
         auto tracker = trackedSatellites->getTrackers()[selectedIndex.row()];
         enableSatelliteButtons();
@@ -154,7 +154,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         const int numRows = pd.size();
         const int numColumns = 1;
 
-        if(tableModel) { delete tableModel; }
+        if (tableModel) { delete tableModel; }
         tableModel = new QStandardItemModel(numRows, numColumns);
         tableModel->setHorizontalHeaderLabels(QStringList() << "Aquisição de sinal"
                                                             << "Perda de sinal"
@@ -211,7 +211,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 << "Duração"
                 << "Tipo";
 
-        if(tableModel) { delete tableModel; }
+        if (tableModel) { delete tableModel; }
         tableModel = new QStandardItemModel(numRows, numColumns);
         tableModel->setHorizontalHeaderLabels(headers);
 
@@ -259,7 +259,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
 
 void MainWindow::addTrackerDialogSlot() {
     AddTrackerDialog dialog(satelliteCatalogue, trackedSatellites, this);
-    if(dialog.exec()) {
+    if (dialog.exec()) {
         auto selectionModel = ui->satellitesView->selectionModel();
         auto idx = trackedSatellites->index(trackedSatellites->rowCount() - 1);
         selectionModel->clear();
@@ -270,7 +270,7 @@ void MainWindow::addTrackerDialogSlot() {
 
 void MainWindow::settingsDialogSlot(bool) {
     SettingsDialog dialog;
-    if(dialog.exec()) {
+    if (dialog.exec()) {
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
         setPortFromSettings();
@@ -307,7 +307,7 @@ void MainWindow::satInfoUpdateSlot() {
     auto remaining = nextPass.passDetails.aos - DateTime::Now();
     ui->nextPassesView->repaint();
 
-    if(nextPass.tracker->getElevationForObserver() >= 0) {
+    if (nextPass.tracker->getElevationForObserver() >= 0) {
         ui->nextPassCountdownLabel->setText("Passando");
     } else {
         ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
@@ -315,13 +315,13 @@ void MainWindow::satInfoUpdateSlot() {
 
     ui->nextPassSatLabel->setText(trackedSatellites->getAllPasses().at(0).tracker->getCommonName());
 
-    if(control->isPortValid()) {
+    if (control->isPortValid()) {
         AzEle antennaInfo = control->getState();
         ui->azLabel->setText(QString::number(antennaInfo.azimuth));
         ui->eleLabel->setText(QString::number(antennaInfo.elevation));
     }
 
-    if(!selected.isEmpty()) {
+    if (!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
         auto tracker = trackedSatellites->getTrackers()[selectedIndex.row()];
 

@@ -37,7 +37,7 @@ void drawText(QPainter & painter, const QPointF & point, Qt::Alignment flags,
 }
 
 void NextPassesView::paintEvent(QPaintEvent *) {
-    if(trackers != nullptr) {
+    if (trackers != nullptr) {
         QPainter painter;
         int totalHeight = 0;
         const int margins = 10;
@@ -46,9 +46,9 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         painter.begin(this);
         painter.setRenderHint(QPainter::Antialiasing);
         int textMaxWidth = 0;
-        for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
+        for (QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             Tracker t = *it;
-            if(textMaxWidth < painter.fontMetrics().width(t.getCommonName())) {
+            if (textMaxWidth < painter.fontMetrics().width(t.getCommonName())) {
                 textMaxWidth = painter.fontMetrics().width(t.getCommonName());
             }
         }
@@ -65,7 +65,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
 
         // Desenha linhas de referência (eixo X)
         painter.setPen(Qt::gray);
-        while(dateIt < later) {
+        while (dateIt < later) {
             auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
             float lineX = floor(xAxisRect.left() + (xAxisRect.width() * linePercentage)) + 0.5;
             painter.drawLine(QPointF(lineX, xAxisRect.top()),
@@ -87,7 +87,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                          QPointF(xAxisRect.left() + 0.5, xAxisRect.bottom()));
 
         // Desenha blocos
-        for(QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
+        for (QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
             QRectF itemRect(0, totalHeight, width(), trackerHeight);
 
             auto tracker = *it;
@@ -98,7 +98,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                      tracker.getCommonName());
 
             auto passes = tracker.GeneratePassList(now, later);
-            for(QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {
+            for (QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {
                 auto pass = *it2;
                 auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;
                 auto rightPercentage = (float) (pass.los - now).Ticks() / totalTicks;

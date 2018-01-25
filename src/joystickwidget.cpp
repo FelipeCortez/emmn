@@ -23,15 +23,15 @@ JoystickWidget::JoystickWidget(QWidget *parent)
 }
 
 void JoystickWidget::mouseMoveEvent(QMouseEvent *event) {
-    if(dragging) {
+    if (dragging) {
         double dx = joyCircleCenter.x();
         double dy = -joyCircleCenter.y();
 
-        if(controlAxes != ControlAxes::elevationOnly) {
+        if (controlAxes != ControlAxes::elevationOnly) {
             dx = event->pos().x() - rect().center().x() - mouseOffset.x();
         }
 
-        if(controlAxes != ControlAxes::azimuthOnly) {
+        if (controlAxes != ControlAxes::azimuthOnly) {
             dy = rect().center().y() - event->pos().y() + mouseOffset.y();
         }
 
@@ -48,37 +48,37 @@ void JoystickWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void JoystickWidget::setFreeSlot(bool toggled) {
-    if(toggled) {
+    if (toggled) {
         controlAxes = ControlAxes::free;
     }
 }
 
 void JoystickWidget::setAzimuthSlot(bool toggled) {
-    if(toggled) {
+    if (toggled) {
         controlAxes = ControlAxes::azimuthOnly;
     }
 }
 
 void JoystickWidget::setElevationSlot(bool toggled) {
-    if(toggled) {
+    if (toggled) {
         controlAxes = ControlAxes::elevationOnly;
     }
 }
 
 void JoystickWidget::refreshSlot() {
-    if(!dragging || controlAxes == ControlAxes::elevationOnly) {
+    if (!dragging || controlAxes == ControlAxes::elevationOnly) {
         joyCircleCenter.setX(joyCircleCenter.x() * 0.95);
     }
 
-    if(!dragging || controlAxes == ControlAxes::azimuthOnly) {
+    if (!dragging || controlAxes == ControlAxes::azimuthOnly) {
         joyCircleCenter.setY(joyCircleCenter.y() * 0.95);
     }
 
-    if(fabs(joyCircleCenter.x()) < 0.1) {
+    if (fabs(joyCircleCenter.x()) < 0.1) {
         joyCircleCenter.setX(0);
     }
 
-    if(fabs(joyCircleCenter.y()) < 0.1) {
+    if (fabs(joyCircleCenter.y()) < 0.1) {
         joyCircleCenter.setY(0);
     }
 
@@ -98,7 +98,7 @@ void JoystickWidget::mousePressEvent(QMouseEvent *event) {
     const double dx = event->pos().x() - getJoyCircleRealCenter().x();
     const double dy = event->pos().y() - getJoyCircleRealCenter().y();
     double mouseToJoyDistance = sqrt(dx * dx + dy * dy);
-    if(mouseToJoyDistance < (getJoyCircleWidth() / 2.0)) {
+    if (mouseToJoyDistance < (getJoyCircleWidth() / 2.0)) {
         dragging = true;
         mouseOffset = event->pos() - getJoyCircleRealCenter();
     }

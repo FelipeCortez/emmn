@@ -150,12 +150,12 @@ bool Tracker::IsPassReverse(PassDetails pd) const
     DateTime current_time(pd.aos);
     double prevAz = -1;
 
-    while(current_time < pd.los) {
+    while (current_time < pd.los) {
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        if(prevAz != -1) {
-            if(fabs(Helpers::radToDeg(topo.azimuth) - prevAz) > 180) {
+        if (prevAz != -1) {
+            if (fabs(Helpers::radToDeg(topo.azimuth) - prevAz) > 180) {
                 return true;
             }
         }
@@ -287,7 +287,7 @@ QList<PassDetails> Tracker::GeneratePassList(
                 DateTime real_start = start_time.AddMicroseconds(-start_time.Microsecond());
 
                 float elevation = topo.elevation;
-                while(elevation > 0) {
+                while (elevation > 0) {
                     real_start = real_start.AddSeconds(-1);
                     Eci eci2 = sgp4.FindPosition(real_start);
                     CoordTopocentric topo2 = obs.GetLookAngle(eci2);
@@ -320,20 +320,20 @@ QList<PassDetails> Tracker::GeneratePassList(
                     false);
             //qDebug() << QString::fromStdString(los_time.ToString());
 
-            if(los_time.Microsecond() != 0) {
+            if (los_time.Microsecond() != 0) {
                 qDebug() << QString::fromStdString(los_time.ToString());
             }
 
-            if((los_time - aos_time).Microseconds() != 0) {
+            if ((los_time - aos_time).Microseconds() != 0) {
                 qDebug() << "Q";
             }
             DateTime real_los = los_time.AddMicroseconds(-los_time.Microsecond());
             //qDebug() << QString::fromStdString(real_los.ToString());
-            //while(true) {
+            //while (true) {
             //    Eci eci2 = sgp4.FindPosition(real_los);
             //    CoordTopocentric topo2 = obs.GetLookAngle(eci2);
             //    float elevation = topo2.elevation;
-            //    if(elevation > 0) {
+            //    if (elevation > 0) {
             //        real_los = real_los.AddSeconds(1);
             //    } else {
             //        break;
@@ -410,7 +410,7 @@ double Tracker::getElevationForObserver() {
 }
 
 QString Tracker::nextPass() const {
-    if(getSatInfo(Elevation).toDouble() < 0) {
+    if (getSatInfo(Elevation).toDouble() < 0) {
         return QString::fromStdString((GeneratePassList()[0].aos - DateTime::Now()).ToString());
     } else {
         return QString("Passando");

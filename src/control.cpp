@@ -26,7 +26,7 @@ Control::Control(QString port,
 }
 
 Control::~Control() {
-    if(validPort) {
+    if (validPort) {
         sendPower();
     }
 
@@ -132,14 +132,14 @@ AzEle Control::getState() {
 }
 
 void Control::changePort(QString port) {
-    if(serial.IsOpen()) {
+    if (serial.IsOpen()) {
         serial.Close();
     }
 
     wchar_t* portWchar = new wchar_t[port.length() + 1];
     port.toWCharArray(portWchar);
     portWchar[port.length()] = '\0';
-    if(serial.CheckPort(portWchar) == 0) {
+    if (serial.CheckPort(portWchar) == 0) {
         serial.Open(portWchar);
         serial.Setup(CSerial::EBaud9600, CSerial::EData8, CSerial::EParNone, CSerial::EStop1);
         serial.SetupReadTimeouts(serial.EReadTimeoutBlocking);
@@ -152,7 +152,7 @@ void Control::changePort(QString port) {
         validPort = sendPower();
         qDebug() << "valid: " << validPort;
 
-        if(validPort) {
+        if (validPort) {
             antennaTimer.start(100);
             setTarget(180, 90);
         } else {
@@ -221,7 +221,7 @@ void Control::moveToTarget() {
 bool Control::sendPower() {
     int count = 0;
 
-    while(true) {
+    while (true) {
         serial.Write(power, 1);
         // Timeout de leitura de 50 ms
         char data[50];
@@ -230,7 +230,7 @@ bool Control::sendPower() {
         if (data[0] == 'A') {
             return true;
         } else {
-            if(count > 10) { return false; }
+            if (count > 10) { return false; }
             ++count;
         }
     }
@@ -269,7 +269,7 @@ bool Control::isPortValid() {
 
 void Control::updateSlot() {
     if (controlMode == ControlMode::Schedule) {
-        if(trackerListModel->getAllPasses().empty()) {
+        if (trackerListModel->getAllPasses().empty()) {
             setTarget(180, 90);
         } else {
             auto nextPass = trackerListModel->getAllPasses().at(0);
@@ -277,20 +277,20 @@ void Control::updateSlot() {
             float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
             float positioningTime = 60;
 
-            if(nextPass.tracker->getElevationForObserver() >= 3.0) {
+            if (nextPass.tracker->getElevationForObserver() >= 3.0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
                 double ele = nextPass.tracker->getElevationForObserver();
-                if(nextPass.passDetails.reverse) {
+                if (nextPass.passDetails.reverse) {
                     az = fmod(az + 180, 360);
                     ele = 180 - ele;
                 }
 
                 setTarget(az, ele);
-            } else if(secondsRemaining <= positioningTime &&
+            } else if (secondsRemaining <= positioningTime &&
                       secondsRemaining > 0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
                 double ele = 3.0;
-                if(nextPass.passDetails.reverse) {
+                if (nextPass.passDetails.reverse) {
                     az = fmod(az + 180, 360);
                     ele = 180 - ele;
                 }

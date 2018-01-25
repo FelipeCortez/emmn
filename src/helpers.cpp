@@ -96,7 +96,7 @@ namespace Helpers {
     QString betterTime(DateTime time) {
         QString zone;
 
-        if(Settings::getUseLocalTime()) {
+        if (Settings::getUseLocalTime()) {
             time = time.AddHours(-3);
             zone = "(GMT-3)";
         } else {
@@ -114,7 +114,7 @@ namespace Helpers {
     }
 
     double clip(double val, double max) {
-        if(fabs(val) > max) {
+        if (fabs(val) > max) {
             return max * (fabs(val) / val);
         } else {
             return val;
@@ -128,16 +128,16 @@ namespace Helpers {
     bool saveTLEList(QStringList tleList) {
         //https://stackoverflow.com/a/32535544
         auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        if(path.isEmpty()) {
+        if (path.isEmpty()) {
             qFatal("Cannot determine settings storage location");
         }
 
         QDir d{path};
 
-        if(d.mkpath(d.absolutePath()) && QDir::setCurrent(d.absolutePath())) {
+        if (d.mkpath(d.absolutePath()) && QDir::setCurrent(d.absolutePath())) {
             qDebug() << "settings in" << QDir::currentPath();
             QFile f("tleList.txt");
-            if(f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream stream(&f);
                 stream.setCodec("UTF-8");
                 for(auto& str : tleList) {
@@ -152,7 +152,7 @@ namespace Helpers {
 
     TrackerListModel* readTLEList() {
         auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        if(path.isEmpty()) {
+        if (path.isEmpty()) {
             qFatal("Cannot determine settings storage location");
         }
 
@@ -162,12 +162,12 @@ namespace Helpers {
 
         TrackerListModel* tles = new TrackerListModel();
 
-        if(QDir::setCurrent(d.absolutePath())) {
+        if (QDir::setCurrent(d.absolutePath())) {
             QFile f("tleList.txt");
-            if(f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                while(!f.atEnd()) {
+            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                while (!f.atEnd()) {
                     QString line1 = f.readLine().trimmed().replace("\n", "");
-                    if(line1.at(0) == '0' && !re.match(line1).hasMatch()) {
+                    if (line1.at(0) == '0' && !re.match(line1).hasMatch()) {
                         line1 = line1.remove(0, 2).replace("\n", "");
                         QString line2 = f.readLine().trimmed().replace("\n", "");
                         QString line3 = f.readLine().trimmed().replace("\n", "");
@@ -199,7 +199,7 @@ namespace Helpers {
     QStringList getSpaceTrackCredentials() {
         QFile file(":/txt/credentials.txt");
 
-        if(!file.open(QFile::ReadOnly)) {
+        if (!file.open(QFile::ReadOnly)) {
             qFatal("Couldn't find credentials file");
             return QStringList();
         } else {
