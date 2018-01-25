@@ -58,13 +58,26 @@ namespace Settings {
         settings->setValue("serialPort", serialPort);
         delete settings;
     }
+
+    QDateTime getLastUpdatedDate() {
+        QSettings* settings = Settings::getSettings();
+        QDateTime lastUpdated = settings->value("lastUpdated", QDateTime(QDate(1970, 1, 1))).toDateTime();
+        delete settings;
+        return lastUpdated;
+    }
+
+    void setLastUpdatedDate(QDateTime date) {
+        QSettings* settings = Settings::getSettings();
+        settings->setValue("lastUpdated", date);
+        delete settings;
+    }
 }
 
 namespace Helpers {
     QString betterDate(DateTime date) {
         QString zone;
 
-        if(Settings::getUseLocalTime()) {
+        if (Settings::getUseLocalTime()) {
             date = date.AddHours(-3);
             zone = "(GMT-3)";
         } else {
@@ -133,6 +146,7 @@ namespace Helpers {
             }
         }
 
+        Settings::setLastUpdatedDate(QDateTime::currentDateTime());
         return true;
     }
 

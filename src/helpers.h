@@ -47,6 +47,15 @@ namespace Settings {
     /*! \brief Salva nome da porta usada
      */
     void setSerialPort(QString serialPort);
+
+    /*! \brief Carrega última data de atualização de catálogo das TLEs
+     */
+    QDateTime getLastUpdatedDate();
+
+    /*! \brief Salva última data de atualização de catálogo das TLEs
+     */
+    void setLastUpdatedDate(QDateTime date);
+
 }
 
 //! Funções úteis

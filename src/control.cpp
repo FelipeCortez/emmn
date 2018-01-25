@@ -12,7 +12,7 @@ Control::Control(QString port,
     , speedEle(0)
     , accelerationEle(0)
     , maxSpeed(7.0)
-    , maxAcceleration(1.0)
+    , maxAcceleration(0.3)
 {
     changePort(port);
 
@@ -162,9 +162,12 @@ void Control::changePort(QString port) {
 }
 
 void Control::setDeltas(float deltaAz, float deltaEle) {
+    const float minEle = 5.0f;
+    const float maxEle = 175.0f;
+
     if (fabs(deltaAz) > 1e-3 || fabs(deltaEle) > 1e-3) {
-        if(lastAzEle.azimuth + deltaAz < 0 || lastAzEle.azimuth + deltaAz >= 360) { deltaAz = 0; }
-        if(lastAzEle.elevation + deltaEle < 0 || lastAzEle.elevation + deltaEle >= 360) { deltaEle = 0; }
+        if (lastAzEle.azimuth + deltaAz < 0 || lastAzEle.azimuth + deltaAz >= 360) { deltaAz = 0; }
+        if (lastAzEle.elevation + deltaEle < minEle || lastAzEle.elevation + deltaEle >= maxEle) { deltaEle = 0; }
 
         setTarget(lastAzEle.azimuth + deltaAz, lastAzEle.elevation + deltaEle);
     }

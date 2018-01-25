@@ -17,13 +17,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->satellitesView->setModel(trackedSatellites);
     ui->passesView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height()+6);
+    ui->passesView->verticalHeader()->setDefaultSectionSize(ui->passesView->verticalHeader()->fontMetrics().height() + 6);
     ui->passesView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->passesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->satellitesView->setDragDropMode(QAbstractItemView::InternalMove);
     ui->satellitesView->setDragEnabled(true);
 
     setPortFromSettings();
+
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime lastUpdate = Settings::getLastUpdatedDate();
+    qDebug() << lastUpdate;
+    qDebug() << now;
+    qDebug() << now.addDays(-1);
+    if (lastUpdate < now.addDays(-1)) {
+        qDebug() << "yes! update";
+        network.getSpaceTrackCookies();
+    } else {
+        qDebug() << "don't update";
+    }
 
     satInfoTimer.start(100);
 
@@ -357,15 +369,7 @@ void MainWindow::trackSatellitesCheckboxChanged(int state) {
 }
 
 void MainWindow::debugSlot(bool) {
-    //QFileInfo::lastModified()
-    //network.getSpaceTrackCookies();
-
-
-    //Helpers::readTLEList();
-    //qDebug() << trackedSatellites->getTrackers().at(0).getSatCatNumber();
-
-    //qDebug() << Helpers::getSpaceTrackCredentials().at(0);
-    //qDebug() << Helpers::getSpaceTrackCredentials().at(1);
+    //
 }
 
 MainWindow::~MainWindow()

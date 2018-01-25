@@ -67,17 +67,18 @@ private:
     //funcao para mudanca de referencia
     void change_ref(float *az, float *ele);
 
-    char sat_name[20]; //Array que armazenará o nome do satelite
-    time_t d_ef_time[1200];	// armazena o horario das coordenadas
-    float d_azi[1200];	// armazena as coordenadas azimutes (0 - 360)
-    float d_ele[1200];	// armazena as coordenadas elevacao (0 - 90)
-    float d_range[1200];	// armazena o range do satelite a estação
-    int d_pos;			// linha atual na tabela das efemerides (0, 1, 2, ... , tam_da_tabela - 1 )
-    int d_size; 		// numero de linhas da tabela das efemerides
-    float d_offset_az, d_offset_ele; //armazena os offsets para cada posicao
-    time_t start_t, stop_t; //Horario de inicio e fim das passagens
-    float duration; //Duração da passagem
-    float max_ele; //Máxima elevação da antena na passagem atual
+    char sat_name[20];          // array que armazenará o nome do satelite
+    time_t d_ef_time[1200];     // armazena o horario das coordenadas
+    float d_azi[1200];          // armazena as coordenadas azimutes (0 - 360)
+    float d_ele[1200];          // armazena as coordenadas elevacao (0 - 90)
+    float d_range[1200];        // armazena o range do satelite a estação
+    int d_pos;                  // linha atual na tabela das efemerides (0, 1, 2, ... , tam_da_tabela - 1 )
+    int d_size;                 // numero de linhas da tabela das efemerides
+    float d_offset_az;
+    float d_offset_ele;         // armazena os offsets para cada posicao
+    time_t start_t, stop_t;     // horario de inicio e fim das passagens
+    float duration;             // duração da passagem
+    float max_ele;              // máxima elevação da antena na passagem atual
 };
 
 #endif
