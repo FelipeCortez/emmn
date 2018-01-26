@@ -12,6 +12,7 @@ AddTrackerDialog::AddTrackerDialog(TrackerListModel* satelliteCatalogue,
     completer = new QCompleter(this);
     completer->setModel(Helpers::QStringListModelFromSatelliteCatalog(satelliteCatalogue));
     completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
     titleInput->setCompleter(completer);
 
     connect(addTLEButtonBox,
