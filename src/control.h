@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <QDebug>
-#include "efem.h"
 #include "helpers.h"
 #include "serial.h"
 #include "trackerlistmodel.h"
@@ -106,30 +105,31 @@ public:
       */
     bool isPortValid();
 private:
-    bool validPort; //!< true se porta verdadeira é um dispotivo Arduino válido
-    ControlMode controlMode; //!< Modo de controle da antena
-    QTimer antennaTimer; //!< Timer responsável por mandar informações para a antena repetidamente
+    bool validPort;             //!< true se porta é detectada como um dispotivo Arduino válido
+    ControlMode controlMode;    //!< Modo de controle da antena
+    QTimer antennaTimer;        //!< Manda informações para a antena repetidamente
     double speedAz;
     double accelerationAz;
     double speedEle;
     double accelerationEle;
     double maxSpeed;
     double maxAcceleration;
-    CSerial serial; //!< Classe de comunicação serial
-    TrackerListModel* trackerListModel; //!< Ponteiro para lista que armazena todos os satélites cadastrados
-    AzEle lastAzEle; //!< Última posição lida
+    CSerial serial;                     //!< Utilidades para comunicação serial
+    TrackerListModel* trackerListModel; //!< Referencia lista que armazena todos os satélites cadastrados
+    AzEle lastAzEle;                    //!< Última posição da antena lida pelos sensores
     Logger* logger;
-    float targetAz; //!< Azimute alvo para a antena
-    float targetEle; //!< Elevação alvo para a antena
+    float targetAz;                     //!< Azimute alvo para a antena
+    float targetEle;                    //!< Elevação alvo para a antena
 
     unsigned char a1 = 0, a0 = 0, e1 = 0, e0 = 0; //bytes a serem enviados (refAZ e refELE)
     int cont_aux = 0;
 
     // Por que não usar 'S', 'P', 'A', 'N', 'X' direto???
-    unsigned char setString[6] = {87,48,48,48,48,48}; //Array onde será formado o comando SET a ser enviado para o arduino
-    unsigned char input_state[7] = {87,48,48,48,48,48,0}; //Array de comando STATE a ser recebido do arduino
+    // E por que criar arrays com UM caractere?
+    unsigned char setString[6] = {87,48,48,48,48,48};           //Array onde será formado o comando SET a ser enviado para o arduino
+    unsigned char input_state[7] = {87,48,48,48,48,48,0};       //Array de comando STATE a ser recebido do arduino
     unsigned char state[1] = { 83 };    // 'S'
-    unsigned char power[1] = { 80 };    //'P'
+    unsigned char power[1] = { 80 };    // 'P'
     unsigned char ack[1] = { 65 };      // 'A'
     unsigned char nack[1] = { 78 };     // 'N'
     unsigned char input_ack[1] = { 88 };// 'X' //será utilizada para verificar reconhecimento de mensagens enviadas e recebidas

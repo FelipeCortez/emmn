@@ -11,7 +11,7 @@ public:
     Network(QObject *parent = 0);
     void getTLE(const QString tle1);
     void getTLEs();
-    void getSpaceTrackCookies();
+    void updateSatelliteCatalogue();
 
 private:
     QNetworkAccessManager manager;

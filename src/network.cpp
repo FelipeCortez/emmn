@@ -36,7 +36,7 @@ QStringList Network::tleDownloadFinished() {
 
 // -----------------------------------------
 
-void Network::getSpaceTrackCookies() {
+void Network::updateSatelliteCatalogue() {
     QNetworkRequest req;
     req.setUrl(QUrl("https://www.space-track.org/ajaxauth/login"));
     req.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");

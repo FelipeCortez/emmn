@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << now.addDays(-1);
     if (lastUpdate < now.addDays(-1)) {
         qDebug() << "yes! update";
-        network.getSpaceTrackCookies();
+        network.updateSatelliteCatalogue();
     } else {
         qDebug() << "don't update";
     }
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
 
-    // Força atualização da tabela (meio gambiarra... talvez mudar)
+    // Força atualização da tabela de passagens (meio gambiarra... talvez mudar)
     auto selected = ui->satellitesView->selectionModel()->selection();
     rowChangedSlot(selected, QItemSelection());
 
@@ -167,8 +167,6 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
             int row = 0;
             QList<PassDetails>::const_iterator itr = pd.begin();
             do {
-                //QCoreApplication::processEvents();
-                //QEventLoop::processEvents();
                 QString text;
                 QStandardItem* item;
 
@@ -283,7 +281,7 @@ void MainWindow::manualControlDialogSlot(bool) {
     ui->eleLabel->setText("---");
     control->setControlMode(ControlMode::Manual);
     ManualControlDialog dialog(control, this);
-    // exec bloqueia, de forma que o start do timer só rodará quando o dialog for fechado
+    // exec bloqueia, então o timer só será iniciado ao fechar a caixa de diálogo
     dialog.exec();
     control->setControlMode(ControlMode::None);
     ui->trackSatellitesCheckbox->setChecked(false);
@@ -329,7 +327,6 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satAz->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));
         ui->satNextPass->setText(tracker.nextPass());
     } else {
-        //satInfoTimer.stop();
         ui->satelliteGroupBox->setTitle("Satélite");
         ui->satEle->setText("");
         ui->satAz->setText("");

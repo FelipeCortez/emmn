@@ -8,7 +8,6 @@
 #include "trackerlistmodel.h"
 #include "DateTime.h"
 
-//! Struct que armazena azimute e elevação quaisquer
 typedef struct AzEle {
     double azimuth;
     double elevation;

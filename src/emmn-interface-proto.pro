@@ -18,7 +18,6 @@ SOURCES += main.cpp\
            tracker.cpp \
            addtrackerdialog.cpp \
            control.cpp \
-           efem.cpp \
            serial.cpp \
            trackerlistmodel.cpp \
            network.cpp \
@@ -33,7 +32,6 @@ HEADERS += mainwindow.h \
            tracker.h \
            addtrackerdialog.h \
            control.h \
-           efem.h \
            serial.h \
            trackerlistmodel.h \
            network.h \
