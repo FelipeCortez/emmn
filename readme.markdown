@@ -10,7 +10,7 @@ Software para controle de missões da EMMN. Implementado em C++ usando Qt 5.7. U
 Licença
 -------
 
-    Copyright 2017 Felipe Cortez
+    Copyright 2017-2018 Felipe Cortez
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
