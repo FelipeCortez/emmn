@@ -27,7 +27,6 @@ QStringList Network::tleDownloadFinished() {
         if (line.trimmed() == satName) {
             tle << QString(reply->readLine()).replace("\r\n", "");
             tle << QString(reply->readLine()).replace("\r\n", "");
-
         }
     }
 

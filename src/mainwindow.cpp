@@ -27,14 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     QDateTime now = QDateTime::currentDateTime();
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
-    qDebug() << lastUpdate;
-    qDebug() << now;
-    qDebug() << now.addDays(-1);
+    prevTime = now;
+
     if (lastUpdate < now.addDays(-1)) {
-        qDebug() << "yes! update";
         network.updateSatelliteCatalogue();
-    } else {
-        qDebug() << "don't update";
     }
 
     satInfoTimer.start(100);
@@ -285,7 +281,7 @@ void MainWindow::manualControlDialogSlot(bool) {
     dialog.exec();
     control->setControlMode(ControlMode::None);
     ui->trackSatellitesCheckbox->setChecked(false);
-    satInfoTimer.start();
+    satInfoTimer.start(100);
 }
 
 void MainWindow::removeSelectedTrackerSlot() {
@@ -300,10 +296,14 @@ void MainWindow::removeSelectedTrackerSlot() {
 }
 
 void MainWindow::satInfoUpdateSlot() {
-    auto selected = ui->satellitesView->selectionModel()->selection();
-    auto nextPass = trackedSatellites->getAllPasses().at(0);
-    auto remaining = nextPass.passDetails.aos - DateTime::Now();
-    ui->nextPassesView->repaint();
+    const auto selected = ui->satellitesView->selectionModel()->selection();
+    const auto nextPass = trackedSatellites->getAllPasses().at(0);
+    const auto remaining = nextPass.passDetails.aos - DateTime::Now();
+
+    if (prevTime.time().minute() != QDateTime::currentDateTime().time().minute()) {
+        ui->nextPassesView->repaint();
+        prevTime = QDateTime::currentDateTime();
+    }
 
     if (nextPass.tracker->getElevationForObserver() >= 0) {
         ui->nextPassCountdownLabel->setText("Passando");
@@ -321,7 +321,7 @@ void MainWindow::satInfoUpdateSlot() {
 
     if (!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
-        auto tracker = trackedSatellites->getTrackers()[selectedIndex.row()];
+        auto& tracker = trackedSatellites->getTrackersRef()[selectedIndex.row()];
 
         ui->satEle->setText(tracker.getSatInfo(Tracker::Elevation) + QString("°"));
         ui->satAz->setText(tracker.getSatInfo(Tracker::Azimuth) + QString("°"));

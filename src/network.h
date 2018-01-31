@@ -7,6 +7,7 @@
 class Network : public QObject
 {
     Q_OBJECT
+
 public:
     Network(QObject *parent = 0);
     void getTLE(const QString tle1);

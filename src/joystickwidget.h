@@ -32,16 +32,16 @@ public:
     AzEle getDeltas();
 
 private:
-    const int widgetSize; //!< Tamanho da widget do joystick
-    const int margins; //!< Tamanho das margens internas
+    const int widgetSize;             //!< Tamanho da widget do joystick
+    const int margins;                //!< Tamanho das margens internas
     const double joyCircleProportion; //!< Razão de proporção entre tamanho do joystick e círculo externo
-    QPointF joyCircleCenter; //!< Armazena posição central do joystick
-    QRectF limitCircle; //!< Retângulo associado ao círculo do limite
-    bool dragging; //!< Armazena se o joystick está sendo arrastado pelo mouse
-    QPointF mouseOffset; //!< Armazena distância do mouse para o centro do joystick no momento do clique
-    ControlAxes controlAxes; //!< Armazena graus de liberdade disponíveis para movimentação do joystick
+    QPointF joyCircleCenter;          //!< Armazena posição central do joystick
+    QRectF limitCircle;               //!< Retângulo associado ao círculo do limite
+    bool dragging;                    //!< Armazena se o joystick está sendo arrastado pelo mouse
+    QPointF mouseOffset;              //!< Armazena distância do mouse para o centro do joystick no momento do clique
+    ControlAxes controlAxes;          //!< Armazena graus de liberdade disponíveis para movimentação do joystick
 
-    double getJoyCircleWidth(); //!< Calcula tamanho do círculo do joystick
+    double getJoyCircleWidth();       //!< Calcula tamanho do círculo do joystick
     QPointF getJoyCircleRealCenter(); //!< Calcula centro real (não relativo) do círculo do joystick
 
 signals:

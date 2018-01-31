@@ -54,19 +54,20 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         }
 
         const int hours = 12;
-        auto now = DateTime::Now(false);
-        auto later = DateTime::Now(false).AddHours(hours);
-        auto totalTicks = (later - now).Ticks();
+        const auto now = DateTime::Now(false);
+        const auto later = DateTime::Now(false).AddHours(hours);
+        const auto totalTicks = (later - now).Ticks();
 
         QRectF xAxisRect(QPointF(margins + textMaxWidth + margins, totalHeight),
                          QPointF(width() - 1 - margins, totalHeight + trackerHeight * trackers->length()));
-        auto hourNow = now.AddMinutes(60 - now.Minute());
-        auto dateIt = hourNow;
+
+        // Hora atual (12:25 -> 12:00)
+        auto dateIt = now.AddMinutes(60 - now.Minute());
 
         // Desenha linhas de referência (eixo X)
         painter.setPen(Qt::gray);
         while (dateIt < later) {
-            auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
+            const auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
             float lineX = floor(xAxisRect.left() + (xAxisRect.width() * linePercentage)) + 0.5;
             painter.drawLine(QPointF(lineX, xAxisRect.top()),
                              QPointF(lineX, xAxisRect.bottom()));
@@ -79,7 +80,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         }
 
         // Desenha linha vertical para hora atual
-        QString nowStr(QString::number(now.Hour()) + ":" + QString::number(now.Minute()));
+        const QString nowStr(QString::number(now.Hour()) + ":" + QString::number(now.Minute()));
         QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
         boundingRect.setWidth(boundingRect.width() + 10);
         boundingRect.moveCenter(QPointF(xAxisRect.left() + margins * 2, xAxisRect.top() + margins / 2 + 1));
@@ -88,7 +89,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
 
         // Desenha blocos
         for (QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
-            QRectF itemRect(0, totalHeight, width(), trackerHeight);
+            const QRectF itemRect(0, totalHeight, width(), trackerHeight);
 
             auto tracker = *it;
             painter.setPen(Qt::black);
@@ -100,8 +101,8 @@ void NextPassesView::paintEvent(QPaintEvent *) {
             auto passes = tracker.GeneratePassList(now, later);
             for (QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {
                 auto pass = *it2;
-                auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;
-                auto rightPercentage = (float) (pass.los - now).Ticks() / totalTicks;
+                const auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;
+                const auto rightPercentage = (float) (pass.los - now).Ticks() / totalTicks;
                 QRectF barRect(itemRect);
                 barRect.setTop(itemRect.top() + 3);
                 barRect.setBottom(itemRect.bottom() - 3);
@@ -110,7 +111,6 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                 painter.setPen(Qt::NoPen);
                 painter.setBrush(Qt::black);
                 painter.setOpacity(0.7);
-                //painter.setBrush(Qt::black);
                 painter.drawRoundedRect(barRect, 3, 3);
                 painter.setBrush(Qt::NoBrush);
                 painter.setOpacity(1);

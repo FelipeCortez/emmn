@@ -57,7 +57,7 @@ public:
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
         const int time_step = 180) const;
     bool IsPassReverse(PassDetails pd) const;
-    QString nextPass() const;
+    QString nextPass();
     QString getCommonName() const;
     QString getFullTLE() const;
     QString getSatInfo(int info) const;

@@ -33,15 +33,15 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow* ui; //! Ponteiro para elementos de interface gráfica do arquivo .ui
-    TrackerListModel* trackedSatellites; //! Lista de todos os satélites rastreados
+    Ui::MainWindow* ui;                   //! Ponteiro para elementos de interface gráfica do arquivo .ui
+    TrackerListModel* trackedSatellites;  //! Lista de todos os satélites rastreados
     TrackerListModel* satelliteCatalogue; //! Lista de todos os satélites catalogados pelo SpaceTrack
-    QTimer satInfoTimer; //! Timer para recarregar informações do satélite todo segundo
-    QStandardItemModel* tableModel; //! Elementos de tabela de passagens
-    //Network network; //! Conexão com a Internet
-    Control* control; //! Controle da antena
-    Logger* logger;
-    Network network;
+    QTimer satInfoTimer;                  //! Timer para recarregar informações do satélite todo segundo
+    QStandardItemModel* tableModel;       //! Elementos de tabela de passagens
+    Control* control;                     //! Controle da antena
+    Logger* logger;                       //! Logger para posição da antena
+    Network network;                      //! Conexão com a Internet para atualizar TLEs
+    QDateTime prevTime;                   //! Hora lida (para atualizar próximas passagens)
 
     /*! \brief Modifica porta serial utilizada pelo programa basead
      */

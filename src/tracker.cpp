@@ -409,9 +409,13 @@ double Tracker::getElevationForObserver() {
     return Helpers::radToDeg(topo.elevation);
 }
 
-QString Tracker::nextPass() const {
+QString Tracker::nextPass() {
+    if (passList.empty() || passList.at(0).aos.Ticks() < DateTime::Now().Ticks()) {
+        passList = GeneratePassList();
+    }
+
     if (getSatInfo(Elevation).toDouble() < 0) {
-        return QString::fromStdString((GeneratePassList()[0].aos - DateTime::Now()).ToString());
+        return QString::fromStdString((passList.at(0).aos - DateTime::Now()).ToString());
     } else {
         return QString("Passando");
     }

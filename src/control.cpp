@@ -17,7 +17,7 @@ Control::Control(QString port,
     changePort(port);
 
     this->trackerListModel = trackerListModel;
-    this->logger = new Logger();
+    //this->logger = new Logger();
 
     connect(&antennaTimer,
             SIGNAL(timeout()),
@@ -287,7 +287,7 @@ void Control::updateSlot() {
 
                 setTarget(az, ele);
             } else if (secondsRemaining <= positioningTime &&
-                      secondsRemaining > 0) {
+                       secondsRemaining > 0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
                 double ele = 3.0;
                 if (nextPass.passDetails.reverse) {

@@ -126,13 +126,13 @@ private:
 
     // Por que não usar 'S', 'P', 'A', 'N', 'X' direto???
     // E por que criar arrays com UM caractere?
-    unsigned char setString[6] = {87,48,48,48,48,48};           //Array onde será formado o comando SET a ser enviado para o arduino
-    unsigned char input_state[7] = {87,48,48,48,48,48,0};       //Array de comando STATE a ser recebido do arduino
-    unsigned char state[1] = { 83 };    // 'S'
-    unsigned char power[1] = { 80 };    // 'P'
-    unsigned char ack[1] = { 65 };      // 'A'
-    unsigned char nack[1] = { 78 };     // 'N'
-    unsigned char input_ack[1] = { 88 };// 'X' //será utilizada para verificar reconhecimento de mensagens enviadas e recebidas
+    unsigned char setString[6] = {87,48,48,48,48,48};     //Array onde será formado o comando SET a ser enviado para o arduino
+    unsigned char input_state[7] = {87,48,48,48,48,48,0}; //Array de comando STATE a ser recebido do arduino
+    unsigned char state[1] = { 83 };                      // 'S'
+    unsigned char power[1] = { 80 };                      // 'P'
+    unsigned char ack[1] = { 65 };                        // 'A'
+    unsigned char nack[1] = { 78 };                       // 'N'
+    unsigned char input_ack[1] = { 88 };                  // 'X'
 
     //Status do sistema
     int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
