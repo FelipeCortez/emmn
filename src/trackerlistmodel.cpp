@@ -109,6 +109,10 @@ void TrackerListModel::generatePassList(const DateTime& start_time, const DateTi
 }
 
 QList<PassDetailsWithTracker> TrackerListModel::getAllPasses() {
+    if (allPasses.empty()) {
+        return QList<PassDetailsWithTracker>();
+    }
+
     auto it = allPasses.begin();
     int pos = 0;
 

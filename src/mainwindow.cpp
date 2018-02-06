@@ -206,44 +206,49 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 << "Tipo";
 
         if (tableModel) { delete tableModel; }
-        tableModel = new QStandardItemModel(numRows, numColumns);
-        tableModel->setHorizontalHeaderLabels(headers);
 
-        if (allPasses.begin() == allPasses.end()) {
-            qDebug() << "no passes found";
+        if (trackedSatellites->rowCount() > 0) {
+            tableModel = new QStandardItemModel(numRows, numColumns);
+            tableModel->setHorizontalHeaderLabels(headers);
+
+            if (allPasses.begin() == allPasses.end()) {
+                qDebug() << "no passes found";
+            } else {
+                int row = 0;
+                QList<PassDetailsWithTracker>::const_iterator itr = allPasses.begin();
+                do {
+                    QString text;
+                    QStandardItem* item;
+
+                    text = itr->tracker->getCommonName();
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 0, item);
+
+                    text = Helpers::betterDate(itr->passDetails.aos);
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 1, item);
+
+                    text = Helpers::betterDate(itr->passDetails.los);
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 2, item);
+
+                    text = QString::number(Util::RadiansToDegrees(itr->passDetails.max_elevation)) + QString("°");
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 3, item);
+
+                    text = QString::fromStdString((itr->passDetails.los - itr->passDetails.aos).ToString());
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 4, item);
+
+                    text = itr->passDetails.reverse ? QString("Inversa") : QString("Normal");
+                    item = new QStandardItem(text);
+                    tableModel->setItem(row, 5, item);
+
+                    ++row;
+                } while (++itr != allPasses.end());
+            }
         } else {
-            int row = 0;
-            QList<PassDetailsWithTracker>::const_iterator itr = allPasses.begin();
-            do {
-                QString text;
-                QStandardItem* item;
-
-                text = itr->tracker->getCommonName();
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 0, item);
-
-                text = Helpers::betterDate(itr->passDetails.aos);
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 1, item);
-
-                text = Helpers::betterDate(itr->passDetails.los);
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 2, item);
-
-                text = QString::number(Util::RadiansToDegrees(itr->passDetails.max_elevation)) + QString("°");
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 3, item);
-
-                text = QString::fromStdString((itr->passDetails.los - itr->passDetails.aos).ToString());
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 4, item);
-
-                text = itr->passDetails.reverse ? QString("Inversa") : QString("Normal");
-                item = new QStandardItem(text);
-                tableModel->setItem(row, 5, item);
-
-                ++row;
-            } while (++itr != allPasses.end());
+            tableModel = new QStandardItemModel();
         }
 
         ui->passesView->setModel(tableModel);
@@ -286,38 +291,19 @@ void MainWindow::manualControlDialogSlot(bool) {
 
 void MainWindow::removeSelectedTrackerSlot() {
     foreach(const QModelIndex &index, ui->satellitesView->selectionModel()->selectedIndexes()) {
-        qDebug() << index.data(Qt::DisplayRole).toString();
         trackedSatellites->removeRow(index.row());
         ui->satellitesView->selectionModel()->clear();
         Settings::saveTrackers(trackedSatellites->getTrackers());
     }
 
     ui->nextPassesView->repaint();
+
+    auto selected = ui->satellitesView->selectionModel()->selection();
+    rowChangedSlot(selected, QItemSelection());
 }
 
 void MainWindow::satInfoUpdateSlot() {
     const auto selected = ui->satellitesView->selectionModel()->selection();
-    const auto nextPass = trackedSatellites->getAllPasses().at(0);
-    const auto remaining = nextPass.passDetails.aos - DateTime::Now();
-
-    if (prevTime.time().minute() != QDateTime::currentDateTime().time().minute()) {
-        ui->nextPassesView->repaint();
-        prevTime = QDateTime::currentDateTime();
-    }
-
-    if (nextPass.tracker->getElevationForObserver() >= 0) {
-        ui->nextPassCountdownLabel->setText("Passando");
-    } else {
-        ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
-    }
-
-    ui->nextPassSatLabel->setText(trackedSatellites->getAllPasses().at(0).tracker->getCommonName());
-
-    if (control->isPortValid()) {
-        AzEle antennaInfo = control->getState();
-        ui->azLabel->setText(QString::number(antennaInfo.azimuth));
-        ui->eleLabel->setText(QString::number(antennaInfo.elevation));
-    }
 
     if (!selected.isEmpty()) {
         auto selectedIndex = selected.indexes().first();
@@ -333,7 +319,36 @@ void MainWindow::satInfoUpdateSlot() {
         ui->satNextPass->setText("");
     }
 
-    trackedSatellites->getAllPasses();
+    if (trackedSatellites->rowCount() > 0) {
+        const auto nextPass = trackedSatellites->getAllPasses().at(0);
+        const auto remaining = nextPass.passDetails.aos - DateTime::Now();
+
+        if (prevTime.time().minute() != QDateTime::currentDateTime().time().minute()) {
+            ui->nextPassesView->repaint();
+            prevTime = QDateTime::currentDateTime();
+        }
+
+        if (nextPass.tracker->getElevationForObserver() >= 0) {
+            ui->nextPassCountdownLabel->setText("Passando");
+        } else {
+            ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
+        }
+
+        ui->nextPassSatLabel->setText(trackedSatellites->getAllPasses().at(0).tracker->getCommonName());
+    } else {
+        ui->nextPassCountdownLabel->setText("");
+        ui->nextPassSatLabel->setText("");
+    }
+
+    if (control->isPortValid()) {
+        AzEle antennaInfo = control->getState();
+        ui->azLabel->setText(QString::number(antennaInfo.azimuth));
+        ui->eleLabel->setText(QString::number(antennaInfo.elevation));
+    } else {
+        //! \todo Estas duas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
+        ui->azLabel->setText("");
+        ui->eleLabel->setText("");
+    }
 }
 
 void MainWindow::clearSelectedTrackerSlot() {

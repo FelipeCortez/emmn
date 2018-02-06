@@ -52,7 +52,6 @@ void Network::updateSatelliteCatalogue() {
     #ifndef QT_NO_SSL
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), SLOT(sslErrors(QList<QSslError>)));
     #endif
-
 }
 
 #ifndef QT_NO_SSL
