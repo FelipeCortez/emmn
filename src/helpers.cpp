@@ -193,6 +193,7 @@ namespace Helpers {
         }
 
         listModel->setStringList(titles);
+        listModel->sort(0);
         return listModel;
     }
 
