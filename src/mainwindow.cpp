@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QMessageBox>
+#include <QLocale>
 #include <string>
 #include "helpers.h"
 
@@ -8,8 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , satInfoTimer(this)
+  , updateTLETimer(this)
   , tableModel(nullptr)
   , control(nullptr)
+  , network(this)
 {
     trackedSatellites = new TrackerListModel();
     satelliteCatalogue = Helpers::readTLEList();
@@ -30,17 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
     prevTime = now;
 
     if (lastUpdate < now.addDays(-1)) {
+        ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
+    } else {
+        updateTrackersListSlot();
     }
 
     satInfoTimer.start(100);
-
-    loadTrackersFromSettings();
-    ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
-
-    // Força atualização da tabela de passagens (meio gambiarra... talvez mudar)
-    auto selected = ui->satellitesView->selectionModel()->selection();
-    rowChangedSlot(selected, QItemSelection());
+    updateTLETimer.start(60000);
 
     connect(ui->actionConfig,
             SIGNAL(triggered(bool)),
@@ -54,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(triggered(bool)),
             this,
             SLOT(debugSlot(bool)));
+    connect(ui->actionUpdateTLEs,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(updateTLESlot(bool)));
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -82,10 +87,18 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(satInfoUpdateSlot()));
+    connect(&updateTLETimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(updateTLECheckSlot()));
     connect(ui->trackSatellitesCheckbox,
             SIGNAL(stateChanged(int)),
             this,
             SLOT(trackSatellitesCheckboxChanged(int)));
+    connect(&network,
+            SIGNAL(updateTrackersUI()),
+            this,
+            SLOT(updateTrackersListSlot()));
 }
 
 void MainWindow::setPortFromSettings() {
@@ -108,6 +121,8 @@ void MainWindow::setPortFromSettings() {
 
 void MainWindow::loadTrackersFromSettings() {
     auto trackers = Settings::loadTrackers();
+
+    trackedSatellites->getTrackersRef().clear();
 
     for (auto& tSaved : trackers) {
         for (auto& tCatalog : satelliteCatalogue->getTrackersRef()) {
@@ -384,7 +399,52 @@ void MainWindow::debugSlot(bool) {
     //
 }
 
+void MainWindow::updateTLESlot(bool) {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirmação",
+                                  "As TLEs são atualizadas diariamente e esta ação só é recomendada em casos de emergência",
+                                  QMessageBox::Yes | QMessageBox::Cancel);
+    if (reply == QMessageBox::Yes) {
+        ui->statusBar->showMessage("Atualizando");
+        network.updateSatelliteCatalogue();
+    } else {
+        qDebug() << "Yes was *not* clicked";
+    }
+}
+
+void MainWindow::updateTrackersListSlot() {
+    loadTrackersFromSettings();
+    ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
+
+    // Força atualização da tabela de passagens (meio gambiarra... talvez mudar)
+    auto selected = ui->satellitesView->selectionModel()->selection();
+    rowChangedSlot(selected, QItemSelection());
+
+    QDateTime lastUpdate = Settings::getLastUpdatedDate();
+    //QLabel* lastUpdateLabel = new QLabel("Última atualização: " + lastUpdate.toString());
+    //ui->statusBar->addWidget(lastUpdateLabel);
+    ui->statusBar->showMessage("Última atualização: " + lastUpdate.toString());
+}
+
+void MainWindow::updateTLECheckSlot() {
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime lastUpdate = Settings::getLastUpdatedDate();
+    prevTime = now;
+
+    if (lastUpdate < now.addDays(-1)) {
+        ui->statusBar->showMessage("Atualizando");
+        network.updateSatelliteCatalogue();
+    }
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete trackedSatellites;
+    delete satelliteCatalogue;
+    delete tableModel;
+    delete control;
+    /*
+    delete logger;
+    */
 }

@@ -305,11 +305,45 @@
     <item row="3" column="0" colspan="2">
      <widget class="QGroupBox" name="nextPassesGroupBox">
       <property name="title">
-       <string>Próximas passagens (todos os satélites)</string>
+       <string>Próximas passagens</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="NextPassesView" name="nextPassesView" native="true"/>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>915</width>
+            <height>225</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="NextPassesView" name="nextPassesView" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -332,6 +366,7 @@
     <addaction name="actionConfig"/>
     <addaction name="actionManualControl"/>
     <addaction name="actionDebugar"/>
+    <addaction name="actionUpdateTLEs"/>
    </widget>
    <widget class="QMenu" name="menuSobre">
     <property name="title">
@@ -402,6 +437,11 @@
    </property>
    <property name="text">
     <string>Refazer</string>
+   </property>
+  </action>
+  <action name="actionUpdateTLEs">
+   <property name="text">
+    <string>Atualizar TLEs</string>
    </property>
   </action>
  </widget>

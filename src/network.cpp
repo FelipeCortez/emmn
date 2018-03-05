@@ -5,35 +5,8 @@
 Network::Network(QObject *parent)
     : QObject(parent)
     , reply(nullptr)
-    , cookiesAcquired(false)
 {
 }
-
-void Network::getTLE(const QString tle1) {
-    QNetworkRequest req;
-    req.setUrl(QUrl("http://celestrak.com/NORAD/elements/resource.txt"));
-    req.setRawHeader("User-Agent" ,
-                     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17");
-    reply = manager.get(req);
-    satName = tle1;
-    connect(reply, SIGNAL(finished()), this, SLOT(tleDownloadFinished()));
-}
-
-QStringList Network::tleDownloadFinished() {
-    QStringList tle;
-    while (reply->canReadLine()) {
-        QString line = QString(reply->readLine()).replace("\r\n", "");
-
-        if (line.trimmed() == satName) {
-            tle << QString(reply->readLine()).replace("\r\n", "");
-            tle << QString(reply->readLine()).replace("\r\n", "");
-        }
-    }
-
-    return tle;
-}
-
-// -----------------------------------------
 
 void Network::updateSatelliteCatalogue() {
     QNetworkRequest req;
@@ -59,8 +32,9 @@ void Network::sslErrors(const QList<QSslError> &errors)
 {
     QString errorString;
     foreach (const QSslError &error, errors) {
-        if (!errorString.isEmpty())
+        if (!errorString.isEmpty()) {
             errorString += '\n';
+        }
         errorString += error.errorString();
     }
 
@@ -84,12 +58,10 @@ void Network::cookiesDownloadFinished() {
     getTLEs();
 }
 
-// -----------------------------------------
-
 void Network::getTLEs() {
     QNetworkRequest req;
     req.setUrl(QUrl("https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/EPOCH/%3Enow-30/MEAN_MOTION/%3E11.25/format/3le"));
-    req.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     reply = manager.get(req);
 
     connect(reply, SIGNAL(finished()), this, SLOT(tlesDownloadFinished()));
@@ -103,7 +75,12 @@ void Network::tlesDownloadFinished() {
         qDebug() << tleList.last();
     }
 
-    Helpers::saveTLEList(tleList);
+    qDebug() << tleList.size();
+    if (tleList.size() > 0) {
+        Helpers::saveTLEList(tleList);
+    }
+
+    emit updateTrackersUI();
 
     reply->deleteLater();
 }

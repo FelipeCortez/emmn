@@ -64,6 +64,22 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         // Hora atual (12:25 -> 12:00)
         auto dateIt = now.AddMinutes(60 - now.Minute());
 
+        // Desenha barras com cores alternadas
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(230, 230, 230));
+
+        bool drawBar = true;
+        for (QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
+            if (drawBar) {
+                const QRectF itemRect(0, totalHeight, width(), trackerHeight);
+                painter.drawRect(itemRect);
+            }
+
+            drawBar = !drawBar;
+            totalHeight += trackerHeight;
+        }
+        totalHeight = 0;
+
         // Desenha linhas de referência (eixo X)
         painter.setPen(Qt::gray);
         while (dateIt < later) {
@@ -84,8 +100,11 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         QRectF boundingRect = painter.fontMetrics().boundingRect(nowStr);
         boundingRect.setWidth(boundingRect.width() + 10);
         boundingRect.moveCenter(QPointF(xAxisRect.left() + margins * 2, xAxisRect.top() + margins / 2 + 1));
+        painter.setOpacity(0.5);
+        painter.setPen(Qt::red);
         painter.drawLine(QPointF(xAxisRect.left() + 0.5, xAxisRect.top()),
                          QPointF(xAxisRect.left() + 0.5, xAxisRect.bottom()));
+        painter.setOpacity(1);
 
         // Desenha blocos
         for (QList<Tracker>::iterator it = trackers->begin(); it != trackers->end(); ++it) {
@@ -111,7 +130,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                 painter.setPen(Qt::NoPen);
                 painter.setBrush(Qt::black);
                 painter.setOpacity(0.7);
-                painter.drawRoundedRect(barRect, 3, 3);
+                painter.drawRoundedRect(barRect, 2, 2);
                 painter.setBrush(Qt::NoBrush);
                 painter.setOpacity(1);
             }

@@ -10,25 +10,24 @@ class Network : public QObject
 
 public:
     Network(QObject *parent = 0);
-    void getTLE(const QString tle1);
-    void getTLEs();
     void updateSatelliteCatalogue();
+    void getTLEs();
 
 private:
     QNetworkAccessManager manager;
     QNetworkReply* reply;
     QNetworkCookieJar jar;
     QString satName;
-    bool cookiesAcquired;
-
 
 public slots:
-    QStringList tleDownloadFinished();
     void tlesDownloadFinished();
     void cookiesDownloadFinished();
 #ifndef QT_NO_SSL
     void sslErrors(const QList<QSslError> &errors);
 #endif
+
+signals:
+    void updateTrackersUI();
 };
 
 #endif // NETWORK_H

@@ -37,6 +37,7 @@ private:
     TrackerListModel* trackedSatellites;  //! Lista de todos os satélites rastreados
     TrackerListModel* satelliteCatalogue; //! Lista de todos os satélites catalogados pelo SpaceTrack
     QTimer satInfoTimer;                  //! Timer para recarregar informações do satélite todo segundo
+    QTimer updateTLETimer;                //! Timer para verificar atualização de TLEs
     QStandardItemModel* tableModel;       //! Elementos de tabela de passagens
     Control* control;                     //! Controle da antena
     Logger* logger;                       //! Logger para posição da antena
@@ -76,6 +77,10 @@ public slots:
      */
    void debugSlot(bool);
 
+    /*! \brief Slot chamado ao clicar em Arquivo > Atualizar TLEs
+     */
+   void updateTLESlot(bool);
+
     /*! \brief Slot chamado ao selecionar um satélite e clicar em Remover
      */
    void removeSelectedTrackerSlot();
@@ -99,6 +104,14 @@ public slots:
     /*! \brief Slot chamado ao clicar na checkbox para habilitar rastreio
      */
    void trackSatellitesCheckboxChanged(int state);
+
+    /*! \brief Atualiza interface com informação das TLEs mais atualizada
+     */
+    void updateTrackersListSlot();
+
+    /*! \brief Chamada periodicamente para verificar se TLEs precisam de atualização
+     */
+    void updateTLECheckSlot();
 };
 
 #endif // MAINWINDOW_H
