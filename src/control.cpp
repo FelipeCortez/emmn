@@ -6,20 +6,21 @@ Control::Control(QString port,
     : QObject(parent)
     , validPort(false)
     , controlMode(ControlMode::None)
-    , antennaTimer(this)
+    , controllerTimer(this)
     , speedAz(0)
     , accelerationAz(0)
     , speedEle(0)
     , accelerationEle(0)
     , maxSpeed(7.0)
     , maxAcceleration(0.3)
+    , powerStatus(false)
 {
     changePort(port);
 
     this->trackerListModel = trackerListModel;
     //this->logger = new Logger();
 
-    connect(&antennaTimer,
+    connect(&controllerTimer,
             SIGNAL(timeout()),
             this,
             SLOT(updateSlot()));
@@ -69,7 +70,7 @@ void Control::sendPosition(float az, float ele) {
         serial.Write(setString, 6);
 
         //Recebe comando ACK ou NACK vindo do arduino e armazena código de erro
-        erro_ack = acknowledge(input_ack);
+        erro_ack = acknowledge(inputAck);
 
         //Incrementa erro (se houver)
         //errors += erro_ack;
@@ -87,7 +88,7 @@ AzEle Control::getState() {
     //Caso contenha erro, enviará NACK e esperará pela mensagem novamente
     while (erro_ack != 0) {
         //recebe comando STATE
-        serial.Read(input_state, 7);
+        serial.Read(inputState, 7);
 
         //verifica checksum: retorna 0 se estiver OK
         erro_ack = verifyChecksum();
@@ -97,8 +98,8 @@ AzEle Control::getState() {
     }
 
     //Decodifica posições AZ e ELE
-    a0 = input_state[2];
-    a1 = input_state[1];
+    a0 = inputState[2];
+    a1 = inputState[1];
 
     unsigned short temp = 0;
     temp = a1 << 8;
@@ -106,8 +107,8 @@ AzEle Control::getState() {
 
     float az = temp * (360.0 / 65535.0);
 
-    e0 = input_state[4];
-    e1 = input_state[3];
+    e0 = inputState[4];
+    e1 = inputState[3];
 
     temp = e1 << 8;
     temp = temp | e0;
@@ -118,15 +119,14 @@ AzEle Control::getState() {
     lastAzEle.elevation = ele;
 
     //Decodificação do STATUS do sistema contido no byte 5 da mensagem
-    m =    (input_state[5]) % 2;
-    del = ((input_state[5]) >> 1) % 2;
-    daz = ((input_state[5]) >> 2) % 2;
-    ka2 = ((input_state[5]) >> 3) % 2;
-    ka1 = ((input_state[5]) >> 4) % 2;
-    p =   ((input_state[5]) >> 7);
+    m =    (inputState[5]) % 2;
+    del = ((inputState[5]) >> 1) % 2;
+    daz = ((inputState[5]) >> 2) % 2;
+    ka2 = ((inputState[5]) >> 3) % 2;
+    ka1 = ((inputState[5]) >> 4) % 2;
+    p =   ((inputState[5]) >> 7);
 
-    //printf("\nP:%d  KA1: %d KA2: %d DAZ: %d  DEL: %d  M: %d  Erros: %d\n\n", p, ka1, ka2, daz, del, m, erro_ack);
-    //printf("Erros detectados: %d\n\n", cont_erro);
+    powerStatus = ka1 && ka2;
 
     return lastAzEle;
 }
@@ -153,10 +153,10 @@ void Control::changePort(QString port) {
         qDebug() << "valid: " << validPort;
 
         if (validPort) {
-            antennaTimer.start(100);
+            controllerTimer.start(100);
             setTarget(180, 90);
         } else {
-            antennaTimer.stop();
+            controllerTimer.stop();
         }
     }
 }
@@ -234,11 +234,13 @@ bool Control::sendPower() {
             ++count;
         }
     }
+
+    return false;
 }
 
 int Control::verifyChecksum() {
     //verifica checksum
-    if ((input_state[0] ^ input_state[1] ^ input_state[2] ^ input_state[3] ^ input_state[4] ^ input_state[5]) == input_state[6]) {
+    if ((inputState[0] ^ inputState[1] ^ inputState[2] ^ inputState[3] ^ inputState[4] ^ inputState[5]) == inputState[6]) {
         return 0;
     } else {
         return 1;
@@ -305,4 +307,8 @@ void Control::updateSlot() {
     }
 
     moveToTarget();
+}
+
+bool Control::getPowerStatus() {
+    return powerStatus;
 }

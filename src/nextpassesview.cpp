@@ -85,9 +85,19 @@ void NextPassesView::paintEvent(QPaintEvent *) {
         while (dateIt < later) {
             const auto linePercentage = (float) (dateIt - now).Ticks() / totalTicks;
             float lineX = floor(xAxisRect.left() + (xAxisRect.width() * linePercentage)) + 0.5;
+            painter.setOpacity(0.5);
             painter.drawLine(QPointF(lineX, xAxisRect.top()),
                              QPointF(lineX, xAxisRect.bottom()));
 
+            const auto linePercentage2 = (float) (dateIt.AddMinutes(30) - now).Ticks() / totalTicks;
+            float lineX2 = floor(xAxisRect.left() + (xAxisRect.width() * linePercentage2)) + 0.5;
+            painter.setOpacity(0.2);
+            painter.drawLine(QPointF(lineX2, xAxisRect.top()),
+                             QPointF(lineX2, xAxisRect.bottom()));
+
+            //dateIt.AddMinutes(30);
+
+            painter.setOpacity(1);
             drawText(painter,
                      QPointF(lineX, xAxisRect.bottom() + margins),
                      Qt::AlignVCenter | Qt::AlignHCenter,

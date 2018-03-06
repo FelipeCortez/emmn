@@ -27,18 +27,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->satellitesView->setDragDropMode(QAbstractItemView::InternalMove);
     ui->satellitesView->setDragEnabled(true);
 
-    setPortFromSettings();
-
     QDateTime now = QDateTime::currentDateTime();
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
     prevTime = now;
 
+    // updateTrackersListSlot demora um pouco / rodar paralelamente!
     if (lastUpdate < now.addDays(-1)) {
         ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
     } else {
         updateTrackersListSlot();
     }
+
+    setPortFromSettings();
 
     satInfoTimer.start(100);
     updateTLETimer.start(60000);
@@ -110,12 +111,8 @@ void MainWindow::setPortFromSettings() {
 
     if (!control->isPortValid()) {
         ui->actionManualControl->setEnabled(false);
-        ui->azLabel->setText("---");
-        ui->eleLabel->setText("---");
-        ui->powerLabel->setText("Porta inválida");
     } else {
         ui->actionManualControl->setEnabled(true);
-        ui->powerLabel->setText("Ligado");
     }
 }
 
@@ -293,8 +290,8 @@ void MainWindow::settingsDialogSlot(bool) {
 
 void MainWindow::manualControlDialogSlot(bool) {
     satInfoTimer.stop();
-    ui->azLabel->setText("---");
-    ui->eleLabel->setText("---");
+    ui->azLabel->setText("--");
+    ui->eleLabel->setText("--");
     control->setControlMode(ControlMode::Manual);
     ManualControlDialog dialog(control, this);
     // exec bloqueia, então o timer só será iniciado ao fechar a caixa de diálogo
@@ -359,10 +356,12 @@ void MainWindow::satInfoUpdateSlot() {
         AzEle antennaInfo = control->getState();
         ui->azLabel->setText(QString::number(antennaInfo.azimuth));
         ui->eleLabel->setText(QString::number(antennaInfo.elevation));
+        ui->powerLabel->setText(control->getPowerStatus() ? "Ligado" : "Desligado");
     } else {
         //! \todo Estas duas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
         ui->azLabel->setText("");
         ui->eleLabel->setText("");
+        ui->powerLabel->setText("Porta inválida");
     }
 }
 
@@ -397,6 +396,7 @@ void MainWindow::trackSatellitesCheckboxChanged(int state) {
 
 void MainWindow::debugSlot(bool) {
     //
+    control->sendPower();
 }
 
 void MainWindow::updateTLESlot(bool) {
