@@ -101,19 +101,22 @@ AzEle Control::getState() {
     a0 = inputState[2];
     a1 = inputState[1];
 
-    unsigned short temp = 0;
-    temp = a1 << 8;
-    temp = temp | a0;
+    // unsigned mesmo
+    unsigned short azBits = 0;
+    azBits = a1 << 8;
+    azBits = azBits | a0;
 
-    float az = temp * (360.0 / 65535.0);
+    float az = azBits * (360.0 / 65535.0);
 
     e0 = inputState[4];
     e1 = inputState[3];
 
-    temp = e1 << 8;
-    temp = temp | e0;
+    // _signed_ só pra enfatizar!
+    signed short eleBits = 0;
+    eleBits = e1 << 8;
+    eleBits = eleBits | e0;
 
-    float ele = temp * (360.0 / 65535.0);
+    float ele = eleBits * (360.0 / 65535.0);
 
     lastAzEle.azimuth = az;
     lastAzEle.elevation = ele;
@@ -279,7 +282,7 @@ void Control::updateSlot() {
             float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
             float positioningTime = 60;
 
-            if (nextPass.tracker->getElevationForObserver() >= 3.0) {
+            if (nextPass.tracker->getElevationForObserver() >= 0.0f) {
                 double az = nextPass.tracker->getAzimuthForObserver();
                 double ele = nextPass.tracker->getElevationForObserver();
                 if (nextPass.passDetails.reverse) {
@@ -291,7 +294,7 @@ void Control::updateSlot() {
             } else if (secondsRemaining <= positioningTime &&
                        secondsRemaining > 0) {
                 double az = nextPass.tracker->getAzimuthForObserver();
-                double ele = 3.0;
+                double ele = 0.0f;
                 if (nextPass.passDetails.reverse) {
                     az = fmod(az + 180, 360);
                     ele = 180 - ele;
