@@ -106,17 +106,21 @@ AzEle Control::getState() {
     azBits = a1 << 8;
     azBits = azBits | a0;
 
-    float az = azBits * (360.0 / 65535.0);
+    float az = azBits * (400.0 / 65535.0);
+    az -= 20.0f;
 
     e0 = inputState[4];
     e1 = inputState[3];
 
-    // _signed_ só pra enfatizar!
-    signed short eleBits = 0;
+    unsigned short eleBits = 0;
     eleBits = e1 << 8;
     eleBits = eleBits | e0;
 
     float ele = eleBits * (360.0 / 65535.0);
+    ele -= 90.0f;
+
+    // @todo corrigir no Arduino
+    //ele = (ele < 350.0f) ? ele : ele - 360.0f;
 
     lastAzEle.azimuth = az;
     lastAzEle.elevation = ele;
