@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(triggered(bool)),
             this,
             SLOT(manualControlDialogSlot(bool)));
+    connect(ui->actionSendPower,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(sendPowerSlot(bool)));
     connect(ui->actionDebugar,
             SIGNAL(triggered(bool)),
             this,
@@ -396,6 +400,9 @@ void MainWindow::trackSatellitesCheckboxChanged(int state) {
 
 void MainWindow::debugSlot(bool) {
     //
+}
+
+void MainWindow::sendPowerSlot(bool) {
     control->sendPower();
 }
 

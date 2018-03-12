@@ -81,6 +81,10 @@ public slots:
      */
    void updateTLESlot(bool);
 
+    /*! \brief Envia sinal de power pra antena
+     */
+    void sendPowerSlot(bool);
+
     /*! \brief Slot chamado ao selecionar um satélite e clicar em Remover
      */
    void removeSelectedTrackerSlot();

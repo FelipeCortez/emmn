@@ -364,9 +364,8 @@
      <string>Arquivo</string>
     </property>
     <addaction name="actionConfig"/>
-    <addaction name="actionManualControl"/>
-    <addaction name="actionDebugar"/>
     <addaction name="actionUpdateTLEs"/>
+    <addaction name="actionDebugar"/>
    </widget>
    <widget class="QMenu" name="menuSobre">
     <property name="title">
@@ -382,8 +381,16 @@
     <addaction name="actionDesfazer"/>
     <addaction name="actionRefazer"/>
    </widget>
+   <widget class="QMenu" name="menuAntena">
+    <property name="title">
+     <string>Antena</string>
+    </property>
+    <addaction name="actionManualControl"/>
+    <addaction name="actionSendPower"/>
+   </widget>
    <addaction name="menuArquivo"/>
    <addaction name="menuEditar"/>
+   <addaction name="menuAntena"/>
    <addaction name="menuSobre"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -442,6 +449,11 @@
   <action name="actionUpdateTLEs">
    <property name="text">
     <string>Atualizar TLEs</string>
+   </property>
+  </action>
+  <action name="actionSendPower">
+   <property name="text">
+    <string>Enviar Power</string>
    </property>
   </action>
  </widget>
