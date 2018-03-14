@@ -4,6 +4,8 @@ Control::Control(QString port,
                  TrackerListModel *trackerListModel,
                  QObject *parent)
     : QObject(parent)
+    , azOffset(0.0f)
+    , eleOffset(0.0f)
     , validPort(false)
     , controlMode(ControlMode::None)
     , controllerTimer(this)
@@ -14,6 +16,7 @@ Control::Control(QString port,
     , maxSpeed(7.0)
     , maxAcceleration(0.3)
     , powerStatus(false)
+    //, timeOffset(0.0f)
 {
     changePort(port);
 
@@ -193,8 +196,8 @@ void Control::moveToTarget() {
     lastAzEle = getState();
     //logger->addLog(lastAzEle);
 
-    double incrementAz = targetAz - lastAzEle.azimuth;
-    double incrementEle = targetEle - lastAzEle.elevation;
+    double incrementAz = (targetAz + azOffset) - lastAzEle.azimuth;
+    double incrementEle = (targetEle + eleOffset) - lastAzEle.elevation;
 
     if (fabs(incrementAz) > maxSpeed) {
         accelerationAz = Helpers::clip(incrementAz, maxAcceleration);

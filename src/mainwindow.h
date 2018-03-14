@@ -116,6 +116,14 @@ public slots:
     /*! \brief Chamada periodicamente para verificar se TLEs precisam de atualização
      */
     void updateTLECheckSlot();
+
+    /*! \brief Offset do azimute para posicionamento da antena
+     */
+    void updateAzOffsetSlot();
+
+    /*! \brief Offset da elevação para posicionamento da antena
+     */
+    void updateEleOffsetSlot();
 };
 
 #endif // MAINWINDOW_H

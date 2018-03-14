@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
     prevTime = now;
 
-    // updateTrackersListSlot demora um pouco / rodar paralelamente!
+    // updateTrackersListSlot demora um pouco / não rodar na thread da GUI
     if (lastUpdate < now.addDays(-1)) {
         ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
@@ -104,6 +104,14 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(updateTrackersUI()),
             this,
             SLOT(updateTrackersListSlot()));
+    connect(ui->azOffset,
+            SIGNAL(editingFinished()),
+            this,
+            SLOT(updateAzOffsetSlot()));
+    connect(ui->eleOffset,
+            SIGNAL(editingFinished()),
+            this,
+            SLOT(updateEleOffsetSlot()));
 }
 
 void MainWindow::setPortFromSettings() {
@@ -414,8 +422,6 @@ void MainWindow::updateTLESlot(bool) {
     if (reply == QMessageBox::Yes) {
         ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
-    } else {
-        qDebug() << "Yes was *not* clicked";
     }
 }
 
@@ -428,8 +434,6 @@ void MainWindow::updateTrackersListSlot() {
     rowChangedSlot(selected, QItemSelection());
 
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
-    //QLabel* lastUpdateLabel = new QLabel("Última atualização: " + lastUpdate.toString());
-    //ui->statusBar->addWidget(lastUpdateLabel);
     ui->statusBar->showMessage("Última atualização: " + lastUpdate.toString());
 }
 
@@ -441,6 +445,22 @@ void MainWindow::updateTLECheckSlot() {
     if (lastUpdate < now.addDays(-1)) {
         ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
+    }
+}
+
+void MainWindow::updateAzOffsetSlot() {
+    bool ok;
+    double az = ui->azOffset->text().toFloat(&ok);
+    if (ok && control) {
+        control->azOffset = az;
+    }
+}
+
+void MainWindow::updateEleOffsetSlot() {
+    bool ok;
+    double ele = ui->eleOffset->text().toFloat(&ok);
+    if (ok && control) {
+        control->eleOffset = ele;
     }
 }
 
