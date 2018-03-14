@@ -1,4 +1,5 @@
 #include "control.h"
+#include "soltrack.h"
 
 Control::Control(QString port,
                  TrackerListModel *trackerListModel,
@@ -16,7 +17,6 @@ Control::Control(QString port,
     , maxSpeed(7.0)
     , maxAcceleration(0.3)
     , powerStatus(false)
-    //, timeOffset(0.0f)
 {
     changePort(port);
 
@@ -279,7 +279,43 @@ bool Control::isPortValid() {
     return validPort;
 }
 
+AzEle Control::getSunPositionNow() {
+    QDateTime now = QDateTime::currentDateTime();
+
+    int useDegrees = 1;             // Input (geographic position) and output are in degrees
+    int useNorthEqualsZero = 1;     // Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East
+    int computeRefrEquatorial = 1;  // Compure refraction-corrected equatorial coordinates (Hour angle, declination): 0-no, 1-yes
+    int computeDistance = 1;        // Compute the distance to the Sun in AU: 0-no, 1-yes
+
+    struct Time time;
+
+    time.year = now.date().year();
+    time.month = now.date().month();
+    time.day = now.date().day();
+    time.hour = now.time().hour() + 3; //! biblioteca pede valor em UTC
+    time.minute = now.time().minute();
+    time.second = now.time().second();
+
+    struct Location loc;
+    loc.longitude =  Helpers::longitude;
+    loc.latitude  = Helpers::latitude;
+    loc.pressure = 101.0;     // Atmospheric pressure in kPa
+    loc.temperature = 283.0;  // Atmospheric temperature in K
+
+    struct Position pos;
+
+    // Compute positions:
+    SolTrack(time, loc, &pos, useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance);
+
+    AzEle azEle;
+    azEle.azimuth = pos.azimuthRefract;
+    azEle.elevation = pos.altitudeRefract;
+
+    return azEle;
+}
+
 void Control::updateSlot() {
+    // talvez um switch seria melhor
     if (controlMode == ControlMode::Schedule) {
         if (trackerListModel->getAllPasses().empty()) {
             setTarget(180, 90);
@@ -314,6 +350,9 @@ void Control::updateSlot() {
         }
     } else if (controlMode == ControlMode::None) {
         setTarget(180, 90);
+    } else if (controlMode == ControlMode::Sun) {
+        AzEle sun = getSunPositionNow();
+        setTarget(sun.azimuth, sun.elevation);
     }
 
     moveToTarget();

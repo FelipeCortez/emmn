@@ -26,7 +26,8 @@ SOURCES += main.cpp\
            helpers.cpp \
            manualcontroldialog.cpp \
            joystickwidget.cpp \
-    logger.cpp
+           logger.cpp \
+           soltrack.cpp
 
 HEADERS += mainwindow.h \
            tracker.h \
@@ -40,7 +41,8 @@ HEADERS += mainwindow.h \
            helpers.h \
            manualcontroldialog.h \
            joystickwidget.h \
-    logger.h
+           logger.h \
+           soltrack.h
 
 FORMS   += mainwindow.ui \
            settingsdialog.ui \
@@ -49,8 +51,6 @@ FORMS   += mainwindow.ui \
 
 LIBS +=        ..\sgp4\build\libsgp4\libsgp4.a
 INCLUDEPATH += ..\sgp4\build\libsgp4\include
-#LIBS +=        C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\libsgp4.a
-#INCLUDEPATH += C:\Users\Inpe\Documents\FelipeC\sgp4\build\libsgp4\include
 
 DISTFILES += \
     credentials.txt

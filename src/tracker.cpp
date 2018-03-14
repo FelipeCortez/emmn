@@ -3,33 +3,29 @@
 #include "helpers.h"
 #include <QDebug>
 
-const float latitude = -5.7793f;
-const float longitude = -35.201f;
-const float altitude = 0.014f;
-
 Tracker::Tracker()
-    : user_geo(latitude, longitude, altitude)
+    : user_geo(Helpers::latitude, Helpers::longitude, Helpers::altitude)
     , commonName("")
     , tle1("")
     , tle2("")
 {}
 
 Tracker::Tracker(std::vector<std::string> tle_list)
-    : user_geo(latitude, longitude, altitude)
+    : user_geo(Helpers::latitude, Helpers::longitude, Helpers::altitude)
     , commonName(QString::fromStdString(tle_list[0]))
     , tle1(QString::fromStdString(tle_list[1]))
     , tle2(QString::fromStdString(tle_list[2]))
 {}
 
 Tracker::Tracker(QList<QString> tle_list)
-    : user_geo(latitude, longitude, altitude)
+    : user_geo(Helpers::latitude, Helpers::longitude, Helpers::altitude)
     , commonName(tle_list[0])
     , tle1(tle_list[1])
     , tle2(tle_list[2])
 {}
 
 Tracker::Tracker(std::string commonName, std::string tle1, std::string tle2)
-    : user_geo(latitude, longitude, altitude)
+    : user_geo(Helpers::latitude, Helpers::longitude, Helpers::altitude)
     , commonName(QString::fromStdString(commonName))
     , tle1(QString::fromStdString(tle1))
     , tle2(QString::fromStdString(tle2))

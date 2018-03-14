@@ -12,7 +12,7 @@
 
 //!  Modo de controle da antena.
 enum class ControlMode {
-    Schedule, Manual, None
+    Schedule, Manual, Sun, None
 };
 
 //!  Classe responsável pela manipulação da antena
@@ -109,7 +109,6 @@ public:
 
     float azOffset;
     float eleOffset;
-    //float timeOffset;
 private:
     bool validPort;             //!< true se porta é detectada como um dispotivo Arduino válido
     ControlMode controlMode;    //!< Modo de controle da antena
@@ -143,6 +142,8 @@ private:
 
     //Status do sistema
     int ka1 = 0, ka2 = 0, daz = 0, del = 0, m = 0, p = 0;
+
+    AzEle getSunPositionNow();
 
 public slots:
     //! Lógica de atualização da posição da antena

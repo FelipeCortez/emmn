@@ -105,9 +105,9 @@ public slots:
      */
    void moveTrackerDownSlot();
 
-    /*! \brief Slot chamado ao clicar na checkbox para habilitar rastreio
+    /*! \brief Slot chamado ao clicar em um dos radio buttons
      */
-   void trackSatellitesCheckboxChanged(int state);
+   void modeRadioButtonsChanged(bool);
 
     /*! \brief Atualiza interface com informação das TLEs mais atualizada
      */

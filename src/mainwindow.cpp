@@ -96,10 +96,22 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(updateTLECheckSlot()));
-    connect(ui->trackSatellitesCheckbox,
-            SIGNAL(stateChanged(int)),
+    //connect(ui->trackSatellitesCheckbox,
+    //        SIGNAL(stateChanged(int)),
+    //        this,
+    //        SLOT(trackSatellitesCheckboxChanged(int)));
+    connect(ui->noneModeRadio,
+            SIGNAL(toggled(bool)),
             this,
-            SLOT(trackSatellitesCheckboxChanged(int)));
+            SLOT(modeRadioButtonsChanged(bool)));
+    connect(ui->sunModeRadio,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(modeRadioButtonsChanged(bool)));
+    connect(ui->satModeRadio,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(modeRadioButtonsChanged(bool)));
     connect(&network,
             SIGNAL(updateTrackersUI()),
             this,
@@ -309,7 +321,7 @@ void MainWindow::manualControlDialogSlot(bool) {
     // exec bloqueia, então o timer só será iniciado ao fechar a caixa de diálogo
     dialog.exec();
     control->setControlMode(ControlMode::None);
-    ui->trackSatellitesCheckbox->setChecked(false);
+    ui->noneModeRadio->setChecked(true);
     satInfoTimer.start(100);
 }
 
@@ -401,9 +413,15 @@ void MainWindow::moveTrackerDownSlot() {
     Settings::saveTrackers(trackedSatellites->getTrackers());
 }
 
-void MainWindow::trackSatellitesCheckboxChanged(int state) {
-    ControlMode mode = (state == 0) ? ControlMode::None : ControlMode::Schedule;
-    control->setControlMode(mode);
+void MainWindow::modeRadioButtonsChanged(bool) {
+    qDebug() << "TRIGGERED";
+    if (ui->noneModeRadio->isChecked()) {
+        control->setControlMode(ControlMode::None);
+    } else if (ui->sunModeRadio->isChecked()) {
+        control->setControlMode(ControlMode::Sun);
+    } else if (ui->satModeRadio->isChecked()) {
+        control->setControlMode(ControlMode::Schedule);
+    }
 }
 
 void MainWindow::debugSlot(bool) {

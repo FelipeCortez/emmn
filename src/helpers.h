@@ -59,6 +59,10 @@ namespace Settings {
 
 //! Funções úteis
 namespace Helpers {
+    const float latitude = -5.7793f;
+    const float longitude = -35.201f;
+    const float altitude = 0.014f;
+
     /*! \brief Transforma uma data da classe DateTime (SGP4)  em string
      *
      * Formatação YYYY/MM/DD HH:MM:SS UTC/GMT
