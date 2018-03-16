@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QLocale>
+#include <QtConcurrent/QtConcurrentRun>
 #include <string>
 #include "helpers.h"
 
@@ -40,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     setPortFromSettings();
+    control->azOffset = Settings::getAzOffset();
+    ui->azOffset->setText(QString::number(control->azOffset));
 
     satInfoTimer.start(100);
     updateTLETimer.start(60000);
@@ -414,7 +417,6 @@ void MainWindow::moveTrackerDownSlot() {
 }
 
 void MainWindow::modeRadioButtonsChanged(bool) {
-    qDebug() << "TRIGGERED";
     if (ui->noneModeRadio->isChecked()) {
         control->setControlMode(ControlMode::None);
     } else if (ui->sunModeRadio->isChecked()) {
@@ -439,7 +441,7 @@ void MainWindow::updateTLESlot(bool) {
                                   QMessageBox::Yes | QMessageBox::Cancel);
     if (reply == QMessageBox::Yes) {
         ui->statusBar->showMessage("Atualizando");
-        network.updateSatelliteCatalogue();
+        QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
     }
 }
 
@@ -462,7 +464,8 @@ void MainWindow::updateTLECheckSlot() {
 
     if (lastUpdate < now.addDays(-1)) {
         ui->statusBar->showMessage("Atualizando");
-        network.updateSatelliteCatalogue();
+        qDebug() << "hello from thread" << QThread::currentThread();
+        QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
     }
 }
 
@@ -471,6 +474,7 @@ void MainWindow::updateAzOffsetSlot() {
     double az = ui->azOffset->text().toFloat(&ok);
     if (ok && control) {
         control->azOffset = az;
+        Settings::setAzOffset(az);
     }
 }
 

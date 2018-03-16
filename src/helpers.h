@@ -55,6 +55,14 @@ namespace Settings {
      */
     void setLastUpdatedDate(QDateTime date);
 
+    /*! \brief Carrega offset do azimute
+     */
+    float getAzOffset();
+
+    /*! \brief Salva offset do azimute
+     */
+    void setAzOffset(float offset);
+
 }
 
 //! Funções úteis

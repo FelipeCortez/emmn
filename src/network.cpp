@@ -9,6 +9,8 @@ Network::Network(QObject *parent)
 }
 
 void Network::updateSatelliteCatalogue() {
+    qDebug() << "hello from thread" << QThread::currentThread();
+
     QNetworkRequest req;
     req.setUrl(QUrl("https://www.space-track.org/ajaxauth/login"));
     req.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");

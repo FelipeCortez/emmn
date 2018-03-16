@@ -116,7 +116,7 @@ void ManualControlDialog::validateBoth() {
 void ManualControlDialog::validateAzimuth(QString azimuth) {
     bool ok;
     double az = azimuth.toDouble(&ok);
-    if (ok && az >= 0 && az < 360) {
+    if (ok && az >= 0 && az < 500) {
         ui->sendAzButton->setEnabled(true);
         validAz = true;
     } else {

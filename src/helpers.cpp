@@ -71,6 +71,19 @@ namespace Settings {
         settings->setValue("lastUpdated", date);
         delete settings;
     }
+
+    float getAzOffset() {
+        QSettings* settings = Settings::getSettings();
+        float lastUpdated = settings->value("azOffset").toFloat();
+        delete settings;
+        return lastUpdated;
+    }
+
+    void setAzOffset(float offset) {
+        QSettings* settings = Settings::getSettings();
+        settings->setValue("azOffset", offset);
+        delete settings;
+    }
 }
 
 namespace Helpers {

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>955</width>
-    <height>749</height>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,47 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2" columnstretch="2,6">
+    <item row="6" column="0" colspan="2">
+     <layout class="QHBoxLayout" name="trackingModeLayout">
+      <item>
+       <widget class="QRadioButton" name="noneModeRadio">
+        <property name="text">
+         <string>Repouso</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="satModeRadio">
+        <property name="text">
+         <string>Satélites</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="sunModeRadio">
+        <property name="text">
+         <string>Sol</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
     <item row="2" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -356,7 +397,7 @@
       </item>
      </layout>
     </item>
-    <item row="4" column="0" colspan="2">
+    <item row="7" column="0" colspan="2">
      <widget class="QGroupBox" name="nextPassesGroupBox">
       <property name="title">
        <string>Próximas passagens</string>
@@ -373,7 +414,7 @@
             <x>0</x>
             <y>0</y>
             <width>915</width>
-            <height>220</height>
+            <height>69</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -393,7 +434,14 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="NextPassesView" name="nextPassesView" native="true"/>
+            <widget class="NextPassesView" name="nextPassesView" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -401,44 +449,6 @@
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="6" column="0" colspan="2">
-     <layout class="QHBoxLayout" name="trackingModeLayout">
-      <item>
-       <widget class="QRadioButton" name="noneModeRadio">
-        <property name="text">
-         <string>Repouso</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="satModeRadio">
-        <property name="text">
-         <string>Satélites</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="sunModeRadio">
-        <property name="text">
-         <string>Sol</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
