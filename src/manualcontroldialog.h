@@ -47,14 +47,6 @@ public slots:
      */
     void sendJoystickDeltas();
 
-    /*! \brief Envia apenas azimute do formulário de posicionamento
-     */
-    void sendAz();
-
-    /*! \brief Envia apenas elevação do formulário de posicionamento
-     */
-    void sendEle();
-
     /*! \brief Envia azimute e elevação do formulário de posicionamento
      */
     void sendBoth();

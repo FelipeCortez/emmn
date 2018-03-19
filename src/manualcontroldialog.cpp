@@ -99,24 +99,16 @@ void ManualControlDialog::sendBoth() {
                        ui->elevationLineEdit->text().toDouble());
 }
 
-void ManualControlDialog::sendAz() {
-    control->setTarget(ui->azimuthLineEdit->text().toDouble(),
-                       control->getState().elevation);
-}
-
-void ManualControlDialog::sendEle() {
-    control->setTarget(control->getState().azimuth,
-                       ui->elevationLineEdit->text().toDouble());
-}
-
 void ManualControlDialog::validateBoth() {
     ui->sendBothButton->setEnabled(validAz && validEle);
 }
 
 void ManualControlDialog::validateAzimuth(QString azimuth) {
+    //! TODO: levar em conta diferença entre azimute mecânico e azimute geográfico
+
     bool ok;
     double az = azimuth.toDouble(&ok);
-    if (ok && az >= 0 && az < 500) {
+    if (ok && az >= 0 && az < 360) {
         ui->sendAzButton->setEnabled(true);
         validAz = true;
     } else {
