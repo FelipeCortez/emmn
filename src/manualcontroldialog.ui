@@ -73,7 +73,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="joystickTab">
       <property name="autoFillBackground">
@@ -136,22 +136,6 @@
        <string>Posição</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
-       <item row="0" column="2">
-        <widget class="QPushButton" name="sendAzButton">
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
@@ -194,23 +178,7 @@
        <item row="2" column="0" colspan="3">
         <widget class="QPushButton" name="sendBothButton">
          <property name="text">
-          <string>Enviar ambos</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="sendEleButton">
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>&gt;</string>
+          <string>Posicionar</string>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -235,9 +203,7 @@
   <tabstop>azimuthRadio</tabstop>
   <tabstop>elevationRadio</tabstop>
   <tabstop>azimuthLineEdit</tabstop>
-  <tabstop>sendAzButton</tabstop>
   <tabstop>elevationLineEdit</tabstop>
-  <tabstop>sendEleButton</tabstop>
   <tabstop>sendBothButton</tabstop>
   <tabstop>controlSourceTab</tabstop>
   <tabstop>freeRadio</tabstop>

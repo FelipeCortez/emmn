@@ -13,8 +13,6 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->sendAzButton->setEnabled(false);
-    ui->sendEleButton->setEnabled(false);
     ui->sendBothButton->setEnabled(false);
 
     antennaInfoUpdateTimer.start(100);
@@ -51,14 +49,6 @@ ManualControlDialog::ManualControlDialog(Control* control, QWidget *parent)
             this,
             SLOT(updateAntennaInfo()));
     // Form ------
-    connect(ui->sendAzButton,
-            SIGNAL(clicked(bool)),
-            this,
-            SLOT(sendAz()));
-    connect(ui->sendEleButton,
-            SIGNAL(clicked(bool)),
-            this,
-            SLOT(sendEle()));
     connect(ui->sendBothButton,
             SIGNAL(clicked(bool)),
             this,
@@ -109,10 +99,8 @@ void ManualControlDialog::validateAzimuth(QString azimuth) {
     bool ok;
     double az = azimuth.toDouble(&ok);
     if (ok && az >= 0 && az < 360) {
-        ui->sendAzButton->setEnabled(true);
         validAz = true;
     } else {
-        ui->sendAzButton->setEnabled(false);
         validAz = false;
     }
 
@@ -123,10 +111,8 @@ void ManualControlDialog::validateElevation(QString elevation) {
     bool ok;
     double ele = elevation.toDouble(&ok);
     if (ok && ele >= 0 && ele < 360) {
-        ui->sendEleButton->setEnabled(true);
         validEle = true;
     } else {
-        ui->sendEleButton->setEnabled(false);
         validEle = false;
     }
 
