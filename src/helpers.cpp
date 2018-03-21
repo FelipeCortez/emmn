@@ -134,6 +134,26 @@ namespace Helpers {
         }
     }
 
+    double angleWrap(double angle) {
+        while (angle < 0.0) {
+            angle += 360.0;
+        }
+
+        while (angle > 360.0) {
+            angle -= 360.0;
+        }
+
+        return angle;
+    }
+
+    float geographicalToMechanical(float azimuth) {
+        return azimuth - Settings::getAzOffset();
+    }
+
+    float mechanicalToGeographical(float azimuth) {
+        return azimuth + Settings::getAzOffset();
+    }
+
     QList<QSerialPortInfo> getSerialPortsAvailable() {
         return QSerialPortInfo::availablePorts();
     }

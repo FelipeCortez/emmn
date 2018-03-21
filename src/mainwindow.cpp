@@ -123,10 +123,6 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(editingFinished()),
             this,
             SLOT(updateAzOffsetSlot()));
-    connect(ui->eleOffset,
-            SIGNAL(editingFinished()),
-            this,
-            SLOT(updateEleOffsetSlot()));
 }
 
 void MainWindow::setPortFromSettings() {
@@ -317,7 +313,8 @@ void MainWindow::settingsDialogSlot(bool) {
 
 void MainWindow::manualControlDialogSlot(bool) {
     satInfoTimer.stop();
-    ui->azLabel->setText("--");
+    ui->azMecLabel->setText("--");
+    ui->azGeoLabel->setText("--");
     ui->eleLabel->setText("--");
     control->setControlMode(ControlMode::Manual);
     ManualControlDialog dialog(control, this);
@@ -381,12 +378,14 @@ void MainWindow::satInfoUpdateSlot() {
 
     if (control->isPortValid()) {
         AzEle antennaInfo = control->getState();
-        ui->azLabel->setText(QString::number(antennaInfo.azimuth));
+        ui->azMecLabel->setText(QString::number(antennaInfo.azimuth));
+        ui->azGeoLabel->setText(QString::number(Helpers::mechanicalToGeographical(antennaInfo.azimuth)));
         ui->eleLabel->setText(QString::number(antennaInfo.elevation));
         ui->powerLabel->setText(control->getPowerStatus() ? "Ligado" : "Desligado");
     } else {
-        //! \todo Estas duas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
-        ui->azLabel->setText("");
+        //! \todo Estas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
+        ui->azMecLabel->setText("");
+        ui->azGeoLabel->setText("");
         ui->eleLabel->setText("");
         ui->powerLabel->setText("Porta inválida");
     }
@@ -475,14 +474,6 @@ void MainWindow::updateAzOffsetSlot() {
     if (ok && control) {
         control->azOffset = az;
         Settings::setAzOffset(az);
-    }
-}
-
-void MainWindow::updateEleOffsetSlot() {
-    bool ok;
-    double ele = ui->eleOffset->text().toFloat(&ok);
-    if (ok && control) {
-        control->eleOffset = ele;
     }
 }
 

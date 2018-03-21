@@ -120,10 +120,6 @@ public slots:
     /*! \brief Offset do azimute para posicionamento da antena
      */
     void updateAzOffsetSlot();
-
-    /*! \brief Offset da elevação para posicionamento da antena
-     */
-    void updateEleOffsetSlot();
 };
 
 #endif // MAINWINDOW_H

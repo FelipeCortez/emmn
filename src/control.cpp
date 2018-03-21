@@ -6,7 +6,6 @@ Control::Control(QString port,
                  QObject *parent)
     : QObject(parent)
     , azOffset(0.0f)
-    , eleOffset(0.0f)
     , validPort(false)
     , controlMode(ControlMode::None)
     , controllerTimer(this)
@@ -122,13 +121,10 @@ AzEle Control::getState() {
     float ele = eleBits * (360.0 / 65535.0);
     ele -= 90.0f;
 
-    // @todo corrigir no Arduino
-    //ele = (ele < 350.0f) ? ele : ele - 360.0f;
-
     lastAzEle.azimuth = az;
     lastAzEle.elevation = ele;
 
-    //Decodificação do STATUS do sistema contido no byte 5 da mensagem
+    // Decodificação do STATUS do sistema contido no byte 5 da mensagem
     m =    (inputState[5]) % 2;
     del = ((inputState[5]) >> 1) % 2;
     daz = ((inputState[5]) >> 2) % 2;
@@ -184,7 +180,7 @@ void Control::setDeltas(float deltaAz, float deltaEle) {
 }
 
 void Control::setTarget(float az, float ele) {
-    targetAz = az;
+    targetAz = Helpers::geographicalToMechanical(az);
     targetEle = ele;
 }
 
@@ -196,8 +192,8 @@ void Control::moveToTarget() {
     lastAzEle = getState();
     //logger->addLog(lastAzEle);
 
-    double incrementAz = (targetAz + azOffset) - lastAzEle.azimuth;
-    double incrementEle = (targetEle + eleOffset) - lastAzEle.elevation;
+    double incrementAz = targetAz - lastAzEle.azimuth;
+    double incrementEle = targetEle - lastAzEle.elevation;
 
     if (fabs(incrementAz) > maxSpeed) {
         accelerationAz = Helpers::clip(incrementAz, maxAcceleration);

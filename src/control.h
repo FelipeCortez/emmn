@@ -108,7 +108,6 @@ public:
     bool getPowerStatus();
 
     float azOffset;
-    float eleOffset;
 private:
     bool validPort;             //!< true se porta é detectada como um dispotivo Arduino válido
     ControlMode controlMode;    //!< Modo de controle da antena

@@ -143,6 +143,8 @@ double Tracker::FindMaxElevation(
 
 bool Tracker::IsPassReverse(PassDetails pd) const
 {
+    const float arbitrarilyLargeNumber = 180.0f;
+
     Observer obs(user_geo);
     SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
 
@@ -154,13 +156,16 @@ bool Tracker::IsPassReverse(PassDetails pd) const
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
+        double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
+        currentAz        = Helpers::angleWrap(currentAz);
+
         if (prevAz != -1) {
-            if (fabs(Helpers::radToDeg(topo.azimuth) - prevAz) > 180) {
+            if (fabs(currentAz - prevAz) > arbitrarilyLargeNumber) {
                 return true;
             }
         }
 
-        prevAz = Helpers::radToDeg(topo.azimuth);
+        prevAz = currentAz;
         current_time = current_time.AddSeconds(time_step);
     }
 

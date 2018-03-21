@@ -103,6 +103,22 @@ namespace Helpers {
      */
     double clip(double val, double max);
 
+    /*! \brief Converte ângulo para limites [0, 360[
+     */
+    double angleWrap(double angle);
+
+    /*! \brief Converte ângulo para limites [0, 360[
+     */
+    double angleWrap(double angle);
+
+    /*! \brief Converte coordenadas mecânicas para coordenadas geográficas
+     */
+    float mechanicalToGeographical(float azimuth);
+
+    /*! \brief Converte coordenadas geográficas para coordenadas mecânicas
+     */
+    float geographicalToMechanical(float azimuth);
+
     /*! \brief Retorna uma lista de portas seriais disponíveis
      */
     QList<QSerialPortInfo> getSerialPortsAvailable();
