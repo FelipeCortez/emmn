@@ -5,7 +5,7 @@ Software para controle de missões da EMMN. Implementado em C++ usando Qt 5.7. U
 [SGP4](https://www.danrw.com/sgp4/) escrita por DanRW com modificações documentadas e
 [SolTrack](http://soltrack.sourceforge.net/).
 
-![Imagem do software de controle de missões da EMMN](https://raw.githubusercontent.com/CFelipe/emmn/master/emmn.png "Tela inicial do software")
+![Imagem do software de controle de missões da EMMN](https://raw.githubusercontent.com/FelipeCortez/emmn/master/emmn.png "Tela inicial do software")
 
 
 Licença
