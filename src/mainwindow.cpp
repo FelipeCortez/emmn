@@ -447,8 +447,9 @@ void MainWindow::updateTLESlot(bool) {
 void MainWindow::updateTrackersListSlot() {
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
+    ui->nextPassesView->repaint();
 
-    // Força atualização da tabela de passagens (meio gambiarra... talvez mudar)
+    // Força atualização da tabela de passagens
     auto selected = ui->satellitesView->selectionModel()->selection();
     rowChangedSlot(selected, QItemSelection());
 
