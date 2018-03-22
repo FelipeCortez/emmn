@@ -5,6 +5,7 @@
 #include <QVector>
 #include "helpers.h"
 
+//! Salva periodicamente arquivos com informações de azimute, elevação e horário
 class Logger : public QObject
 {
     Q_OBJECT

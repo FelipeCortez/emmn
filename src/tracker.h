@@ -26,7 +26,10 @@ struct PassDetails
 Q_DECLARE_METATYPE(PassDetails)
 Q_DECLARE_METATYPE(QList<PassDetails>)
 
-/*! Classe que armazena TLEs de um satélite */
+/*! Armazena TLEs de um satélite
+ *
+ * @todo Não armazenar localização geográfica (userGeo) nesta classe
+ */
 class Tracker
 {
 public:
@@ -69,7 +72,7 @@ public:
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);
     friend QDataStream &operator >>(QDataStream &stream, Tracker &val);
 private:
-    CoordGeodetic user_geo;
+    CoordGeodetic userGeo;
     QString commonName;
     QString tle1;
     QString tle2;

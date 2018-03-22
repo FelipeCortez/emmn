@@ -11,7 +11,7 @@ namespace Ui {
 class ManualControlDialog;
 }
 
-/*! Caixa de diálogo de controle manual (abas com joystick e formulário de posição) */
+//! Caixa de diálogo de controle manual (abas com joystick e formulário de posicionamento)
 class ManualControlDialog : public QDialog
 {
     Q_OBJECT

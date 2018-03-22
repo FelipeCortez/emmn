@@ -7,6 +7,7 @@
 /*! Widget com visualização de próximas passagens
  *
  * @todo Adicionar interação com mouse
+ * @todo Divir tabela e rótulos com horários em widgets diferentes
  */
 class NextPassesView : public QWidget
 {

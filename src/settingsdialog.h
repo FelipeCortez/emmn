@@ -4,7 +4,7 @@
 #include <QDialog>
 #include "ui_settingsdialog.h"
 
-/*! Caixa de diálogo de configurações */
+//! Caixa de diálogo de configurações
 class SettingsDialog : public QDialog, public Ui::SettingsDialog {
     Q_OBJECT
 

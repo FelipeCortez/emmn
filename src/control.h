@@ -15,7 +15,7 @@ enum class ControlMode {
     Schedule, Manual, Sun, None
 };
 
-//!  Classe responsável pela manipulação da antena
+//! Lógica de manipulação da antena
 class Control : public QObject
 {
     Q_OBJECT

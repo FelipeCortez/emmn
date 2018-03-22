@@ -11,7 +11,7 @@ enum class ControlAxes {
     azimuthOnly, elevationOnly, free
 };
 
-//! Classe responsável pelo desenho lógica de interação com usuário do widget de joystick virtual
+//! Joystick virtual usado através da janela de controle manual
 class JoystickWidget : public QWidget
 {
     Q_OBJECT

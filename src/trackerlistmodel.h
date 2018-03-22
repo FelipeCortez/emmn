@@ -5,14 +5,15 @@
 #include "tracker.h"
 
 /*! Detalhes de uma passagem e o satélite referente à passagem
- @todo Usar apenas PassDetailsWithTracker, deletar PassDetails
+ *
+ * @todo Usar apenas PassDetailsWithTracker, deletar PassDetails
 */
 struct PassDetailsWithTracker {
     Tracker* tracker;
     PassDetails passDetails;
 };
 
-/*! Classe que armazena satélites rastreados em um formato que o Qt pode usar com um widget de lista */
+//! Armazena satélites rastreados em um formato que o Qt pode usar com um widget de lista
 class TrackerListModel : public QAbstractListModel
 {
 public:

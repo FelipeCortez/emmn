@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtNetwork>
 
+//! Conexão com a Internet para atualizar diariamente dados de TLEs
 class Network : public QObject
 {
     Q_OBJECT
