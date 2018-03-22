@@ -8,12 +8,12 @@ QT       += core gui network serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = emmn-interface-proto
+TARGET = emmn-gui
 TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
            mainwindow.cpp \
            tracker.cpp \
            addtrackerdialog.cpp \
@@ -49,11 +49,9 @@ FORMS   += mainwindow.ui \
            manualcontroldialog.ui \
            trackerdialog.ui
 
-LIBS +=        ..\sgp4\build\libsgp4\libsgp4.a
-INCLUDEPATH += ..\sgp4\build\libsgp4\include
+LIBS +=        $$PWD\libs\libsgp4.a
+INCLUDEPATH += $$PWD\includes\sgp4\
 
-DISTFILES += \
-    credentials.txt
+DISTFILES += credentials.txt
 
-RESOURCES += \
-    resources.qrc
+RESOURCES += resources.qrc
