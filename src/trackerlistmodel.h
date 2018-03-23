@@ -4,10 +4,10 @@
 #include <QAbstractListModel>
 #include "tracker.h"
 
-/*! Detalhes de uma passagem e o satélite referente à passagem
+/*! \brief Detalhes de uma passagem e o satélite referente à passagem
  *
  * @todo Usar apenas PassDetailsWithTracker, deletar PassDetails
-*/
+ */
 struct PassDetailsWithTracker {
     Tracker* tracker;
     PassDetails passDetails;

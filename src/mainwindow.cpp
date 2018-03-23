@@ -32,15 +32,16 @@ MainWindow::MainWindow(QWidget *parent)
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
     prevTime = now;
 
-    // updateTrackersListSlot demora um pouco / não rodar na thread da GUI
+    //! @todo updateTrackersListSlot demora um pouco / não rodar na thread da GUI
     if (lastUpdate < now.addDays(-1)) {
+        //! @todo Mudar showMessage para add[Permanent]Widget e corrigir formatação
         ui->statusBar->showMessage("Atualizando");
         network.updateSatelliteCatalogue();
     } else {
         updateTrackersListSlot();
     }
 
-    setPortFromSettings();
+    setPortFromSettings(); //! Instancia control! Talvez mover as duas linhas de baixo pra dentro da função
     control->azOffset = Settings::getAzOffset();
     ui->azOffset->setText(QString::number(control->azOffset));
 
@@ -99,10 +100,6 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(timeout()),
             this,
             SLOT(updateTLECheckSlot()));
-    //connect(ui->trackSatellitesCheckbox,
-    //        SIGNAL(stateChanged(int)),
-    //        this,
-    //        SLOT(trackSatellitesCheckboxChanged(int)));
     connect(ui->noneModeRadio,
             SIGNAL(toggled(bool)),
             this,

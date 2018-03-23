@@ -13,7 +13,7 @@
 #include <QMetaType>
 #include "network.h"
 
-/*! Detalhes de uma passagem */
+//! Detalhes de uma passagem
 struct PassDetails
 {
     DateTime aos; //!< Data/hora de aquisição do sinal
@@ -26,7 +26,7 @@ struct PassDetails
 Q_DECLARE_METATYPE(PassDetails)
 Q_DECLARE_METATYPE(QList<PassDetails>)
 
-/*! Armazena TLEs de um satélite
+/*! \brief Armazena TLEs de um satélite
  *
  * @todo Não armazenar localização geográfica (userGeo) nesta classe
  */

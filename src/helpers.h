@@ -8,10 +8,11 @@
 #include "trackerlistmodel.h"
 #include "DateTime.h"
 
-typedef struct AzEle {
+//! Azimute e elevação
+struct AzEle {
     double azimuth;
     double elevation;
-} AzEle;
+};
 
 //! Funções de configuração
 namespace Settings {
