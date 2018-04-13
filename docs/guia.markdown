@@ -3,7 +3,7 @@
 ## Estrutura
 
 O ponto de entrada do programa está no arquivo main.cpp. Na função main, uma MainWindow é
-instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, instancia
+instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, instancia:
 
 - Control, responsável pela movimentação da Antena
 - Network, responsável pela comunicação com a Internet para atualizar TLEs
@@ -14,10 +14,12 @@ instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, ins
 - O projeto é documentado com Doxygen. Para gerar a documentação, rode o Doxywizard
     - usando o prompt de comando (eu uso o Cmder), `doxywizard.exe` ou `doxywizard.exe Doxyfile`
     - através do Menu Iniciar: Digite `Doxywizard` e localize o Doxyfile na pasta principal do projeto
+- Para gerar um pdf da documentação (útil para colocar na biblioteca do INPE), vá para a pasta
+  doxygen/latex e rode make.bat.
 
 ## Estilo
 
-Você é livre para usar o estilo que quiser, mas se quiser continuar formatando da maneira que está,
+Você é livre para usar o estilo que quiser, mas caso queira continuar usando a formatação atual,
 eu sigo estes padrões:
 
 - Quatro espaços para indentação

@@ -1,5 +1,4 @@
-Estação Multi Missão de Natal
-=============================
+# Estação Multi Missão de Natal
 
 Software para controle de missões da EMMN. Implementado em C++ usando Qt 5.7. Utiliza a biblioteca
 [SGP4](https://www.danrw.com/sgp4/) escrita por DanRW com modificações documentadas e
@@ -7,9 +6,13 @@ Software para controle de missões da EMMN. Implementado em C++ usando Qt 5.7. U
 
 ![Imagem do software de controle de missões da EMMN](https://raw.githubusercontent.com/FelipeCortez/emmn/master/emmn.png "Tela inicial do software")
 
+## Guia do projeto
+Para informações sobre a documentação, estrutura e estilo do código, consulte o documento `guia.markdown` diretório `docs`.
 
-Licença
--------
+## Contato
+`felipecortezfi@gmail.com`
+
+## Licença
 
     Copyright 2017-2018 Felipe Cortez
 
