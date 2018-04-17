@@ -7,7 +7,7 @@ Software para controle de missões da EMMN. Implementado em C++ usando Qt 5.7. U
 ![Imagem do software de controle de missões da EMMN](https://raw.githubusercontent.com/FelipeCortez/emmn/master/emmn.png "Tela inicial do software")
 
 ## Guia do projeto
-Para informações sobre a documentação, estrutura e estilo do código, consulte o documento `guia.markdown` diretório `docs`.
+Para informações sobre a documentação, estrutura e estilo do código, consulte o documento `guia.markdown` no diretório `docs`.
 
 ## Contato
 `felipecortezfi@gmail.com`

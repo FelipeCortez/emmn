@@ -311,6 +311,12 @@ AzEle Control::getSunPositionNow() {
 }
 
 void Control::updateSlot() {
+    // watchdog desliga sistema de controle automaticamente!
+    // se alguma operação do programa demorar demais, mandar sinal de power
+    if (!getPowerStatus()) {
+        sendPower();
+    }
+
     // talvez um switch seria melhor
     if (controlMode == ControlMode::Schedule) {
         if (trackerListModel->getAllPasses().empty()) {
