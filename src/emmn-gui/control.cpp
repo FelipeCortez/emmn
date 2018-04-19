@@ -156,7 +156,6 @@ void Control::changePort(QString port) {
         validPort = false;
     } else {
         validPort = sendPower();
-        qDebug() << "valid: " << validPort;
 
         if (validPort) {
             controllerTimer.start(100);
