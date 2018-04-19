@@ -36,23 +36,23 @@ Logger::Logger(QObject *parent)
 
         if (newFile) {
             *stream << "sep=," << endl;
-            *stream << QString::fromUtf8("hora, azimute, elevacao") << endl;
+            *stream << QString::fromUtf8("hora, azimute_geo, azimute_mec, elevacao") << endl;
         }
     }
 }
 
-void Logger::addLog(AzEle pos) {
-    if (stream != nullptr) {
-        auto now = QDateTime::currentDateTime();
-        *stream << now.time().toString(Qt::DateFormat::ISODate)
-                << ", "
-                << QString::number(pos.azimuth, 'f', 3)
-                << ", "
-                << QString::number(pos.elevation, 'f', 3)
-                << endl;
-    }
+void Logger::addLog(LogEntry log) {
+    // if (stream != nullptr) {
+    //     auto now = QDateTime::currentDateTime();
+    //     *stream << now.time().toString(Qt::DateFormat::ISODate)
+    //             << ", "
+    //             << QString::number(pos.azimuth, 'f', 3)
+    //             << ", "
+    //             << QString::number(pos.elevation, 'f', 3)
+    //             << endl;
+    // }
 }
 
 void Logger::openLogDirectory() {
-    //QDesktopServices::openUrl(QUrl(dir.absolutePath()));
+    QDesktopServices::openUrl(QUrl(QDir(path).absolutePath()));
 }

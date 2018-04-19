@@ -5,13 +5,23 @@
 #include <QVector>
 #include "helpers.h"
 
+struct LogEntry {
+    AzEle mecPos; //! posição mecânica
+    float azGeo; //! azimute geográfico
+    float azSpeed;
+    float eleSpeed;
+    // controlMode
+    // currentPass
+    // power
+};
+
 //! Salva periodicamente arquivos com informações de azimute, elevação e horário
 class Logger : public QObject
 {
     Q_OBJECT
 public:
-    explicit Logger(QObject *parent = 0);
-    void addLog(AzEle pos);
+    Logger(QObject *parent = 0);
+    void addLog(LogEntry log);
     void openLogDirectory();
 
 private:

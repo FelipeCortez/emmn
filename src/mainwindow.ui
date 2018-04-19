@@ -458,6 +458,7 @@
     </property>
     <addaction name="actionConfig"/>
     <addaction name="actionUpdateTLEs"/>
+    <addaction name="actionOpenLog"/>
     <addaction name="actionDebugar"/>
    </widget>
    <widget class="QMenu" name="menuSobre">
@@ -547,6 +548,11 @@
   <action name="actionSendPower">
    <property name="text">
     <string>Enviar Power</string>
+   </property>
+  </action>
+  <action name="actionOpenLog">
+   <property name="text">
+    <string>Abrir log</string>
    </property>
   </action>
  </widget>

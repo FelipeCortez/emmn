@@ -14,10 +14,13 @@ MainWindow::MainWindow(QWidget *parent)
   , updateTLETimer(this)
   , tableModel(nullptr)
   , control(nullptr)
+  , logger(nullptr)
   , network(this)
 {
     trackedSatellites = new TrackerListModel();
     satelliteCatalogue = Helpers::readTLEList();
+
+    logger = new Logger(this);
 
     ui->setupUi(this);
     ui->satellitesView->setModel(trackedSatellites);
@@ -68,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
             SIGNAL(triggered(bool)),
             this,
             SLOT(updateTLESlot(bool)));
+    connect(ui->actionOpenLog,
+            SIGNAL(triggered(bool)),
+            this,
+            SLOT(openLogDirectorySlot(bool)));
     connect(ui->satellitesView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
@@ -380,7 +387,7 @@ void MainWindow::satInfoUpdateSlot() {
         ui->eleLabel->setText(QString::number(antennaInfo.elevation));
         ui->powerLabel->setText(control->getPowerStatus() ? "Ligado" : "Desligado");
     } else {
-        //! \todo Estas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
+        //! @todo Estas variáveis estão espalhadas por vários lugares do código. Deixar num canto só
         ui->azMecLabel->setText("");
         ui->azGeoLabel->setText("");
         ui->eleLabel->setText("");
@@ -442,6 +449,8 @@ void MainWindow::updateTLESlot(bool) {
 }
 
 void MainWindow::updateTrackersListSlot() {
+    // QFuture<void> f1 = QtConcurrent::run(&loadTrackersFromSettings);
+    //! TODO: chame loadTrackersFromSettings concorrentemente, e só execute o resto quando terminar
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
     ui->nextPassesView->repaint();
@@ -475,6 +484,10 @@ void MainWindow::updateAzOffsetSlot() {
     }
 }
 
+void MainWindow::openLogDirectorySlot(bool) {
+    logger->openLogDirectory();
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -482,7 +495,5 @@ MainWindow::~MainWindow()
     delete satelliteCatalogue;
     delete tableModel;
     delete control;
-    /*
     delete logger;
-    */
 }

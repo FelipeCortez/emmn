@@ -71,6 +71,10 @@ public slots:
      */
    void manualControlDialogSlot(bool);
 
+    /*! \brief Abre pasta contendo logs
+     */
+    void openLogDirectorySlot(bool);
+
     /*! \brief Slot chamado ao clicar em Arquivo > Debug
      *
      * Para testes em geral.

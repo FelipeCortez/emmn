@@ -156,8 +156,9 @@ bool Tracker::IsPassReverse(PassDetails pd) const
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
-        currentAz        = Helpers::angleWrap(currentAz);
+        //double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
+        double currentAz = topo.azimuth;
+        currentAz = Helpers::angleWrap(currentAz);
 
         if (prevAz != -1) {
             if (fabs(currentAz - prevAz) > arbitrarilyLargeNumber) {

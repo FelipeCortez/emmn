@@ -180,7 +180,10 @@ void Control::setDeltas(float deltaAz, float deltaEle) {
 }
 
 void Control::setTarget(float az, float ele) {
-    targetAz = Helpers::geographicalToMechanical(az);
+    // instancia e deleta repetidamente Settings
+    //! @todo pensar numa lógica de atualização melhor
+    //targetAz = Helpers::geographicalToMechanical(az);
+    targetAz = az;
     targetEle = ele;
 }
 
