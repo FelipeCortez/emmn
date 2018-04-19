@@ -2,6 +2,7 @@
 #define ADDTRACKERDIALOG_H
 #include <QDialog>
 #include <QCompleter>
+#include <QStringListModel>
 #include "ui_trackerdialog.h"
 #include "trackerlistmodel.h"
 #include "tracker.h"

@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QVector>
+#include <QTextStream>
+#include <QFile>
 #include "helpers.h"
 
 struct LogEntry {

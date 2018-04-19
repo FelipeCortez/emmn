@@ -1,5 +1,6 @@
 #include "control.h"
 #include "soltrack.h"
+#include <QDateTime>
 
 Control::Control(QString port,
                  TrackerListModel *trackerListModel,

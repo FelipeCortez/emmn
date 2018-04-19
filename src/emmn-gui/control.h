@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <QDebug>
+#include <QTimer>
 #include "helpers.h"
 #include "serial.h"
 #include "trackerlistmodel.h"

@@ -2,6 +2,8 @@
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QDir>
+#include <QUrl>
 
 // https://stackoverflow.com/a/26991243
 bool fileExists(QString path) {

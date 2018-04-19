@@ -2,7 +2,9 @@
 #define HELPERS_H
 
 #include <QSettings>
+#include <QStringListModel>
 #include <QList>
+#include <QDateTime>
 #include <QtSerialPort/QSerialPortInfo>
 #include "tracker.h"
 #include "trackerlistmodel.h"

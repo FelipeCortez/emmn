@@ -1,5 +1,8 @@
 #include "helpers.h"
 #include <QRegularExpression>
+#include <QStandardPaths>
+#include <QDir>
+#include <QDebug>
 
 namespace Settings {
     QSettings* getSettings() {

@@ -11,7 +11,6 @@
 #include <QString>
 #include <QList>
 #include <QMetaType>
-#include "network.h"
 
 //! Detalhes de uma passagem
 struct PassDetails
