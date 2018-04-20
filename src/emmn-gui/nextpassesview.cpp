@@ -127,7 +127,7 @@ void NextPassesView::paintEvent(QPaintEvent *) {
                      Qt::AlignVCenter,
                      tracker.getCommonName());
 
-            auto passes = tracker.GeneratePassList(now, later);
+            auto passes = tracker.generatePassList(now, later);
             for (QList<PassDetails>::iterator it2 = passes.begin(); it2 != passes.end(); ++it2) {
                 auto pass = *it2;
                 const auto leftPercentage = (float) (pass.aos - now).Ticks() / totalTicks;

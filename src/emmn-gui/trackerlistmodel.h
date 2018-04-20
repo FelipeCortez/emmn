@@ -73,10 +73,6 @@ public:
     /*! \brief Retorna ponteiro para satélite com satCatNumber informado */
     Tracker* findTracker(QString satCatNumber);
 
-    /*! \brief Gera lista com todas as passagens */
-    void generatePassList(const DateTime& start_time = DateTime::Now(true),
-                          const DateTime& end_time = DateTime::Now(true).AddHours(24));
-
     /*! \brief Acessa lista com todas as passagens anteriormente gerada */
     QList<PassDetailsWithTracker> getAllPasses();
 
@@ -85,6 +81,10 @@ public:
 private:
     QList<Tracker> trackers;
     QList<PassDetailsWithTracker> allPasses;
+    /*! \brief Gera lista com todas as passagens */
+    void generatePassList(const DateTime& start_time = DateTime::Now(true),
+                          const DateTime& end_time = DateTime::Now(true).AddHours(24));
+
 };
 
 #endif // TRACKERLISTMODEL_H

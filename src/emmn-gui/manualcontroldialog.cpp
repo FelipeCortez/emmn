@@ -94,7 +94,7 @@ void ManualControlDialog::validateBoth() {
 }
 
 void ManualControlDialog::validateAzimuth(QString azimuth) {
-    //! @todo: levar em conta diferença entre azimute mecânico e azimute geográfico
+    //! @todo Levar em conta diferença entre azimute mecânico e azimute geográfico
 
     bool ok;
     double az = azimuth.toDouble(&ok);

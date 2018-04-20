@@ -29,7 +29,7 @@ QVariant TrackerListModel::data(const QModelIndex &index, int role) const {
         case Qt::DisplayRole:
             return trackers[index.row()].getCommonName();
         case Roles::PassesRole:
-            return QVariant::fromValue(trackers[index.row()].GeneratePassList());
+            return QVariant::fromValue(trackers[index.row()].getPassList());
         case Roles::SatCatRole:
             return QVariant::fromValue(trackers[index.row()].getSatCatNumber());
         default:
@@ -95,7 +95,7 @@ bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) 
 void TrackerListModel::generatePassList(const DateTime& start_time, const DateTime& end_time) {
     QList<PassDetailsWithTracker> allPassList;
     for (auto &t : trackers) {
-        QList<PassDetails> pdList = t.GeneratePassList(start_time, end_time);
+        QList<PassDetails> pdList = t.generatePassList(start_time, end_time);
         for (auto pd : pdList) {
             PassDetailsWithTracker pdt;
             pdt.tracker = &t;

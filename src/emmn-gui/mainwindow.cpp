@@ -184,7 +184,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->satelliteGroupBox->setTitle(tracker.getCommonName());
         ui->nextPassesView->repaint();
 
-        QList<PassDetails> pd = tracker.GeneratePassList();
+        QList<PassDetails> pd = tracker.generatePassList();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;

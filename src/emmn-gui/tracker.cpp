@@ -140,7 +140,7 @@ double Tracker::FindMaxElevation(
     return max_elevation;
 }
 
-bool Tracker::IsPassReverse(PassDetails pd) const
+bool Tracker::isPassReverse(PassDetails pd) const
 {
     const float arbitrarilyLargeNumber = 180.0f;
 
@@ -250,10 +250,10 @@ DateTime Tracker::FindCrossingPoint(
     return middle_time;
 }
 
-QList<PassDetails> Tracker::GeneratePassList(
+QList<PassDetails> Tracker::generatePassList(
         const DateTime& start_time,
         const DateTime& end_time,
-        const int time_step) const
+        const int time_step)
 {
     QList<PassDetails> pass_list;
 
@@ -352,7 +352,7 @@ QList<PassDetails> Tracker::GeneratePassList(
             pd.max_elevation = FindMaxElevation(
                     aos_time,
                     los_time);
-            pd.reverse = IsPassReverse(pd);
+            pd.reverse = isPassReverse(pd);
 
             pass_list.push_back(pd);
         }
@@ -395,7 +395,12 @@ QList<PassDetails> Tracker::GeneratePassList(
         pass_list.push_back(pd);
     }
 
+    passList = pass_list;
     return pass_list;
+}
+
+QList<PassDetails> Tracker::getPassList() const {
+    return passList;
 }
 
 double Tracker::getAzimuthForObserver() {
@@ -416,7 +421,7 @@ double Tracker::getElevationForObserver() {
 
 QString Tracker::nextPass() {
     if (passList.empty() || passList.at(0).aos.Ticks() < DateTime::Now().Ticks()) {
-        passList = GeneratePassList();
+        passList = generatePassList();
     }
 
     if (getSatInfo(Elevation).toDouble() < 0) {

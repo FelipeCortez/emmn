@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QUrl>
+#include <QDebug>
 
 // https://stackoverflow.com/a/26991243
 bool fileExists(QString path) {
@@ -44,6 +45,7 @@ Logger::Logger(QObject *parent)
 }
 
 void Logger::addLog(LogEntry log) {
+    qDebug() << log.azGeo;
     // if (stream != nullptr) {
     //     auto now = QDateTime::currentDateTime();
     //     *stream << now.time().toString(Qt::DateFormat::ISODate)

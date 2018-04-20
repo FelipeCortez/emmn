@@ -54,11 +54,12 @@ public:
         const DateTime& initial_time1,
         const DateTime& initial_time2,
         bool finding_aos) const;
-    QList<PassDetails> GeneratePassList(
+    QList<PassDetails> generatePassList(
         const DateTime& start_time = DateTime::Now(true),
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),
-        const int time_step = 180) const;
-    bool IsPassReverse(PassDetails pd) const;
+        const int time_step = 180);
+    QList<PassDetails> getPassList() const;
+    bool isPassReverse(PassDetails pd) const;
     QString nextPass();
     QString getCommonName() const;
     QString getFullTLE() const;
