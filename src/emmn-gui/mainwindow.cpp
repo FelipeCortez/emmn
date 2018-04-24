@@ -44,9 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
         updateTrackersListSlot();
     }
 
-    setPortFromSettings(); //! Instancia control! Talvez mover as duas linhas de baixo pra dentro da função
-    control->azOffset = Settings::getAzOffset();
-    ui->azOffset->setText(QString::number(control->azOffset));
+    setPortFromSettings();
 
     satInfoTimer.start(100);
     updateTLETimer.start(60000);
@@ -132,6 +130,8 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::setPortFromSettings() {
     if (!control) {
         control = new Control(Settings::getSerialPort(), trackedSatellites);
+        control->azOffset = Settings::getAzOffset();
+        ui->azOffset->setText(QString::number(control->azOffset));
     } else {
         control->changePort(Settings::getSerialPort());
     }

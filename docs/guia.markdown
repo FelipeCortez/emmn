@@ -38,3 +38,6 @@ default:
 ```
 - Código em inglês, comentários em português
 - Mensagens de commit do Git em português
+
+## Miscelânea
+- Ao mudar o diretório de build pelo Qt, é preciso copiar os arquivos dll do `ssh` (`libeay32.dll` e `ssleay32.dll`) para o diretório que contém o executável. 
