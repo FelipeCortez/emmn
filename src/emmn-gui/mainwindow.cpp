@@ -44,8 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
         updateTrackersListSlot();
     }
 
-    setPortFromSettings();
-
+    controlSetup();
     satInfoTimer.start(100);
     updateTLETimer.start(60000);
 
@@ -68,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionUpdateTLEs,
             SIGNAL(triggered(bool)),
             this,
-            SLOT(updateTLESlot(bool)));
+            SLOT(forceUpdateTLESlot(bool)));
     connect(ui->actionOpenLog,
             SIGNAL(triggered(bool)),
             this,
@@ -104,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&updateTLETimer,
             SIGNAL(timeout()),
             this,
-            SLOT(updateTLECheckSlot()));
+            SLOT(checkTLEUpdateSlot()));
     connect(ui->noneModeRadio,
             SIGNAL(toggled(bool)),
             this,
@@ -127,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(updateAzOffsetSlot()));
 }
 
-void MainWindow::setPortFromSettings() {
+void MainWindow::controlSetup() {
     if (!control) {
         control = new Control(Settings::getSerialPort(), trackedSatellites);
         control->azOffset = Settings::getAzOffset();
@@ -311,7 +310,7 @@ void MainWindow::settingsDialogSlot(bool) {
     if (dialog.exec()) {
         auto selected = ui->satellitesView->selectionModel()->selection();
         rowChangedSlot(selected, QItemSelection());
-        setPortFromSettings();
+        controlSetup();
     }
 }
 
@@ -437,20 +436,17 @@ void MainWindow::sendPowerSlot(bool) {
     control->sendPower();
 }
 
-void MainWindow::updateTLESlot(bool) {
+void MainWindow::forceUpdateTLESlot(bool) {
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirmação",
                                   "As TLEs são atualizadas diariamente e esta ação só é recomendada em casos de emergência",
                                   QMessageBox::Yes | QMessageBox::Cancel);
     if (reply == QMessageBox::Yes) {
-        ui->statusBar->showMessage("Atualizando");
-        QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
+        updateTLE();
     }
 }
 
 void MainWindow::updateTrackersListSlot() {
-    // QFuture<void> f1 = QtConcurrent::run(&loadTrackersFromSettings);
-    //! TODO: chame loadTrackersFromSettings concorrentemente, e só execute o resto quando terminar
     loadTrackersFromSettings();
     ui->nextPassesView->setTrackers(trackedSatellites->getTrackersPointer());
     ui->nextPassesView->repaint();
@@ -463,16 +459,20 @@ void MainWindow::updateTrackersListSlot() {
     ui->statusBar->showMessage("Última atualização: " + lastUpdate.toString());
 }
 
-void MainWindow::updateTLECheckSlot() {
+void MainWindow::checkTLEUpdateSlot() {
     QDateTime now = QDateTime::currentDateTime();
     QDateTime lastUpdate = Settings::getLastUpdatedDate();
     prevTime = now;
 
     if (lastUpdate < now.addDays(-1)) {
-        ui->statusBar->showMessage("Atualizando");
-        qDebug() << "hello from thread" << QThread::currentThread();
-        QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
+        updateTLE();
     }
+}
+
+void MainWindow::updateTLE() {
+    ui->statusBar->showMessage("Atualizando"); //! @todo Deixar mensagem fixa
+    QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
+    f1.waitForFinished(); // será que precisa?
 }
 
 void MainWindow::updateAzOffsetSlot() {

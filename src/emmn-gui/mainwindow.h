@@ -30,6 +30,11 @@ public:
      */
     void enableSatelliteButtons(bool enable = true);
 
+
+    /*! \brief Atualiza TLEs
+     */
+    void updateTLE();
+
     ~MainWindow();
 
 private:
@@ -46,7 +51,7 @@ private:
 
     /*! \brief Modifica porta serial utilizada pelo programa basead
      */
-    void setPortFromSettings();
+    void controlSetup();
 
     /*! \brief Carrega satélites salvos persistentemente e insere-os na classe do ListModel
      */
@@ -83,7 +88,7 @@ public slots:
 
     /*! \brief Slot chamado ao clicar em Arquivo > Atualizar TLEs
      */
-   void updateTLESlot(bool);
+   void forceUpdateTLESlot(bool);
 
     /*! \brief Envia sinal de power pra antena
      */
@@ -117,9 +122,9 @@ public slots:
      */
     void updateTrackersListSlot();
 
-    /*! \brief Chamada periodicamente para verificar se TLEs precisam de atualização
+    /*! \brief Verifica se TLEs precisam ser atualizadas
      */
-    void updateTLECheckSlot();
+    void checkTLEUpdateSlot();
 
     /*! \brief Offset do azimute para posicionamento da antena
      */
