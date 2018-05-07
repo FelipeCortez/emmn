@@ -93,8 +93,6 @@ public:
     /*! \brief Determina como a posição da antena será atualizada
      *
      * @param controller Modo de controle (manual ou automático)
-     *
-     * @todo Refatorar para setControlMode
      */
     void setControlMode(ControlMode controlMode);
 

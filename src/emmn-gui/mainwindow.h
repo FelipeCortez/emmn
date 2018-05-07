@@ -47,13 +47,13 @@ private:
     Control* control;                     //! Controle da antena
     Logger* logger;                       //! Logger para posição da antena
     Network network;                      //! Conexão com a Internet para atualizar TLEs
-    QDateTime prevTime;                   //! Hora lida (para atualizar próximas passagens)
+    QDateTime prevTime;                   //! Última hora registrada (para atualizar próximas passagens)
 
-    /*! \brief Modifica porta serial utilizada pelo programa basead
+    /*! \brief Determina porta serial utilizada pelo programa
      */
     void controlSetup();
 
-    /*! \brief Carrega satélites salvos persistentemente e insere-os na classe do ListModel
+    /*! \brief Carrega satélites salvos persistentemente e insere-os numa instância de TrackerListModel
      */
     void loadTrackersFromSettings();
 
