@@ -23,7 +23,10 @@ Tracker::Tracker(QList<QString> tle_list)
     , tle2(tle_list[2])
 {}
 
-Tracker::Tracker(std::string commonName, std::string tle1, std::string tle2)
+Tracker::Tracker(
+        std::string commonName,
+        std::string tle1,
+        std::string tle2)
     : userGeo(Helpers::latitude, Helpers::longitude, Helpers::altitude)
     , commonName(QString::fromStdString(commonName))
     , tle1(QString::fromStdString(tle1))

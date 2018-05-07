@@ -9,8 +9,7 @@ Network::Network(QObject *parent)
 }
 
 void Network::updateSatelliteCatalogue() {
-    qDebug() << "hello from thread" << QThread::currentThread();
-
+    qDebug() << "update 1";
     QNetworkRequest req;
     req.setUrl(QUrl("https://www.space-track.org/ajaxauth/login"));
     req.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");
@@ -20,12 +19,16 @@ void Network::updateSatelliteCatalogue() {
     postData.addQueryItem("identity", credentials[0]);
     postData.addQueryItem("password", credentials[1]);
 
-    //qDebug() << postData.toString(QUrl::FullyEncoded).toUtf8();
     reply = manager.post(req, postData.toString(QUrl::FullyEncoded).toUtf8());
-    connect(reply, SIGNAL(finished()), this, SLOT(cookiesDownloadFinished()));
+    connect(reply,
+            SIGNAL(finished()),
+            this,
+            SLOT(cookiesDownloadFinished()));
 
     #ifndef QT_NO_SSL
-        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), SLOT(sslErrors(QList<QSslError>)));
+        connect(reply,
+                SIGNAL(sslErrors(QList<QSslError>)),
+                SLOT(sslErrors(QList<QSslError>)));
     #endif
 }
 
@@ -45,6 +48,8 @@ void Network::sslErrors(const QList<QSslError> &errors)
 #endif
 
 void Network::cookiesDownloadFinished() {
+    qDebug() << "update 2";
+
     QByteArray bytes = reply->readAll(); // bytes
     QString replyString(bytes); // string
     QVariant cookieVar = reply->header(QNetworkRequest::SetCookieHeader);
@@ -55,21 +60,31 @@ void Network::cookiesDownloadFinished() {
         }
     }
 
-    reply->deleteLater();
+    qDebug() << "update 3";
 
-    getTLEs();
-}
-
-void Network::getTLEs() {
     QNetworkRequest req;
-    req.setUrl(QUrl("https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/EPOCH/%3Enow-30/MEAN_MOTION/%3E11.25/format/3le"));
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    req.setUrl(QUrl("https://www.space-track.org/"
+                    "basicspacedata/query/"
+                    "class/tle_latest/"
+                    "ORDINAL/1/"
+                    "EPOCH/%3Enow-30/"
+                    "MEAN_MOTION/%3E11.25/"
+                    "format/3le"));
+    req.setHeader(QNetworkRequest::ContentTypeHeader,
+                  "application/x-www-form-urlencoded");
     reply = manager.get(req);
 
-    connect(reply, SIGNAL(finished()), this, SLOT(tlesDownloadFinished()));
+    connect(reply,
+            SIGNAL(finished()),
+            this,
+            SLOT(tlesDownloadFinished()));
 }
 
 void Network::tlesDownloadFinished() {
+    qDebug() << "update 4";
+
+    // bottleneck aqui!
+
     QStringList tleList;
 
     while (reply->canReadLine()) {
@@ -81,6 +96,8 @@ void Network::tlesDownloadFinished() {
     if (tleList.size() > 0) {
         Helpers::saveTLEList(tleList);
     }
+
+    qDebug() << "update 5";
 
     emit updateTrackersUI();
 

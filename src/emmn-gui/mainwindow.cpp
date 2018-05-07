@@ -183,7 +183,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         ui->satelliteGroupBox->setTitle(tracker.getCommonName());
         ui->nextPassesView->repaint();
 
-        QList<PassDetails> pd = tracker.generatePassList();
+        QList<PassDetails> pd = tracker.getPassList();
         // http://stackoverflow.com/a/11907059
         const int numRows = pd.size();
         const int numColumns = 1;
@@ -232,6 +232,7 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         enableSatelliteButtons(false);
 
         QList<PassDetailsWithTracker> allPasses = trackedSatellites->getAllPasses();
+        qDebug() << allPasses.size();
         const int numRows = allPasses.size();
         const int numColumns = 1;
 
@@ -471,8 +472,7 @@ void MainWindow::checkTLEUpdateSlot() {
 
 void MainWindow::updateTLE() {
     ui->statusBar->showMessage("Atualizando"); //! @todo Deixar mensagem fixa
-    QFuture<void> f1 = QtConcurrent::run(&network, &Network::updateSatelliteCatalogue);
-    f1.waitForFinished(); // será que precisa?
+    network.updateSatelliteCatalogue();
 }
 
 void MainWindow::updateAzOffsetSlot() {

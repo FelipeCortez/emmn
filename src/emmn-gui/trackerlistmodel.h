@@ -82,8 +82,7 @@ private:
     QList<Tracker> trackers;
     QList<PassDetailsWithTracker> allPasses;
     /*! \brief Gera lista com todas as passagens */
-    void generatePassList(const DateTime& start_time = DateTime::Now(true),
-                          const DateTime& end_time = DateTime::Now(true).AddHours(24));
+    void generatePassListForAllTrackers();
 
 };
 

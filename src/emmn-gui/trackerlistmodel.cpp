@@ -9,7 +9,7 @@ QModelIndex TrackerListModel::addTracker(const Tracker &tracker, bool recalculat
     beginInsertRows(QModelIndex(), rowIndex, rowIndex);
     trackers.push_back(tracker);
     endInsertRows();
-    if (recalculatePassList) { generatePassList(); }
+    if (recalculatePassList) { generatePassListForAllTrackers(); }
     return index(rowIndex);
 }
 
@@ -61,7 +61,7 @@ bool TrackerListModel::removeRows(int row, int count, const QModelIndex &parent)
     }
 
     endRemoveRows();
-    generatePassList();
+    generatePassListForAllTrackers();
 
     return true;
 }
@@ -92,10 +92,10 @@ bool comparePassDetails(PassDetailsWithTracker pd1, PassDetailsWithTracker pd2) 
     return pd1.passDetails.aos < pd2.passDetails.aos;
 }
 
-void TrackerListModel::generatePassList(const DateTime& start_time, const DateTime& end_time) {
+void TrackerListModel::generatePassListForAllTrackers() {
     QList<PassDetailsWithTracker> allPassList;
     for (auto &t : trackers) {
-        QList<PassDetails> pdList = t.generatePassList(start_time, end_time);
+        QList<PassDetails> pdList = t.generatePassList();
         for (auto pd : pdList) {
             PassDetailsWithTracker pdt;
             pdt.tracker = &t;
@@ -126,6 +126,6 @@ QList<PassDetailsWithTracker> TrackerListModel::getAllPasses() {
 
 void TrackerListModel::setTracker(int row, Tracker tracker) {
     trackers[row] = tracker;
-    generatePassList();
+    generatePassListForAllTrackers();
 }
 
