@@ -159,7 +159,7 @@ bool Tracker::isPassReverse(PassDetails pd) const
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
         //double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
-        double currentAz = topo.azimuth;
+        double currentAz = Helpers::radToDeg(topo.azimuth);
         currentAz = Helpers::angleWrap(currentAz);
 
         if (prevAz != -1) {
