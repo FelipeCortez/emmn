@@ -12,6 +12,12 @@
 #include <QList>
 #include <QMetaType>
 
+//! Azimute e elevação
+struct AzEle {
+    double azimuth;
+    double elevation;
+};
+
 //! Detalhes de uma passagem
 struct PassDetails
 {
@@ -67,6 +73,7 @@ public:
     QString getSatCatNumber() const;
     double getAzimuthForObserver();
     double getElevationForObserver();
+    AzEle getAzEleAtTime(DateTime time) const;
     QList<QString> getTle();
     void setTle(QList<QString> tle);
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);

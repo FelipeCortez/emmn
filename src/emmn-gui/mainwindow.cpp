@@ -430,7 +430,15 @@ void MainWindow::modeRadioButtonsChanged(bool) {
 }
 
 void MainWindow::debugSlot(bool) {
-    //
+    for (auto pass : trackedSatellites->getAllPasses()) {
+        auto time = pass.passDetails.aos;
+        qDebug() << pass.tracker->getCommonName();
+        qDebug() << QString::fromStdString(time.ToString());
+        while (time < pass.passDetails.los) {
+            qDebug() << pass.tracker->getAzEleAtTime(time).azimuth;
+            time = time.AddMinutes(1);
+        }
+    }
 }
 
 void MainWindow::sendPowerSlot(bool) {

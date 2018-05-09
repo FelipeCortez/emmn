@@ -6,15 +6,9 @@
 #include <QList>
 #include <QDateTime>
 #include <QtSerialPort/QSerialPortInfo>
+#include "DateTime.h"
 #include "tracker.h"
 #include "trackerlistmodel.h"
-#include "DateTime.h"
-
-//! Azimute e elevação
-struct AzEle {
-    double azimuth;
-    double elevation;
-};
 
 //! Funções de configuração
 namespace Settings {

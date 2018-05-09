@@ -422,6 +422,18 @@ double Tracker::getElevationForObserver() {
     return Helpers::radToDeg(topo.elevation);
 }
 
+AzEle Tracker::getAzEleAtTime(DateTime time) const {
+    Observer obs(userGeo);
+    SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
+    Eci eci = sgp4.FindPosition(time);
+    CoordTopocentric topo = obs.GetLookAngle(eci);
+
+    AzEle azEle;
+    azEle.azimuth = Helpers::radToDeg(topo.azimuth);
+    azEle.elevation = Helpers::radToDeg(topo.elevation);
+    return azEle;
+}
+
 QString Tracker::nextPass() {
     if (passList.empty() || passList.at(0).aos.Ticks() < DateTime::Now().Ticks()) {
         passList = generatePassList();
