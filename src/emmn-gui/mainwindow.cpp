@@ -193,7 +193,8 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
         tableModel->setHorizontalHeaderLabels(QStringList() << "Aquisição de sinal"
                                                             << "Perda de sinal"
                                                             << "El. máx."
-                                                            << "Duração");
+                                                            << "Duração"
+                                                            << "Tipo");
 
         if (pd.begin() == pd.end()) {
             qDebug() << "no passes found";
@@ -219,6 +220,10 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 text = QString::fromStdString((itr->los - itr->aos).ToString());
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 3, item);
+
+                text = itr->reverse ? QString("Inversa") : QString("Normal");
+                item = new QStandardItem(text);
+                tableModel->setItem(row, 4, item);
 
                 ++row;
             } while (++itr != pd.end());

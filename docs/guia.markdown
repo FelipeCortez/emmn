@@ -32,7 +32,7 @@ instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, ins
 ## Estilo
 
 Você é livre para usar o estilo que quiser, mas caso queira continuar usando a formatação atual,
-eu sigo estes padrões:
+siga estes padrões:
 
  - Quatro espaços para indentação
  - Espaço entre `if`, `while`, `for` etc e `(`
@@ -53,3 +53,10 @@ default:
 
 ## Miscelânea
  - Ao mudar o diretório de build pelo Qt, é preciso copiar os arquivos dll do `ssh` (`libeay32.dll` e `ssleay32.dll`) para o diretório que contém o executável.
+
+## O que o programa deve fazer e faz
+ - Adicionar e remover satélites para rastreio
+ - Atualizar TLEs automaticamente todo dia
+ - Enviar comandos de apontamento (azimute e elevação) para o Arduino
+ - Controlar manualmente a antena (azimute e elevação arbitrários)
+ - Gravar histórico de posicionamento da antena em arquivos `.csv`
