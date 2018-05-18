@@ -158,8 +158,8 @@ bool Tracker::isPassReverse(PassDetails pd) const
         Eci eci = sgp4.FindPosition(current_time);
         CoordTopocentric topo = obs.GetLookAngle(eci);
 
-        //double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
-        double currentAz = Helpers::radToDeg(topo.azimuth);
+        double currentAz = Helpers::geographicalToMechanical(Helpers::radToDeg(topo.azimuth));
+        // double currentAz = Helpers::radToDeg(topo.azimuth);
         currentAz = Helpers::angleWrap(currentAz);
 
         if (prevAz != -1) {
@@ -406,7 +406,7 @@ QList<PassDetails> Tracker::getPassList() const {
     return passList;
 }
 
-double Tracker::getAzimuthForObserver() {
+double Tracker::getGeographicalAzimuth() {
     Observer obs(userGeo);
     SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
@@ -414,7 +414,7 @@ double Tracker::getAzimuthForObserver() {
     return Helpers::radToDeg(topo.azimuth);
 }
 
-double Tracker::getElevationForObserver() {
+double Tracker::getGeographicalElevation() {
     Observer obs(userGeo);
     SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(DateTime::Now().AddSeconds(1));
@@ -422,7 +422,7 @@ double Tracker::getElevationForObserver() {
     return Helpers::radToDeg(topo.elevation);
 }
 
-AzEle Tracker::getAzEleAtTime(DateTime time) const {
+AzEle Tracker::getGeographicalAzEleAtTime(DateTime time) const {
     Observer obs(userGeo);
     SGP4 sgp4(Tle(commonName.toStdString(), tle1.toStdString(), tle2.toStdString()));
     Eci eci = sgp4.FindPosition(time);

@@ -71,9 +71,10 @@ public:
     QString getFullTLE() const;
     QString getSatInfo(int info) const;
     QString getSatCatNumber() const;
-    double getAzimuthForObserver();
-    double getElevationForObserver();
-    AzEle getAzEleAtTime(DateTime time) const;
+    double getGeographicalAzimuth();
+    double getMechanicalAzimuth();
+    double getGeographicalElevation();
+    AzEle getGeographicalAzEleAtTime(DateTime time) const;
     QList<QString> getTle();
     void setTle(QList<QString> tle);
     friend QDataStream &operator <<(QDataStream &stream, const Tracker &val);

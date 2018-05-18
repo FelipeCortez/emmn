@@ -373,7 +373,7 @@ void MainWindow::satInfoUpdateSlot() {
             prevTime = QDateTime::currentDateTime();
         }
 
-        if (nextPass.tracker->getElevationForObserver() >= 0) {
+        if (nextPass.tracker->getGeographicalElevation() >= 0) {
             ui->nextPassCountdownLabel->setText("Passando");
         } else {
             ui->nextPassCountdownLabel->setText(QString::fromStdString(remaining.ToString()));
@@ -439,8 +439,18 @@ void MainWindow::debugSlot(bool) {
         auto time = pass.passDetails.aos;
         qDebug() << pass.tracker->getCommonName();
         qDebug() << QString::fromStdString(time.ToString());
+        if (pass.passDetails.reverse) { qDebug() << "reverse"; }
+
         while (time < pass.passDetails.los) {
-            qDebug() << pass.tracker->getAzEleAtTime(time).azimuth;
+            double geoAz = pass.tracker->getGeographicalAzEleAtTime(time).azimuth;
+            double mechAz = Helpers::geographicalToMechanical(geoAz);
+
+            if (pass.passDetails.reverse) {
+                mechAz = fmod(mechAz + 180, 360);
+            }
+
+            qDebug() << geoAz << mechAz;
+
             time = time.AddMinutes(1);
         }
     }

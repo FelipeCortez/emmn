@@ -330,25 +330,28 @@ void Control::updateSlot() {
             float secondsRemaining = remaining.Ticks() / (1e6f); // microseconds to seconds
             float positioningTime = 60;
 
-            if (nextPass.tracker->getElevationForObserver() >= 0.0f) {
-                double az = nextPass.tracker->getAzimuthForObserver();
-                double ele = nextPass.tracker->getElevationForObserver();
+            if (nextPass.tracker->getGeographicalElevation() >= 0.0f) {
+                double geoAz = nextPass.tracker->getGeographicalAzimuth();
+                double mechAz = Helpers::geographicalToMechanical(geoAz);
+                double ele = nextPass.tracker->getGeographicalElevation();
+
                 if (nextPass.passDetails.reverse) {
-                    az = fmod(az + 180, 360);
+                    mechAz = fmod(mechAz + 180, 360);
                     ele = 180 - ele;
                 }
 
-                setTarget(az, ele);
+                setTarget(mechAz, ele);
             } else if (secondsRemaining <= positioningTime &&
                        secondsRemaining > 0) {
-                double az = nextPass.tracker->getAzimuthForObserver();
+                double geoAz = nextPass.tracker->getGeographicalAzimuth();
+                double mechAz = Helpers::geographicalToMechanical(geoAz);
                 double ele = 0.0f;
                 if (nextPass.passDetails.reverse) {
-                    az = fmod(az + 180, 360);
+                    mechAz = fmod(mechAz + 180, 360);
                     ele = 180 - ele;
                 }
 
-                setTarget(az, ele);
+                setTarget(mechAz, ele);
             } else {
                 setTarget(180, 90);
             }

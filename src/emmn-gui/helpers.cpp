@@ -150,11 +150,11 @@ namespace Helpers {
     }
 
     float geographicalToMechanical(float azimuth) {
-        return azimuth - Settings::getAzOffset();
+        return angleWrap(azimuth - Settings::getAzOffset());
     }
 
     float mechanicalToGeographical(float azimuth) {
-        return azimuth + Settings::getAzOffset();
+        return angleWrap(azimuth + Settings::getAzOffset());
     }
 
     QList<QSerialPortInfo> getSerialPortsAvailable() {

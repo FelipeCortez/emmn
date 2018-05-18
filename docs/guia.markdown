@@ -21,6 +21,10 @@ instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, ins
  - Network: responsável pela comunicação com a Internet para atualizar TLEs
  - Logger: utilidade para salvar arquivos com dados de posição da antena e timestamps
 
+### Bibliotecas
+ - SGP4: recebe TLEs e gera posições de azimute e elevação
+ - SolTrack: rastreia o sol
+
 ## Documentação
 
  - O projeto é documentado com Doxygen. Para gerar a documentação, rode o Doxywizard
@@ -56,7 +60,11 @@ default:
 
 ## O que o programa deve fazer e faz
  - Adicionar e remover satélites para rastreio
+ - Definir ordem de prioridade de satélites para rastreio
  - Atualizar TLEs automaticamente todo dia
  - Enviar comandos de apontamento (azimute e elevação) para o Arduino
  - Controlar manualmente a antena (azimute e elevação arbitrários)
  - Gravar histórico de posicionamento da antena em arquivos `.csv`
+
+## O que o programa deve fazer e (ainda) não faz
+ - 
