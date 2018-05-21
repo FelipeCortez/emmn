@@ -75,7 +75,8 @@ void ManualControlDialog::tabChanged(int index) {
 
 void ManualControlDialog::updateAntennaInfo() {
     AzEle antennaInfo = control->getState();
-    ui->azimuthLabel->setText(QString::number(antennaInfo.azimuth));
+    ui->azimuthMechLabel->setText(QString::number(antennaInfo.azimuth));
+    ui->azimuthGeoLabel->setText(QString::number(Helpers::mechanicalToGeographical(antennaInfo.azimuth)));
     ui->elevationLabel->setText(QString::number(antennaInfo.elevation));
 }
 

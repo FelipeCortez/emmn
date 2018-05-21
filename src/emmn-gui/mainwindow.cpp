@@ -446,7 +446,7 @@ void MainWindow::debugSlot(bool) {
             double mechAz = Helpers::geographicalToMechanical(geoAz);
 
             if (pass.passDetails.reverse) {
-                mechAz = fmod(mechAz + 180, 360);
+                mechAz = Helpers::angleWrap(mechAz + 180);
             }
 
             qDebug() << geoAz << mechAz;
