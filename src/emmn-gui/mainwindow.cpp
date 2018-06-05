@@ -447,6 +447,7 @@ void MainWindow::debugSlot(bool) {
 
             if (pass.passDetails.reverse) {
                 mechAz = Helpers::angleWrap(mechAz + 180);
+                geoAz = Helpers::angleWrap(geoAz + 180);
             }
 
             qDebug() << geoAz << mechAz;

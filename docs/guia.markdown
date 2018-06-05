@@ -67,4 +67,4 @@ default:
  - Gravar histórico de posicionamento da antena em arquivos `.csv`
 
 ## O que o programa deve fazer e (ainda) não faz
- - 
+ - Várias coisas
