@@ -67,4 +67,15 @@ default:
  - Gravar histórico de posicionamento da antena em arquivos `.csv`
 
 ## O que o programa deve fazer e (ainda) não faz
- - Várias coisas
+- E
+
+## O que o programa poderia fazer e (ainda) não faz
+Na documentação Doxygen é possível ver uma lista de tarefas extraídas dos comentários `@todo`. As melhorias por ordem de relevância são
+
+- Atualizar lista de TLEs obtidas do SpaceTrack numa thread diferente. A maneira atual bloqueia a thread da interface
+- Tirar userGeo da classe Tracker
+- Instanciar Settings apenas na inicialização do programa
+- Colocar velocidade máxima e aceleração da antena nas configurações
+- A classe Control utiliza a biblioteca `CSerial`, mas o Qt possui funções para comunicação com porta serial no cabeçalho `QSerialPort`. A mudança para a biblioteca do Qt eliminaria uma dependência e possivelmente aumentaria a portabilidade
+- Interação com o mouse no widget gráfico de próximas passagens
+- Colocar localização geográfica nas configurações
