@@ -1,9 +1,16 @@
-QT += testlib
+QT += testlib core serialport
 
 CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
-HEADERS += $$PWD\..\emmn-gui\helpers.h
+SOURCES += \
+    tst_helperstest.cpp \
+    $$PWD\..\emmn-gui\helpers.cpp \
+    $$PWD\..\emmn-gui\tracker.cpp \
+    $$PWD\..\emmn-gui\trackerlistmodel.cpp
 
-SOURCES += tst_helperstest.cpp
+
+INCLUDEPATH += $$PWD\..\emmn-gui
+
+include(../emmn.pri)

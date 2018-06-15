@@ -6,6 +6,7 @@
 #include <Util.h>
 #include <CoordTopocentric.h>
 #include <CoordGeodetic.h>
+#include "DateTime.h"
 #include <vector>
 #include <list>
 #include <QString>
@@ -53,13 +54,40 @@ public:
     Tracker(std::vector<std::string> tle_list);
     Tracker(QList<QString> tle_list);
     Tracker(std::string commonName, std::string tle1, std::string tle2);
+
+    /*! \brief Transforma uma data da classe DateTime (SGP4)  em string
+     *
+     * Formatação YYYY/MM/DD HH:MM:SS UTC/GMT
+     *
+     * @param date Classe DateTime da biblioteca SGP4
+     */
+    static QString betterDate(DateTime date);
+
+    /*! \brief Encontra elevação máxima para uma passagem
+     *
+     * @param aos Acquistion of Signal
+     * @param los Loss of Signal
+     */
     double FindMaxElevation(
         const DateTime& aos,
         const DateTime& los) const;
+
+    /*! \brief Encontra horário em que passagem começa
+     *
+     * @param initial_time1 Horário inicial
+     * @param initial_time2 Horário final
+     */
     DateTime FindCrossingPoint(
         const DateTime& initial_time1,
         const DateTime& initial_time2,
         bool finding_aos) const;
+
+    /*! \brief Gera lista de passagens entre dois timestamps
+     *
+     * @param start_time Horário inicial
+     * @param end_time Horário final
+     * @param time_step Valor do "passo" em segundos
+     */
     QList<PassDetails> generatePassList(
         const DateTime& start_time = DateTime::Now(true),
         const DateTime& end_time = DateTime::Now(true).AddDays(7.0),

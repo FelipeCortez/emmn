@@ -33,6 +33,25 @@ Tracker::Tracker(
     , tle2(QString::fromStdString(tle2))
 {}
 
+QString Tracker::betterDate(DateTime date) {
+    QString zone;
+
+    if (Settings::getUseLocalTime()) {
+        date = date.AddHours(-3);
+        zone = "(GMT-3)";
+    } else {
+        zone = "UTC";
+    }
+
+    return QString("%1/%2/%3 %4:%5:%6 %7").arg(date.Year())
+                                          .arg(date.Month(), 2, 10, QChar('0'))
+                                          .arg(date.Day(), 2, 10, QChar('0'))
+                                          .arg(date.Hour(), 2, 10, QChar('0'))
+                                          .arg(date.Minute(), 2, 10, QChar('0'))
+                                          .arg(date.Second(), 2, 10, QChar('0'))
+                                          .arg(zone);
+}
+
 void Tracker::setTle(QList<QString> tle) {
     commonName = tle[0];
     tle1 = tle[1];

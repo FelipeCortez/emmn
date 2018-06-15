@@ -205,11 +205,11 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                 QString text;
                 QStandardItem* item;
 
-                text = Helpers::betterDate(itr->aos);
+                text = Tracker::betterDate(itr->aos);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 0, item);
 
-                text = Helpers::betterDate(itr->los);
+                text = Tracker::betterDate(itr->los);
                 item = new QStandardItem(text);
                 tableModel->setItem(row, 1, item);
 
@@ -268,11 +268,11 @@ void MainWindow::rowChangedSlot(QItemSelection selected, QItemSelection) {
                     item = new QStandardItem(text);
                     tableModel->setItem(row, 0, item);
 
-                    text = Helpers::betterDate(itr->passDetails.aos);
+                    text = Tracker::betterDate(itr->passDetails.aos);
                     item = new QStandardItem(text);
                     tableModel->setItem(row, 1, item);
 
-                    text = Helpers::betterDate(itr->passDetails.los);
+                    text = Tracker::betterDate(itr->passDetails.los);
                     item = new QStandardItem(text);
                     tableModel->setItem(row, 2, item);
 

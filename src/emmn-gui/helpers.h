@@ -6,7 +6,6 @@
 #include <QList>
 #include <QDateTime>
 #include <QtSerialPort/QSerialPortInfo>
-#include "DateTime.h"
 #include "tracker.h"
 #include "trackerlistmodel.h"
 
@@ -68,14 +67,6 @@ namespace Helpers {
     const float longitude = -35.201f;
     const float altitude = 0.014f;
 
-    /*! \brief Transforma uma data da classe DateTime (SGP4)  em string
-     *
-     * Formatação YYYY/MM/DD HH:MM:SS UTC/GMT
-     *
-     * @param date Classe DateTime da biblioteca SGP4
-     */
-    QString betterDate(DateTime date);
-
     /*! \brief Transforma um horário em string
      *
      * Formatação HH:MM
@@ -92,17 +83,13 @@ namespace Helpers {
      *
      * Para -10, 5, saída é -5 <br>
      * Para  10, 5, saída é 5 <br>
-     * Para  3, 4, saída é 3 <br>
+     * Para   3, 4, saída é 3 <br>
      * Para  -3, 4, saída é -3 <br>
      *
      * @param val Valor a ser limitado
      * @param max Módulo máximo (limite)
      */
     double clip(double val, double max);
-
-    /*! \brief Converte ângulo para limites [0, 360[
-     */
-    double angleWrap(double angle);
 
     /*! \brief Converte ângulo para limites [0, 360[
      */
