@@ -24,6 +24,7 @@ instanciada e mostrada ao usuário. O construtor de MainWindow, por sua vez, ins
 ### Bibliotecas
  - SGP4: recebe TLEs e gera posições de azimute e elevação
  - SolTrack: rastreia o sol
+ - CSerial: comunicação com porta serial
 
 ## Documentação
 
@@ -67,7 +68,7 @@ default:
  - Gravar histórico de posicionamento da antena em arquivos `.csv`
 
 ## O que o programa deve fazer e (ainda) não faz
-- E
+- Definição de parâmetros para cada satélite rastreado
 
 ## O que o programa poderia fazer e (ainda) não faz
 Na documentação Doxygen é possível ver uma lista de tarefas extraídas dos comentários `@todo`. As melhorias por ordem de relevância são
@@ -79,3 +80,45 @@ Na documentação Doxygen é possível ver uma lista de tarefas extraídas dos c
 - A classe Control utiliza a biblioteca `CSerial`, mas o Qt possui funções para comunicação com porta serial no cabeçalho `QSerialPort`. A mudança para a biblioteca do Qt eliminaria uma dependência e possivelmente aumentaria a portabilidade
 - Interação com o mouse no widget gráfico de próximas passagens
 - Colocar localização geográfica nas configurações
+
+## Classes
+
+### Interface gráfica
+
+#### MainWindow
+Janela principal do programa. A classe faz a inicialização de todo o sistema e contém timers para leitura de estado da antena.
+
+#### AddTrackerDialog
+Caixa de diálogo para inserção de um satélite
+
+#### JoystickWidget
+Widget para controle da antena através de um joystick virtual.
+
+#### ManualControlDialog
+
+
+#### Control
+Lógica de manipulação da antena. Envia e recebe comandos de hardware
+
+#### Helpers
+Contém funções auxiliares divididas em dois namespaces. Settings contém funções para carregar e salvar configurações. Helpers contém funções de conversões matemáticas, formatação de data e horários, leituras de arquivo etc.
+
+#### Logger
+Classe responsável pelo registro periódico de informações contendo posição da antena em azimute e elevação, velocidade, etc.
+
+#### Network
+#### NextPassesView
+#### Serial
+#### SettingsDialog
+#### Serial
+#### SolTrack
+#### Tracker
+#### TrackerListModel
+
+## Configurações
+
+### emmn-gui.pro
+Atualizada automaticamente pelo Qt toda vez que uma classe é criada. Informa ao compilador quais são os arquivos utilizados pelo programa.
+
+### emmn.pri
+Arquivo de includes do Qt.

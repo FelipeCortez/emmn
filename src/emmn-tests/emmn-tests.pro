@@ -1,10 +1,9 @@
 QT += testlib
-QT += gui network serialport
 
 CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
-SOURCES +=  tst_testfirst.cpp
+HEADERS += $$PWD\..\emmn-gui\helpers.h
 
-include(../emmn.pri)
+SOURCES += tst_helperstest.cpp
